@@ -68,9 +68,7 @@ node_modules/
 .vscode
 *.code-workspace
 
-#css
-public/css/style.css
-public/css/style.css.map
+#firebase
 functions/serviceAccountKey.json
 functions/serviceAccountKey_live.json
 functions/serviceAccountKey_copy.json
@@ -80,4 +78,8 @@ functions/serviceAccountKey_live_copy.json
 functions/serviceAccountKey_copy.json
 functions/serviceAccountKey_live_copy.json
 
+#generated files
+public/css/style.css
+public/css/style.css.map
 public/css/style.min.css
+public/js/monkeytype.js
