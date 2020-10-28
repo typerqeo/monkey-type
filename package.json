@@ -2,7 +2,9 @@
   "name": "monkeytype",
   "version": "1.5.3",
   "license": "GPL-3.0",
+  "private": true,
   "scripts": {
+    "build": "webpack",
     "start": "firebase serve",
     "postinstall": "cd functions && npm install"
   },
@@ -12,7 +14,9 @@
   "devDependencies": {
     "husky": "^4.3.0",
     "prettier": "2.1.2",
-    "pretty-quick": "^3.1.0"
+    "pretty-quick": "^3.1.0",
+    "webpack": "^5.2.0",
+    "webpack-cli": "^4.1.0"
   },
   "husky": {
     "hooks": {
