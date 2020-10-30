@@ -1,8 +1,10 @@
 const db = firebase.firestore();
 
-let dbSnapshot = null;
+export const UserData = {
+  dbSnapshot: null,
+};
 
-async function db_getUserSnapshot() {
+export async function db_getUserSnapshot() {
   let user = firebase.auth().currentUser;
   if (user == null) return false;
   let snap = {
@@ -96,18 +98,18 @@ async function db_getUserSnapshot() {
       .catch((e) => {
         throw e;
       });
-    dbSnapshot = snap;
+    UserData.dbSnapshot = snap;
   } catch (e) {
     console.error(e);
   }
-  return dbSnapshot;
+  return UserData.dbSnapshot;
 }
 
 async function db_getUserResults() {
   let user = firebase.auth().currentUser;
   if (user == null) return false;
-  if (dbSnapshot === null) return false;
-  if (dbSnapshot.results !== undefined) {
+  if (UserData.dbSnapshot === null) return false;
+  if (UserData.dbSnapshot.results !== undefined) {
     return true;
   } else {
     try {
@@ -117,12 +119,12 @@ async function db_getUserResults() {
         .limit(1000)
         .get()
         .then((data) => {
-          dbSnapshot.results = [];
+          UserData.dbSnapshot.results = [];
           let len = data.docs.length;
           data.docs.forEach((doc, index) => {
             let result = doc.data();
             result.id = doc.id;
-            dbSnapshot.results.push(result);
+            UserData.dbSnapshot.results.push(result);
           });
           return true;
         })
@@ -145,7 +147,7 @@ async function db_getUserHighestWpm(
 ) {
   function cont() {
     let topWpm = 0;
-    dbSnapshot.results.forEach((result) => {
+    UserData.dbSnapshot.results.forEach((result) => {
       if (
         result.mode == mode &&
         result.mode2 == mode2 &&
@@ -162,7 +164,10 @@ async function db_getUserHighestWpm(
   }
 
   let retval;
-  if (dbSnapshot == null || dbSnapshot.results === undefined) {
+  if (
+    UserData.dbSnapshot == null ||
+    UserData.dbSnapshot.results === undefined
+  ) {
     // await db_getUserResults().then(data => {
     //     retval = cont();
     // });
@@ -177,7 +182,7 @@ async function db_getLocalPB(mode, mode2, punctuation, language, difficulty) {
   function cont() {
     let ret = 0;
     try {
-      dbSnapshot.personalBests[mode][mode2].forEach((pb) => {
+      UserData.dbSnapshot.personalBests[mode][mode2].forEach((pb) => {
         if (
           pb.punctuation == punctuation &&
           pb.difficulty == difficulty &&
@@ -193,7 +198,7 @@ async function db_getLocalPB(mode, mode2, punctuation, language, difficulty) {
   }
 
   let retval;
-  if (dbSnapshot == null) {
+  if (UserData.dbSnapshot == null) {
     // await db_getUserResults().then(data => {
     //     retval = cont();
     // });
@@ -217,10 +222,10 @@ async function db_saveLocalPB(
   function cont() {
     try {
       let found = false;
-      if (dbSnapshot.personalBests[mode][mode2] === undefined) {
-        dbSnapshot.personalBests[mode][mode2] = [];
+      if (UserData.dbSnapshot.personalBests[mode][mode2] === undefined) {
+        UserData.dbSnapshot.personalBests[mode][mode2] = [];
       }
-      dbSnapshot.personalBests[mode][mode2].forEach((pb) => {
+      UserData.dbSnapshot.personalBests[mode][mode2].forEach((pb) => {
         if (
           pb.punctuation == punctuation &&
           pb.difficulty == difficulty &&
@@ -236,7 +241,7 @@ async function db_saveLocalPB(
       });
       if (!found) {
         //nothing found
-        dbSnapshot.personalBests[mode][mode2].push({
+        UserData.dbSnapshot.personalBests[mode][mode2].push({
           language: language,
           difficulty: difficulty,
           punctuation: punctuation,
@@ -249,8 +254,8 @@ async function db_saveLocalPB(
       }
     } catch (e) {
       //that mode or mode2 is not found
-      dbSnapshot.personalBests[mode] = {};
-      dbSnapshot.personalBests[mode][mode2] = [
+      UserData.dbSnapshot.personalBests[mode] = {};
+      UserData.dbSnapshot.personalBests[mode][mode2] = [
         {
           language: language,
           difficulty: difficulty,
@@ -266,7 +271,7 @@ async function db_saveLocalPB(
   }
 
   let retval;
-  if (dbSnapshot == null) {
+  if (UserData.dbSnapshot == null) {
     // await db_getUserResults().then(data => {
     //     retval = cont();
     // });
