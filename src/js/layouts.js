@@ -1,4 +1,4 @@
-const layouts = {
+export const layouts = {
     default: [],
     qwerty: [
         "`~","1!","2@","3#","4$","5%","6^","7&","8*","9(","0)","-_","=+",
