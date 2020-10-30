@@ -75,7 +75,7 @@ let commands = {
       id: "togglePunctuation",
       display: "Toggle punctuation",
       exec: () => {
-        togglePunctuation();
+        Config.togglePunctuation();
         restartTest();
       },
     },
@@ -157,7 +157,7 @@ let commands = {
       id: "toggleNumbers",
       display: "Toggle numbers",
       exec: () => {
-        toggleNumbers();
+        Config.toggleNumbers();
         restartTest();
       },
     },
@@ -165,58 +165,58 @@ let commands = {
       id: "toggleSmoothCaret",
       display: "Toggle smooth caret",
       exec: () => {
-        toggleSmoothCaret();
+        Config.toggleSmoothCaret();
       },
     },
     {
       id: "toggleQuickTab",
       display: "Toggle quick tab mode",
       exec: () => {
-        toggleQuickTabMode();
+        Config.toggleQuickTabMode();
       },
     },
     {
       id: "toggleShowLiveWpm",
       display: "Toggle live wpm display",
       exec: () => {
-        toggleShowLiveWpm();
-        saveConfigToCookie();
+        Config.toggleShowLiveWpm();
+        Config.saveConfigToCookie();
       },
     },
     {
       id: "toggleTimerBar",
       display: "Toggle timer display",
       exec: () => {
-        toggleShowTimerProgress();
-        saveConfigToCookie();
+        Config.toggleShowTimerProgress();
+        Config.saveConfigToCookie();
       },
     },
     {
       id: "toggleKeyTips",
       display: "Toggle keybind tips",
       exec: () => {
-        toggleKeyTips();
+        Config.toggleKeyTips();
       },
     },
     {
       id: "toggleFreedom",
       display: "Toggle freedom mode",
       exec: () => {
-        toggleFreedomMode();
+        Config.toggleFreedomMode();
       },
     },
     {
       id: "toggleBlindMode",
       display: "Toggle blind mode",
       exec: () => {
-        toggleBlindMode();
+        Config.toggleBlindMode();
       },
     },
     {
       id: "toggleIndicateTypos",
       display: "Toggle indicate typos",
       exec: () => {
-        toggleIndicateTypos();
+        Config.toggleIndicateTypos();
       },
     },
     // {
@@ -230,7 +230,7 @@ let commands = {
       id: "toggleQuickEnd",
       display: "Toggle quick end",
       exec: () => {
-        toggleQuickEnd();
+        Config.toggleQuickEnd();
       },
     },
     {
@@ -255,70 +255,70 @@ let commands = {
       id: "togglePlaySoundOnError",
       display: "Toggle play sound on error",
       exec: () => {
-        togglePlaySoundOnError();
+        Config.togglePlaySoundOnError();
       },
     },
     {
       id: "toggleFlipTestColors",
       display: "Toggle flip test colors",
       exec: () => {
-        toggleFlipTestColors();
+        Config.toggleFlipTestColors();
       },
     },
     {
       id: "toggleSmoothLineScroll",
       display: "Toggle smooth line scroll",
       exec: () => {
-        toggleSmoothLineScroll();
+        Config.toggleSmoothLineScroll();
       },
     },
     {
       id: "toggleAlwaysShowDecimalPlaces",
       display: "Toggle always show decimal places",
       exec: () => {
-        toggleAlwaysShowDecimalPlaces();
+        Config.toggleAlwaysShowDecimalPlaces();
       },
     },
     {
       id: "toggleAlwaysShowCPM",
       display: "Toggle always show CPM",
       exec: () => {
-        toggleAlwaysShowCPM();
+        Config.toggleAlwaysShowCPM();
       },
     },
     {
       id: "toggleSwapEscAndTab",
       display: "Toggle swap esc and tab",
       exec: () => {
-        toggleSwapEscAndTab();
+        Config.toggleSwapEscAndTab();
       },
     },
     {
       id: "toggleShowAllLines",
       display: "Toggle show all lines",
       exec: () => {
-        toggleShowAllLines();
+        Config.toggleShowAllLines();
       },
     },
     {
       id: "toggleColorfulMode",
       display: "Toggle colorful mode",
       exec: () => {
-        toggleColorfulMode();
+        Config.toggleColorfulMode();
       },
     },
     {
       id: "toggleShowOutOfFocusWarning",
       display: "Toggle out of focus warning",
       exec: () => {
-        toggleShowOutOfFocusWarning();
+        Config.toggleShowOutOfFocusWarning();
       },
     },
     {
       id: "togglePresetCustomTheme",
       display: "Toggle preset/custom theme",
       exec: () => {
-        togglePresetCustomTheme();
+        Config.togglePresetCustomTheme();
       },
     },
     {
@@ -433,7 +433,7 @@ let commands = {
       id: "toggleCapsLockBackspace",
       display: "Toggle caps lock backspace",
       exec: () => {
-        toggleCapsLockBackspace();
+        Config.toggleCapsLockBackspace();
       },
     },
     {
@@ -502,7 +502,7 @@ let commands = {
     {
       id: "randomiseTheme",
       display: "Next random theme",
-      exec: () => randomiseTheme(),
+      exec: () => Config.randomiseTheme(),
     },
     {
       id: "viewTypingPage",
@@ -576,7 +576,7 @@ let commands = {
                   bailout = true;
                   showResult();
                 } else {
-                  showNotification(
+                  Util.showNotification(
                     "You can only bailout out of test longer than 3600 seconds / 5000 words.",
                     5000
                   );
@@ -605,35 +605,35 @@ let commandsPageWidth = {
       id: "setPageWidth100",
       display: "100",
       exec: () => {
-        setPageWidth("100");
+        Config.setPageWidth("100");
       },
     },
     {
       id: "setPageWidth125",
       display: "125",
       exec: () => {
-        setPageWidth("125");
+        Config.setPageWidth("125");
       },
     },
     {
       id: "setPageWidth150",
       display: "150",
       exec: () => {
-        setPageWidth("150");
+        Config.setPageWidth("150");
       },
     },
     {
       id: "setPageWidth200",
       display: "200",
       exec: () => {
-        setPageWidth("200");
+        Config.setPageWidth("200");
       },
     },
     {
       id: "setPageWidthMax",
       display: "max",
       exec: () => {
-        setPageWidth("max");
+        Config.setPageWidth("max");
       },
     },
   ],
@@ -646,21 +646,21 @@ let commandsKeymapMode = {
       id: "setKeymapModeOff",
       display: "off",
       exec: () => {
-        changeKeymapMode("off");
+        Config.changeKeymapMode("off");
       },
     },
     {
       id: "setKeymapModeNext",
       display: "next",
       exec: () => {
-        changeKeymapMode("next");
+        Config.changeKeymapMode("next");
       },
     },
     {
       id: "setKeymapModeReact",
       display: "react",
       exec: () => {
-        changeKeymapMode("react");
+        Config.changeKeymapMode("react");
       },
     },
   ],
@@ -673,14 +673,14 @@ let commandsSoundOnClick = {
       id: "setSoundOnClickOff",
       display: "off",
       exec: () => {
-        setPlaySoundOnClick("off");
+        Config.setPlaySoundOnClick("off");
       },
     },
     {
       id: "setSoundOnClick1",
       display: "1",
       exec: () => {
-        setPlaySoundOnClick("1");
+        Config.setPlaySoundOnClick("1");
         playClickSound();
       },
     },
@@ -688,7 +688,7 @@ let commandsSoundOnClick = {
       id: "setSoundOnClick2",
       display: "2",
       exec: () => {
-        setPlaySoundOnClick("2");
+        Config.setPlaySoundOnClick("2");
         playClickSound();
       },
     },
@@ -696,7 +696,7 @@ let commandsSoundOnClick = {
       id: "setSoundOnClick3",
       display: "3",
       exec: () => {
-        setPlaySoundOnClick("3");
+        Config.setPlaySoundOnClick("3");
         playClickSound();
       },
     },
@@ -704,7 +704,7 @@ let commandsSoundOnClick = {
       id: "setSoundOnClick4",
       display: "4",
       exec: () => {
-        setPlaySoundOnClick("4");
+        Config.setPlaySoundOnClick("4");
         playClickSound();
       },
     },
@@ -718,21 +718,21 @@ let commandsRandomTheme = {
       id: "setRandomOff",
       display: "off",
       exec: () => {
-        setRandomTheme("off");
+        Config.setRandomTheme("off");
       },
     },
     {
       id: "setRandomOn",
       display: "on",
       exec: () => {
-        setRandomTheme("on");
+        Config.setRandomTheme("on");
       },
     },
     {
       id: "setRandomFav",
       display: "fav",
       exec: () => {
-        setRandomTheme("fav");
+        Config.setRandomTheme("fav");
       },
     },
   ],
@@ -745,21 +745,21 @@ let commandsDifficulty = {
       id: "setDifficultyNormal",
       display: "Normal",
       exec: () => {
-        setDifficulty("normal");
+        Config.setDifficulty("normal");
       },
     },
     {
       id: "setDifficultyExpert",
       display: "Expert",
       exec: () => {
-        setDifficulty("expert");
+        Config.setDifficulty("expert");
       },
     },
     {
       id: "setDifficultyMaster",
       display: "Master",
       exec: () => {
-        setDifficulty("master");
+        Config.setDifficulty("master");
       },
     },
   ],
@@ -772,35 +772,35 @@ let commandsCaretStyle = {
       id: "setCaretStyleOff",
       display: "off",
       exec: () => {
-        setCaretStyle("off");
+        Config.setCaretStyle("off");
       },
     },
     {
       id: "setCaretStyleDefault",
       display: "line",
       exec: () => {
-        setCaretStyle("default");
+        Config.setCaretStyle("default");
       },
     },
     {
       id: "setCaretStyleBlock",
       display: "block",
       exec: () => {
-        setCaretStyle("block");
+        Config.setCaretStyle("block");
       },
     },
     {
       id: "setCaretStyleOutline",
       display: "outline-block",
       exec: () => {
-        setCaretStyle("outline");
+        Config.setCaretStyle("outline");
       },
     },
     {
       id: "setCaretStyleUnderline",
       display: "underline",
       exec: () => {
-        setCaretStyle("underline");
+        Config.setCaretStyle("underline");
       },
     },
   ],
@@ -813,35 +813,35 @@ let commandsPaceCaretStyle = {
       id: "setPaceCaretStyleOff",
       display: "off",
       exec: () => {
-        setPaceCaretStyle("off");
+        Config.setPaceCaretStyle("off");
       },
     },
     {
       id: "setPaceCaretStyleDefault",
       display: "line",
       exec: () => {
-        setPaceCaretStyle("default");
+        Config.setPaceCaretStyle("default");
       },
     },
     {
       id: "setPaceCaretStyleBlock",
       display: "block",
       exec: () => {
-        setPaceCaretStyle("block");
+        Config.setPaceCaretStyle("block");
       },
     },
     {
       id: "setPaceCaretStyleOutline",
       display: "outline-block",
       exec: () => {
-        setPaceCaretStyle("outline");
+        Config.setPaceCaretStyle("outline");
       },
     },
     {
       id: "setPaceCaretStyleUnderline",
       display: "underline",
       exec: () => {
-        setPaceCaretStyle("underline");
+        Config.setPaceCaretStyle("underline");
       },
     },
   ],
@@ -854,14 +854,14 @@ let commandsPaceCaret = {
       id: "setPaceCaretOff",
       display: "off",
       exec: () => {
-        setPaceCaret("off");
+        Config.setPaceCaret("off");
       },
     },
     {
       id: "setPaceCaretPb",
       display: "pb",
       exec: () => {
-        setPaceCaret("pb");
+        Config.setPaceCaret("pb");
       },
     },
     {
@@ -869,8 +869,8 @@ let commandsPaceCaret = {
       display: "custom...",
       input: true,
       exec: (input) => {
-        setPaceCaretCustomSpeed(input);
-        setPaceCaret("custom");
+        Config.setPaceCaretCustomSpeed(input);
+        Config.setPaceCaret("custom");
       },
     },
     // {
@@ -891,7 +891,7 @@ let commandsMinWpm = {
       id: "setMinWpmOff",
       display: "off",
       exec: () => {
-        setMinWpm("off");
+        Config.setMinWpm("off");
       },
     },
     {
@@ -899,8 +899,8 @@ let commandsMinWpm = {
       display: "custom...",
       input: true,
       exec: (input) => {
-        setMinWpmCustomSpeed(input);
-        setMinWpm("custom");
+        Config.setMinWpmCustomSpeed(input);
+        Config.setMinWpm("custom");
       },
     },
     // {
@@ -921,28 +921,28 @@ let commandsKeymapStyle = {
       id: "setKeymapStyleStaggered",
       display: "staggered",
       exec: () => {
-        changeKeymapStyle("staggered");
+        Config.changeKeymapStyle("staggered");
       },
     },
     {
       id: "setKeymapStyleMatrix",
       display: "matrix",
       exec: () => {
-        changeKeymapStyle("matrix");
+        Config.changeKeymapStyle("matrix");
       },
     },
     {
       id: "setKeymapStyleSplit",
       display: "split",
       exec: () => {
-        changeKeymapStyle("split");
+        Config.changeKeymapStyle("split");
       },
     },
     {
       id: "setKeymapStyleSplitMatrix",
       display: "split matrix",
       exec: () => {
-        changeKeymapStyle("split_matrix");
+        Config.changeKeymapStyle("split_matrix");
       },
     },
   ],
@@ -955,14 +955,14 @@ let commandsHighlightMode = {
       id: "setHighlightModeLetter",
       display: "letter",
       exec: () => {
-        setHighlightMode("letter");
+        Config.setHighlightMode("letter");
       },
     },
     {
       id: "setHighlightModeWord",
       display: "word",
       exec: () => {
-        setHighlightMode("word");
+        Config.setHighlightMode("word");
       },
     },
   ],
@@ -975,14 +975,14 @@ let commandsAlwaysShowCPM = {
       id: "setAlwaysShowCPMTrue",
       display: true,
       exec: () => {
-        setAlwaysShowCPM(true);
+        Config.setAlwaysShowCPM(true);
       },
     },
     {
       id: "setAlwaysShowCPMFalse",
       display: false,
       exec: () => {
-        setHighlightMode(false);
+        Config.setHighlightMode(false);
       },
     },
   ],
@@ -995,21 +995,21 @@ let commandsTimerStyle = {
       id: "setTimerStyleBar",
       display: "bar",
       exec: () => {
-        setTimerStyle("bar");
+        Config.setTimerStyle("bar");
       },
     },
     {
       id: "setTimerStyleText",
       display: "text",
       exec: () => {
-        setTimerStyle("text");
+        Config.setTimerStyle("text");
       },
     },
     {
       id: "setTimerStyleMini",
       display: "mini",
       exec: () => {
-        setTimerStyle("mini");
+        Config.setTimerStyle("mini");
       },
     },
   ],
@@ -1022,28 +1022,28 @@ let commandsTimerColor = {
       id: "setTimerColorBlack",
       display: "black",
       exec: () => {
-        setTimerColor("bar");
+        Config.setTimerColor("bar");
       },
     },
     {
       id: "setTimerColorSub",
       display: "sub",
       exec: () => {
-        setTimerColor("sub");
+        Config.setTimerColor("sub");
       },
     },
     {
       id: "setTimerColorText",
       display: "text",
       exec: () => {
-        setTimerColor("text");
+        Config.setTimerColor("text");
       },
     },
     {
       id: "setTimerColorMain",
       display: "main",
       exec: () => {
-        setTimerColor("main");
+        Config.setTimerColor("main");
       },
     },
   ],
@@ -1056,14 +1056,14 @@ let commandsSingleListCommandLine = {
       id: "singleListCommandLineManual",
       display: "manual",
       exec: () => {
-        setSingleListCommandLine("manual");
+        Config.setSingleListCommandLine("manual");
       },
     },
     {
       id: "singleListCommandLineOn",
       display: "on",
       exec: () => {
-        setSingleListCommandLine("on");
+        Config.setSingleListCommandLine("on");
       },
     },
   ],
@@ -1076,28 +1076,28 @@ let commandsTimerOpacity = {
       id: "setTimerOpacity.25",
       display: ".25",
       exec: () => {
-        setTimerOpacity(0.25);
+        Config.setTimerOpacity(0.25);
       },
     },
     {
       id: "setTimerOpacity.5",
       display: ".5",
       exec: () => {
-        setTimerOpacity(0.5);
+        Config.setTimerOpacity(0.5);
       },
     },
     {
       id: "setTimerOpacity.75",
       display: ".75",
       exec: () => {
-        setTimerOpacity(0.75);
+        Config.setTimerOpacity(0.75);
       },
     },
     {
       id: "setTimerOpacity1",
       display: "1",
       exec: () => {
-        setTimerOpacity(1);
+        Config.setTimerOpacity(1);
       },
     },
   ],
@@ -1110,7 +1110,7 @@ let commandsWordCount = {
       id: "changeWordCount10",
       display: "10",
       exec: () => {
-        changeWordCount("10");
+        Config.changeWordCount("10");
         restartTest();
       },
     },
@@ -1118,7 +1118,7 @@ let commandsWordCount = {
       id: "changeWordCount25",
       display: "25",
       exec: () => {
-        changeWordCount("25");
+        Config.changeWordCount("25");
         restartTest();
       },
     },
@@ -1126,7 +1126,7 @@ let commandsWordCount = {
       id: "changeWordCount50",
       display: "50",
       exec: () => {
-        changeWordCount("50");
+        Config.changeWordCount("50");
         restartTest();
       },
     },
@@ -1134,7 +1134,7 @@ let commandsWordCount = {
       id: "changeWordCount100",
       display: "100",
       exec: () => {
-        changeWordCount("100");
+        Config.changeWordCount("100");
         restartTest();
       },
     },
@@ -1142,7 +1142,7 @@ let commandsWordCount = {
       id: "changeWordCount200",
       display: "200",
       exec: () => {
-        changeWordCount("200");
+        Config.changeWordCount("200");
         restartTest();
       },
     },
@@ -1151,7 +1151,7 @@ let commandsWordCount = {
       display: "custom...",
       input: true,
       exec: (input) => {
-        changeWordCount(input);
+        Config.changeWordCount(input);
         restartTest();
       },
     },
@@ -1165,7 +1165,7 @@ let commandsQuoteLengthConfig = {
       id: "changeQuoteLengthAll",
       display: "all",
       exec: () => {
-        changeQuoteLength(-1);
+        Config.changeQuoteLength(-1);
         restartTest();
       },
     },
@@ -1173,7 +1173,7 @@ let commandsQuoteLengthConfig = {
       id: "changeQuoteLengthShort",
       display: "short",
       exec: () => {
-        changeQuoteLength(0);
+        Config.changeQuoteLength(0);
         restartTest();
       },
     },
@@ -1181,7 +1181,7 @@ let commandsQuoteLengthConfig = {
       id: "changeQuoteLengthMedium",
       display: "medium",
       exec: () => {
-        changeQuoteLength(1);
+        Config.changeQuoteLength(1);
         restartTest();
       },
     },
@@ -1189,7 +1189,7 @@ let commandsQuoteLengthConfig = {
       id: "changeQuoteLengthLong",
       display: "long",
       exec: () => {
-        changeQuoteLength(2);
+        Config.changeQuoteLength(2);
         restartTest();
       },
     },
@@ -1197,7 +1197,7 @@ let commandsQuoteLengthConfig = {
       id: "changeQuoteLengthThicc",
       display: "thicc",
       exec: () => {
-        changeQuoteLength(3);
+        Config.changeQuoteLength(3);
         restartTest();
       },
     },
@@ -1248,7 +1248,7 @@ let commandsTimeConfig = {
       id: "changeTimeConfig15",
       display: "15",
       exec: () => {
-        changeTimeConfig("15");
+        Config.changeTimeConfig("15");
         restartTest();
       },
     },
@@ -1256,7 +1256,7 @@ let commandsTimeConfig = {
       id: "changeTimeConfig30",
       display: "30",
       exec: () => {
-        changeTimeConfig("30");
+        Config.changeTimeConfig("30");
         restartTest();
       },
     },
@@ -1264,7 +1264,7 @@ let commandsTimeConfig = {
       id: "changeTimeConfig60",
       display: "60",
       exec: () => {
-        changeTimeConfig("60");
+        Config.changeTimeConfig("60");
         restartTest();
       },
     },
@@ -1272,7 +1272,7 @@ let commandsTimeConfig = {
       id: "changeTimeConfig120",
       display: "120",
       exec: () => {
-        changeTimeConfig("120");
+        Config.changeTimeConfig("120");
         restartTest();
       },
     },
@@ -1281,7 +1281,7 @@ let commandsTimeConfig = {
       display: "custom...",
       input: true,
       exec: (input) => {
-        changeTimeConfig(input);
+        Config.changeTimeConfig(input);
         restartTest();
       },
     },
@@ -1295,21 +1295,21 @@ let commandsConfidenceMode = {
       id: "changeConfidenceModeOff",
       display: "off",
       exec: () => {
-        setConfidenceMode("off");
+        Config.setConfidenceMode("off");
       },
     },
     {
       id: "changeConfidenceModeOn",
       display: "on",
       exec: () => {
-        setConfidenceMode("on");
+        Config.setConfidenceMode("on");
       },
     },
     {
       id: "changeConfidenceModeMax",
       display: "max",
       exec: () => {
-        setConfidenceMode("max");
+        Config.setConfidenceMode("max");
       },
     },
   ],
@@ -1322,21 +1322,21 @@ let commandsStopOnError = {
       id: "changeStopOnErrorOff",
       display: "off",
       exec: () => {
-        setStopOnError("off");
+        Config.setStopOnError("off");
       },
     },
     {
       id: "changeStopOnErrorLetter",
       display: "letter",
       exec: () => {
-        setStopOnError("letter");
+        Config.setStopOnError("letter");
       },
     },
     {
       id: "changeStopOnErrorWord",
       display: "word",
       exec: () => {
-        setStopOnError("word");
+        Config.setStopOnError("word");
       },
     },
   ],
@@ -1349,7 +1349,7 @@ let commandsFontSize = {
       id: "changeFontSize1",
       display: "1x",
       exec: () => {
-        changeFontSize(1);
+        Config.changeFontSize(1);
         restartTest();
       },
     },
@@ -1357,7 +1357,7 @@ let commandsFontSize = {
       id: "changeFontSize125",
       display: "1.25x",
       exec: () => {
-        changeFontSize(125);
+        Config.changeFontSize(125);
         restartTest();
       },
     },
@@ -1365,7 +1365,7 @@ let commandsFontSize = {
       id: "changeFontSize15",
       display: "1.5x",
       exec: () => {
-        changeFontSize(15);
+        Config.changeFontSize(15);
         restartTest();
       },
     },
@@ -1373,7 +1373,7 @@ let commandsFontSize = {
       id: "changeFontSize2",
       display: "2x",
       exec: () => {
-        changeFontSize(2);
+        Config.changeFontSize(2);
         restartTest();
       },
     },
@@ -1381,7 +1381,7 @@ let commandsFontSize = {
       id: "changeFontSize3",
       display: "3x",
       exec: () => {
-        changeFontSize(3);
+        Config.changeFontSize(3);
         restartTest();
       },
     },
@@ -1394,14 +1394,14 @@ let commandsTags = {
 };
 
 function updateCommandsTagsList() {
-  if (dbSnapshot.tags.length > 0) {
+  if (UserData.dbSnapshot.tags.length > 0) {
     commandsTags.list = [];
 
     commandsTags.list.push({
       id: "clearTags",
       display: "Clear tags",
       exec: () => {
-        dbSnapshot.tags.forEach((tag) => {
+        UserData.dbSnapshot.tags.forEach((tag) => {
           tag.active = false;
         });
         updateTestModesNotice();
@@ -1409,7 +1409,7 @@ function updateCommandsTagsList() {
       },
     });
 
-    dbSnapshot.tags.forEach((tag) => {
+    UserData.dbSnapshot.tags.forEach((tag) => {
       let dis = tag.name;
 
       if (tag.active === true) {
@@ -1454,41 +1454,41 @@ getThemesList().then((themes) => {
       id: "changeTheme" + capitalizeFirstLetter(theme.name),
       display: theme.name.replace(/_/g, " "),
       hover: () => {
-        previewTheme(theme.name);
+        Config.previewTheme(theme.name);
       },
       exec: () => {
-        setTheme(theme.name);
+        Config.setTheme(theme.name);
       },
     });
   });
 });
 
 function showFavouriteThemesAtTheTop() {
-  if (config.favThemes.length > 0) {
+  if (UserConfig.config.favThemes.length > 0) {
     commandsThemes.list = [];
-    config.favThemes.forEach((theme) => {
+    UserConfig.config.favThemes.forEach((theme) => {
       commandsThemes.list.push({
         id: "changeTheme" + capitalizeFirstLetter(theme),
         display: theme.replace(/_/g, " "),
         hover: () => {
-          previewTheme(theme);
+          Config.previewTheme(theme);
         },
         exec: () => {
-          setTheme(theme);
+          Config.setTheme(theme);
         },
       });
     });
     getThemesList().then((themes) => {
       themes.forEach((theme) => {
-        if (config.favThemes.includes(theme.name)) return;
+        if (UserConfig.config.favThemes.includes(theme.name)) return;
         commandsThemes.list.push({
           id: "changeTheme" + capitalizeFirstLetter(theme.name),
           display: theme.name.replace(/_/g, " "),
           hover: () => {
-            previewTheme(theme.name);
+            Config.previewTheme(theme.name);
           },
           exec: () => {
-            setTheme(theme.name);
+            Config.setTheme(theme.name);
           },
         });
       });
@@ -1507,10 +1507,10 @@ getFontsList().then((fonts) => {
       id: "changeFont" + font.name.replace(/ /g, "_"),
       display: font.display !== undefined ? font.display : font.name,
       hover: () => {
-        previewFontFamily(font.name);
+        Config.previewFontFamily(font.name);
       },
       exec: () => {
-        setFontFamily(font.name.replace(/ /g, "_"));
+        Config.setFontFamily(font.name.replace(/ /g, "_"));
       },
     });
   });
@@ -1569,9 +1569,9 @@ getLanguageList().then((languages) => {
       id: "changeLanguage" + capitalizeFirstLetter(language),
       display: language.replace(/_/g, " "),
       exec: () => {
-        changeLanguage(language);
+        Config.changeLanguage(language);
         restartTest();
-        saveConfigToCookie();
+        Config.saveConfigToCookie();
       },
     });
   });
@@ -1606,9 +1606,9 @@ if (Object.keys(layouts).length > 0) {
       id: "changeLayout" + capitalizeFirstLetter(layout),
       display: layout.replace(/_/g, " "),
       exec: () => {
-        changeSavedLayout(layout);
+        Config.changeSavedLayout(layout);
         restartTest();
-        saveConfigToCookie();
+        Config.saveConfigToCookie();
       },
     });
   });
@@ -1632,9 +1632,9 @@ if (Object.keys(layouts).length > 0) {
         id: "changeKeymapLayout" + capitalizeFirstLetter(layout),
         display: layout.replace("_", " "),
         exec: () => {
-          changeKeymapLayout(layout);
+          Config.changeKeymapLayout(layout);
           restartTest();
-          saveConfigToCookie();
+          Config.saveConfigToCookie();
         },
       });
     }
@@ -1673,11 +1673,11 @@ $(document).ready((e) => {
         } else {
           hideCommandLine();
         }
-        setFontFamily(UserConfig.config.fontFamily, true);
+        Config.setFontFamily(UserConfig.config.fontFamily, true);
         if (UserConfig.config.customTheme === true) {
-          applyCustomThemeColors();
+          Config.applyCustomThemeColors();
         } else {
-          setTheme(UserConfig.config.theme);
+          Config.setTheme(UserConfig.config.theme);
         }
       }
     }
@@ -1734,18 +1734,18 @@ $("#commandLineWrapper #commandLine .suggestions").click((e) => {
 $("#commandLineWrapper").click((e) => {
   if ($(e.target).attr("id") === "commandLineWrapper") {
     hideCommandLine();
-    setFontFamily(UserConfig.config.fontFamily, true);
+    Config.setFontFamily(UserConfig.config.fontFamily, true);
     if (UserConfig.config.customTheme === true) {
-      applyCustomThemeColors();
+      Config.applyCustomThemeColors();
     } else {
-      setTheme(UserConfig.config.theme, true);
+      Config.setTheme(UserConfig.config.theme, true);
     }
   }
 });
 
 $(document).keydown((e) => {
   if (isPreviewingTheme) {
-    previewTheme(UserConfig.config.theme, false);
+    Config.previewTheme(UserConfig.config.theme, false);
   }
   if (!$("#commandLineWrapper").hasClass("hidden")) {
     $("#commandLine input").focus();

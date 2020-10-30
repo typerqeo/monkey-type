@@ -272,7 +272,7 @@ export function setPlaySoundOnClick(val, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function togglePlaySoundOnError() {
+export function togglePlaySoundOnError() {
   UserConfig.config.playSoundOnError = !UserConfig.config.playSoundOnError;
   if (UserConfig.config.playSoundOnError == undefined) {
     UserConfig.config.playSoundOnError = false;
@@ -303,7 +303,7 @@ function setFavThemes(themes, nosave) {
 }
 
 //blind mode
-function toggleBlindMode() {
+export function toggleBlindMode() {
   let blind = !UserConfig.config.blindMode;
   if (blind == undefined) {
     blind = false;
@@ -420,7 +420,7 @@ export function setStopOnError(soe, nosave) {
 }
 
 //alwaysshowdecimal
-function toggleAlwaysShowDecimalPlaces() {
+export function toggleAlwaysShowDecimalPlaces() {
   UserConfig.config.alwaysShowDecimalPlaces = !UserConfig.config
     .alwaysShowDecimalPlaces;
   saveConfigToCookie();
@@ -434,7 +434,7 @@ export function setAlwaysShowDecimalPlaces(val, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleAlwaysShowCPM() {
+export function toggleAlwaysShowCPM() {
   UserConfig.config.alwaysShowCPM = !UserConfig.config.alwaysShowCPM;
   saveConfigToCookie();
 }
@@ -448,7 +448,7 @@ export function setAlwaysShowCPM(val, nosave) {
 }
 
 //show out of focus warning
-function toggleShowOutOfFocusWarning() {
+export function toggleShowOutOfFocusWarning() {
   UserConfig.config.showOutOfFocusWarning = !UserConfig.config
     .showOutOfFocusWarning;
   if (!UserConfig.config.showOutOfFocusWarning) {
@@ -473,7 +473,7 @@ export function setShowOutOfFocusWarning(val, nosave) {
 }
 
 //swap esc and tab
-function toggleSwapEscAndTab() {
+export function toggleSwapEscAndTab() {
   UserConfig.config.swapEscAndTab = !UserConfig.config.swapEscAndTab;
   saveConfigToCookie();
   updateKeytips();
@@ -542,7 +542,7 @@ export function setSingleListCommandLine(option, nosave) {
 }
 
 //show all lines
-function toggleShowAllLines() {
+export function toggleShowAllLines() {
   let sal = !UserConfig.config.showAllLines;
   if (sal == undefined) {
     sal = false;
@@ -564,7 +564,7 @@ export function setShowAllLines(sal, nosave) {
 }
 
 //quickend
-function toggleQuickEnd() {
+export function toggleQuickEnd() {
   let qe = !UserConfig.config.quickEnd;
   if (qe == undefined) {
     qe = false;
@@ -591,7 +591,7 @@ export function setFlipTestColors(flip, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleFlipTestColors() {
+export function toggleFlipTestColors() {
   UserConfig.config.flipTestColors = !UserConfig.config.flipTestColors;
   flipTestColors(UserConfig.config.flipTestColors);
   saveConfigToCookie();
@@ -607,7 +607,7 @@ export function setColorfulMode(extra, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleColorfulMode() {
+export function toggleColorfulMode() {
   UserConfig.config.colorfulMode = !UserConfig.config.colorfulMode;
   applyColorfulMode(UserConfig.config.colorfulMode);
   saveConfigToCookie();
@@ -687,7 +687,7 @@ export function setShowTimerProgress(timer, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleShowTimerProgress() {
+export function toggleShowTimerProgress() {
   UserConfig.config.showTimerProgress = !UserConfig.config.showTimerProgress;
   saveConfigToCookie();
 }
@@ -703,7 +703,7 @@ export function setShowLiveWpm(live, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleShowLiveWpm() {
+export function toggleShowLiveWpm() {
   UserConfig.config.showLiveWpm = !UserConfig.config.showLiveWpm;
   // if (config.keymapMode !== "off") {
   //   config.keymapMode = "off";
@@ -754,7 +754,7 @@ export function setKeyTips(keyTips, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleKeyTips() {
+export function toggleKeyTips() {
   UserConfig.config.showKeyTips = !UserConfig.config.showKeyTips;
   if (UserConfig.config.showKeyTips) {
     $("#bottom .keyTips").removeClass("hidden");
@@ -765,7 +765,7 @@ function toggleKeyTips() {
 }
 
 //mode
-function changeTimeConfig(time, nosave) {
+export function changeTimeConfig(time, nosave) {
   if (time !== null && !isNaN(time) && time >= 0) {
   } else {
     time = 15;
@@ -784,7 +784,7 @@ function changeTimeConfig(time, nosave) {
 }
 
 //quote length
-function changeQuoteLength(len, nosave) {
+export function changeQuoteLength(len, nosave) {
   if (len !== null && !isNaN(len) && len >= -1 && len <= 3) {
   } else {
     len = 1;
@@ -799,7 +799,7 @@ function changeQuoteLength(len, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function changeWordCount(wordCount, nosave) {
+export function changeWordCount(wordCount, nosave) {
   if (wordCount !== null && !isNaN(wordCount) && wordCount >= 0) {
   } else {
     wordCount = 10;
@@ -823,7 +823,7 @@ export function setSmoothCaret(mode, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleSmoothCaret() {
+export function toggleSmoothCaret() {
   UserConfig.config.smoothCaret = !UserConfig.config.smoothCaret;
   saveConfigToCookie();
 }
@@ -845,7 +845,7 @@ export function setSmoothLineScroll(mode, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleSmoothLineScroll() {
+export function toggleSmoothLineScroll() {
   UserConfig.config.smoothLineScroll = !UserConfig.config.smoothLineScroll;
   saveConfigToCookie();
 }
@@ -869,7 +869,7 @@ export function setQuickTabMode(mode, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleQuickTabMode() {
+export function toggleQuickTabMode() {
   UserConfig.config.quickTab = !UserConfig.config.quickTab;
   if (!UserConfig.config.quickTab) {
     // $(".pageTest").append('<div id="restartTestButton" class="" tabindex="0"><i class="fas fa-redo-alt"></i></div>');
@@ -898,7 +898,7 @@ function setNumbers(numb, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleNumbers() {
+export function toggleNumbers() {
   if (UserConfig.config.numbers) {
     $("#top .config .numbersMode .text-button").removeClass("active");
   } else {
@@ -919,7 +919,7 @@ function setPunctuation(punc, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function togglePunctuation() {
+export function togglePunctuation() {
   if (UserConfig.config.punctuation) {
     $("#top .config .punctuationMode .text-button").removeClass("active");
   } else {
@@ -929,7 +929,7 @@ function togglePunctuation() {
   saveConfigToCookie();
 }
 
-function previewFontFamily(font) {
+export function previewFontFamily(font) {
   if (font == undefined) {
     font = "Roboto_Mono";
   }
@@ -962,7 +962,7 @@ export function setFreedomMode(freedom, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleFreedomMode() {
+export function toggleFreedomMode() {
   UserConfig.config.freedomMode = !UserConfig.config.freedomMode;
   if (
     UserConfig.config.freedomMode &&
@@ -987,7 +987,7 @@ export function setConfidenceMode(cm, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleIndicateTypos() {
+export function toggleIndicateTypos() {
   let it = !UserConfig.config.indicateTypos;
   if (it == undefined) {
     it = false;
@@ -1055,7 +1055,7 @@ export function setTheme(name, nosave) {
 }
 
 let randomTheme = null;
-function randomiseTheme() {
+export function randomiseTheme() {
   var randomList = themesList.map((t) => {
     return t.name;
   });
@@ -1098,7 +1098,7 @@ export function setCustomThemeColors(colors, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function applyCustomThemeColors() {
+export function applyCustomThemeColors() {
   const array = UserConfig.config.customThemeColors;
 
   if (UserConfig.config.customTheme === true) {
@@ -1121,7 +1121,7 @@ function applyCustomThemeColors() {
   }, 500);
 }
 
-function togglePresetCustomTheme() {
+export function togglePresetCustomTheme() {
   if (UserConfig.config.customTheme) {
     setCustomTheme(false);
     applyCustomThemeColors();
@@ -1209,7 +1209,7 @@ export function setCapsLockBackspace(capsLockBackspace, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleCapsLockBackspace() {
+export function toggleCapsLockBackspace() {
   setCapsLockBackspace(!UserConfig.config.capsLockBackspace, false);
 }
 
