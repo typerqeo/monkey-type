@@ -1583,7 +1583,7 @@ function fillPbTables() {
   </tr>
   `);
 
-  const pb = dbSnapshot.personalBests;
+  const pb = UserData.dbSnapshot.personalBests;
   let pbData;
   let text;
 

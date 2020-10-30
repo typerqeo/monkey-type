@@ -1,3 +1,8 @@
+import { layouts } from "./layouts";
+import * as Config from "./userconfig";
+const defaultConfig = Config.defaultConfig;
+const UserConfig = Config.UserConfig;
+
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -13,7 +18,7 @@ function addChildCommands(
   if (commandItem.subgroup) {
     try {
       commandItem.exec();
-      currentCommandsIndex = currentCommands.length - 1;
+      const currentCommandsIndex = currentCommands.length - 1;
       currentCommands[currentCommandsIndex].list.forEach((cmd) =>
         addChildCommands(unifiedCommands, cmd, commandItemDisplay)
       );
@@ -27,8 +32,8 @@ function addChildCommands(
 }
 
 function generateSingleListOfCommands() {
-  allCommands = [];
-  oldShowCommandLine = showCommandLine;
+  const allCommands = [];
+  const oldShowCommandLine = showCommandLine;
   showCommandLine = () => {};
   commands.list.forEach((c) => addChildCommands(allCommands, c));
   showCommandLine = oldShowCommandLine;
@@ -44,12 +49,12 @@ function isSingleListCommandLineActive() {
 
 function useSingleListCommandLine(show = true) {
   let allCommands = generateSingleListOfCommands();
-  if (config.singleListCommandLine == "manual")
+  if (UserConfig.config.singleListCommandLine == "manual")
     currentCommands.push(allCommands);
-  else if (config.singleListCommandLine == "on")
+  else if (UserConfig.config.singleListCommandLine == "on")
     currentCommands = [allCommands];
 
-  if (config.singleListCommandLine != "off")
+  if (UserConfig.config.singleListCommandLine != "off")
     $("#commandLine").addClass("allCommands");
   if (show) showCommandLine();
 }
@@ -555,16 +560,18 @@ let commands = {
               display: "Yes, I am sure",
               exec: () => {
                 if (
-                  (config.mode === "custom" &&
+                  (UserConfig.config.mode === "custom" &&
                     customTextIsRandom &&
                     customTextWordCount >= 5000) ||
-                  (config.mode === "custom" &&
+                  (UserConfig.config.mode === "custom" &&
                     !customTextIsRandom &&
                     customText.length >= 5000) ||
-                  (config.mode === "words" && config.words >= 5000) ||
-                  config.words === 0 ||
-                  (config.mode === "time" &&
-                    (config.time >= 3600 || config.time === 0))
+                  (UserConfig.config.mode === "words" &&
+                    UserConfig.config.words >= 5000) ||
+                  UserConfig.config.words === 0 ||
+                  (UserConfig.config.mode === "time" &&
+                    (UserConfig.config.time >= 3600 ||
+                      UserConfig.config.time === 0))
                 ) {
                   bailout = true;
                   showResult();
@@ -1644,8 +1651,8 @@ $(document).ready((e) => {
   $(document).keydown((event) => {
     //escape
     if (
-      (event.keyCode == 27 && !config.swapEscAndTab) ||
-      (event["keyCode"] == 9 && config.swapEscAndTab)
+      (event.keyCode == 27 && !UserConfig.config.swapEscAndTab) ||
+      (event["keyCode"] == 9 && UserConfig.config.swapEscAndTab)
     ) {
       event.preventDefault();
       if (!$("#leaderboardsWrapper").hasClass("hidden")) {
@@ -1654,7 +1661,7 @@ $(document).ready((e) => {
         hideLeaderboards();
         return;
       } else if ($("#commandLineWrapper").hasClass("hidden")) {
-        if (config.singleListCommandLine == "on")
+        if (UserConfig.config.singleListCommandLine == "on")
           useSingleListCommandLine(false);
         else currentCommands = [commands];
         showCommandLine();
@@ -1666,11 +1673,11 @@ $(document).ready((e) => {
         } else {
           hideCommandLine();
         }
-        setFontFamily(config.fontFamily, true);
-        if (config.customTheme === true) {
+        setFontFamily(UserConfig.config.fontFamily, true);
+        if (UserConfig.config.customTheme === true) {
           applyCustomThemeColors();
         } else {
-          setTheme(config.theme);
+          setTheme(UserConfig.config.theme);
         }
       }
     }
@@ -1727,22 +1734,22 @@ $("#commandLineWrapper #commandLine .suggestions").click((e) => {
 $("#commandLineWrapper").click((e) => {
   if ($(e.target).attr("id") === "commandLineWrapper") {
     hideCommandLine();
-    setFontFamily(config.fontFamily, true);
-    if (config.customTheme === true) {
+    setFontFamily(UserConfig.config.fontFamily, true);
+    if (UserConfig.config.customTheme === true) {
       applyCustomThemeColors();
     } else {
-      setTheme(config.theme, true);
+      setTheme(UserConfig.config.theme, true);
     }
   }
 });
 
 $(document).keydown((e) => {
   if (isPreviewingTheme) {
-    previewTheme(config.theme, false);
+    previewTheme(UserConfig.config.theme, false);
   }
   if (!$("#commandLineWrapper").hasClass("hidden")) {
     $("#commandLine input").focus();
-    if (e.key == ">" && config.singleListCommandLine == "manual") {
+    if (e.key == ">" && UserConfig.config.singleListCommandLine == "manual") {
       if (!isSingleListCommandLineActive()) {
         useSingleListCommandLine();
         return;
@@ -1755,7 +1762,7 @@ $(document).keydown((e) => {
     if (
       e.keyCode == 8 &&
       $("#commandLine input").val().length == 1 &&
-      config.singleListCommandLine == "manual" &&
+      UserConfig.config.singleListCommandLine == "manual" &&
       isSingleListCommandLineActive()
     )
       restoreOldCommandLine();
@@ -1919,7 +1926,7 @@ function updateSuggestedCommands() {
   let list = currentCommands[currentCommands.length - 1];
   if (
     inputVal[0] === "" &&
-    config.singleListCommandLine === "on" &&
+    UserConfig.config.singleListCommandLine === "on" &&
     currentCommands.length === 1
   ) {
     $.each(list.list, (index, obj) => {

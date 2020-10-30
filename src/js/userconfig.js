@@ -82,7 +82,7 @@ export let UserConfig = {
 };
 
 //cookies
-async function saveConfigToCookie(noDbCheck = false) {
+export async function saveConfigToCookie(noDbCheck = false) {
   if (!UserConfig.dbConfigLoaded && !noDbCheck) {
     // console.log('config changed before db loaded!');
     UserConfig.configChangedBeforeDb = true;
@@ -129,7 +129,7 @@ function resetConfig() {
   saveConfigToCookie();
 }
 
-function saveActiveTagsToCookie() {
+export function saveActiveTagsToCookie() {
   let tags = [];
 
   try {
@@ -159,7 +159,7 @@ function loadConfigFromCookie() {
   restartTest(false, true);
 }
 
-function applyConfig(configObj) {
+export function applyConfig(configObj) {
   if (configObj && configObj != null && configObj != "null") {
     setTheme(configObj.theme, true);
     setCustomTheme(configObj.customTheme, true);
@@ -254,7 +254,7 @@ function hideTestConfig() {
   $("#top .config").css("opacity", 0).addClass("hidden");
 }
 
-function setPlaySoundOnError(val, nosave) {
+export function setPlaySoundOnError(val, nosave) {
   if (val == undefined) {
     val = false;
   }
@@ -262,7 +262,7 @@ function setPlaySoundOnError(val, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setPlaySoundOnClick(val, nosave) {
+export function setPlaySoundOnClick(val, nosave) {
   if (val == undefined) {
     val = "off";
   }
@@ -280,7 +280,7 @@ function togglePlaySoundOnError() {
 }
 
 //difficulty
-function setDifficulty(diff, nosave) {
+export function setDifficulty(diff, nosave) {
   if (
     (diff !== "normal" && diff !== "expert" && diff !== "master") ||
     diff == undefined
@@ -313,7 +313,7 @@ function toggleBlindMode() {
   saveConfigToCookie();
 }
 
-function setBlindMode(blind, nosave) {
+export function setBlindMode(blind, nosave) {
   if (blind == undefined) {
     blind = false;
   }
@@ -407,7 +407,7 @@ function setChartStyle(chartStyle, nosave) {
 //   saveConfigToCookie();
 // }
 
-function setStopOnError(soe, nosave) {
+export function setStopOnError(soe, nosave) {
   if (soe == undefined || soe === true || soe === false) {
     soe = "off";
   }
@@ -426,7 +426,7 @@ function toggleAlwaysShowDecimalPlaces() {
   saveConfigToCookie();
 }
 
-function setAlwaysShowDecimalPlaces(val, nosave) {
+export function setAlwaysShowDecimalPlaces(val, nosave) {
   if (val == undefined) {
     val = false;
   }
@@ -435,15 +435,15 @@ function setAlwaysShowDecimalPlaces(val, nosave) {
 }
 
 function toggleAlwaysShowCPM() {
-  config.alwaysShowCPM = !config.alwaysShowCPM;
+  UserConfig.config.alwaysShowCPM = !UserConfig.config.alwaysShowCPM;
   saveConfigToCookie();
 }
 
-function setAlwaysShowCPM(val, nosave) {
+export function setAlwaysShowCPM(val, nosave) {
   if (val == undefined) {
     val = false;
   }
-  config.alwaysShowCPM = val;
+  UserConfig.config.alwaysShowCPM = val;
   if (!nosave) saveConfigToCookie();
 }
 
@@ -459,7 +459,7 @@ function toggleShowOutOfFocusWarning() {
   saveConfigToCookie();
 }
 
-function setShowOutOfFocusWarning(val, nosave) {
+export function setShowOutOfFocusWarning(val, nosave) {
   if (val == undefined) {
     val = true;
   }
@@ -479,7 +479,7 @@ function toggleSwapEscAndTab() {
   updateKeytips();
 }
 
-function setSwapEscAndTab(val, nosave) {
+export function setSwapEscAndTab(val, nosave) {
   if (val == undefined) {
     val = false;
   }
@@ -489,7 +489,7 @@ function setSwapEscAndTab(val, nosave) {
 }
 
 //pace caret
-function setPaceCaret(val, nosave) {
+export function setPaceCaret(val, nosave) {
   if (val == undefined) {
     val = "off";
   }
@@ -499,7 +499,7 @@ function setPaceCaret(val, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setPaceCaretCustomSpeed(val, nosave) {
+export function setPaceCaretCustomSpeed(val, nosave) {
   if (val == undefined || Number.isNaN(parseInt(val))) {
     val = 100;
   }
@@ -508,7 +508,7 @@ function setPaceCaretCustomSpeed(val, nosave) {
 }
 
 //min wpm
-function setMinWpm(minwpm, nosave) {
+export function setMinWpm(minwpm, nosave) {
   if (minwpm == undefined) {
     minwpm = "off";
   }
@@ -517,7 +517,7 @@ function setMinWpm(minwpm, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setMinWpmCustomSpeed(val, nosave) {
+export function setMinWpmCustomSpeed(val, nosave) {
   if (val == undefined || Number.isNaN(parseInt(val))) {
     val = 100;
   }
@@ -526,7 +526,7 @@ function setMinWpmCustomSpeed(val, nosave) {
 }
 
 //always show words history
-function setAlwaysShowWordsHistory(val, nosave) {
+export function setAlwaysShowWordsHistory(val, nosave) {
   if (val == undefined) {
     val = false;
   }
@@ -535,7 +535,7 @@ function setAlwaysShowWordsHistory(val, nosave) {
 }
 
 //single list command line
-function setSingleListCommandLine(option, nosave) {
+export function setSingleListCommandLine(option, nosave) {
   if (!option) option = "manual";
   UserConfig.config.singleListCommandLine = option;
   if (!nosave) saveConfigToCookie();
@@ -552,7 +552,7 @@ function toggleShowAllLines() {
   saveConfigToCookie();
 }
 
-function setShowAllLines(sal, nosave) {
+export function setShowAllLines(sal, nosave) {
   if (sal == undefined) {
     sal = false;
   }
@@ -573,7 +573,7 @@ function toggleQuickEnd() {
   saveConfigToCookie();
 }
 
-function setQuickEnd(qe, nosave) {
+export function setQuickEnd(qe, nosave) {
   if (qe == undefined) {
     qe = false;
   }
@@ -582,7 +582,7 @@ function setQuickEnd(qe, nosave) {
 }
 
 //flip colors
-function setFlipTestColors(flip, nosave) {
+export function setFlipTestColors(flip, nosave) {
   if (flip == undefined) {
     flip = false;
   }
@@ -598,7 +598,7 @@ function toggleFlipTestColors() {
 }
 
 //extra color
-function setColorfulMode(extra, nosave) {
+export function setColorfulMode(extra, nosave) {
   if (extra == undefined) {
     extra = false;
   }
@@ -613,7 +613,7 @@ function toggleColorfulMode() {
   saveConfigToCookie();
 }
 
-function setPageWidth(val, nosave) {
+export function setPageWidth(val, nosave) {
   if (val == null || val == undefined) {
     val = "100";
   }
@@ -629,7 +629,7 @@ function setPageWidth(val, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setCaretStyle(caretStyle, nosave) {
+export function setCaretStyle(caretStyle, nosave) {
   if (caretStyle == null || caretStyle == undefined) {
     caretStyle = "default";
   }
@@ -654,7 +654,7 @@ function setCaretStyle(caretStyle, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setPaceCaretStyle(caretStyle, nosave) {
+export function setPaceCaretStyle(caretStyle, nosave) {
   if (caretStyle == null || caretStyle == undefined) {
     caretStyle = "default";
   }
@@ -679,7 +679,7 @@ function setPaceCaretStyle(caretStyle, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setShowTimerProgress(timer, nosave) {
+export function setShowTimerProgress(timer, nosave) {
   if (timer == null || timer == undefined) {
     timer = false;
   }
@@ -692,7 +692,7 @@ function toggleShowTimerProgress() {
   saveConfigToCookie();
 }
 
-function setShowLiveWpm(live, nosave) {
+export function setShowLiveWpm(live, nosave) {
   if (live == null || live == undefined) {
     live = false;
   }
@@ -711,7 +711,7 @@ function toggleShowLiveWpm() {
   saveConfigToCookie();
 }
 
-function setHighlightMode(mode, nosave) {
+export function setHighlightMode(mode, nosave) {
   if (mode == null || mode == undefined) {
     mode = "letter";
   }
@@ -719,7 +719,7 @@ function setHighlightMode(mode, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setTimerStyle(style, nosave) {
+export function setTimerStyle(style, nosave) {
   if (style == null || style == undefined) {
     style = "bar";
   }
@@ -727,7 +727,7 @@ function setTimerStyle(style, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setTimerColor(color, nosave) {
+export function setTimerColor(color, nosave) {
   if (color == null || color == undefined) {
     color = "black";
   }
@@ -735,7 +735,7 @@ function setTimerColor(color, nosave) {
   changeTimerColor(color);
   if (!nosave) saveConfigToCookie();
 }
-function setTimerOpacity(opacity, nosave) {
+export function setTimerOpacity(opacity, nosave) {
   if (opacity == null || opacity == undefined) {
     opacity = 0.25;
   }
@@ -744,7 +744,7 @@ function setTimerOpacity(opacity, nosave) {
 }
 
 //key tips
-function setKeyTips(keyTips, nosave) {
+export function setKeyTips(keyTips, nosave) {
   UserConfig.config.showKeyTips = keyTips;
   if (UserConfig.config.showKeyTips) {
     $("#bottom .keyTips").removeClass("hidden");
@@ -818,7 +818,7 @@ function changeWordCount(wordCount, nosave) {
 }
 
 //caret
-function setSmoothCaret(mode, nosave) {
+export function setSmoothCaret(mode, nosave) {
   UserConfig.config.smoothCaret = mode;
   if (!nosave) saveConfigToCookie();
 }
@@ -829,7 +829,7 @@ function toggleSmoothCaret() {
 }
 
 //startgraphsatzero
-function setStartGraphsAtZero(mode, nosave) {
+export function setStartGraphsAtZero(mode, nosave) {
   UserConfig.config.startGraphsAtZero = mode;
   if (!nosave) saveConfigToCookie();
 }
@@ -840,7 +840,7 @@ function setStartGraphsAtZero(mode, nosave) {
 // }
 
 //linescroll
-function setSmoothLineScroll(mode, nosave) {
+export function setSmoothLineScroll(mode, nosave) {
   UserConfig.config.smoothLineScroll = mode;
   if (!nosave) saveConfigToCookie();
 }
@@ -851,7 +851,7 @@ function toggleSmoothLineScroll() {
 }
 
 //quick tab
-function setQuickTabMode(mode, nosave) {
+export function setQuickTabMode(mode, nosave) {
   UserConfig.config.quickTab = mode;
   if (!UserConfig.config.quickTab) {
     // $(".pageTest").append('<div id="restartTestButton" class="" tabindex="0"><i class="fas fa-redo-alt"></i></div>');
@@ -938,7 +938,7 @@ function previewFontFamily(font) {
 }
 
 //font family
-function setFontFamily(font, nosave) {
+export function setFontFamily(font, nosave) {
   if (font == undefined) {
     font = "Roboto_Mono";
   }
@@ -948,7 +948,7 @@ function setFontFamily(font, nosave) {
 }
 
 //freedom
-function setFreedomMode(freedom, nosave) {
+export function setFreedomMode(freedom, nosave) {
   if (freedom == null) {
     freedom = false;
   }
@@ -973,7 +973,7 @@ function toggleFreedomMode() {
   saveConfigToCookie();
 }
 
-function setConfidenceMode(cm, nosave) {
+export function setConfidenceMode(cm, nosave) {
   if (cm == undefined) {
     cm = "off";
   }
@@ -996,7 +996,7 @@ function toggleIndicateTypos() {
   saveConfigToCookie();
 }
 
-function setIndicateTypos(it, nosave) {
+export function setIndicateTypos(it, nosave) {
   if (it == undefined) {
     it = false;
   }
@@ -1004,7 +1004,7 @@ function setIndicateTypos(it, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function previewTheme(name, setIsPreviewingVar = true) {
+export function previewTheme(name, setIsPreviewingVar = true) {
   if (
     (testActive || resultVisible) &&
     (UserConfig.config.theme === "nausea" ||
@@ -1020,7 +1020,7 @@ function previewTheme(name, setIsPreviewingVar = true) {
   }, 500);
 }
 
-function setTheme(name, nosave) {
+export function setTheme(name, nosave) {
   if (
     (testActive || resultVisible) &&
     (UserConfig.config.theme === "nausea" ||
@@ -1068,7 +1068,7 @@ function randomiseTheme() {
   setTheme(randomTheme, true);
 }
 
-function setRandomTheme(val, nosave) {
+export function setRandomTheme(val, nosave) {
   if (val === undefined || val === true || val === false) {
     val = "off";
   }
@@ -1090,7 +1090,7 @@ function setCustomTheme(boolean, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setCustomThemeColors(colors, nosave) {
+export function setCustomThemeColors(colors, nosave) {
   if (colors !== undefined) {
     UserConfig.config.customThemeColors = colors;
     applyCustomThemeColors();
@@ -1186,7 +1186,7 @@ function updateFavicon(size, curveSize) {
   $("#favicon").attr("href", canvas.toDataURL("image/png"));
 }
 
-function changeLanguage(language, nosave) {
+export function changeLanguage(language, nosave) {
   if (language == null || language == undefined) {
     language = "english";
   }
@@ -1201,7 +1201,7 @@ function changeLanguage(language, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setCapsLockBackspace(capsLockBackspace, nosave) {
+export function setCapsLockBackspace(capsLockBackspace, nosave) {
   if (capsLockBackspace === null || capsLockBackspace === undefined) {
     capsLockBackspace = false;
   }
@@ -1222,7 +1222,7 @@ function changeLayout(layout, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function changeSavedLayout(layout, nosave) {
+export function changeSavedLayout(layout, nosave) {
   if (layout == null || layout == undefined) {
     layout = "qwerty";
   }
@@ -1230,7 +1230,7 @@ function changeSavedLayout(layout, nosave) {
   changeLayout(layout, nosave);
 }
 
-function changeKeymapMode(mode, nosave) {
+export function changeKeymapMode(mode, nosave) {
   if (mode == null || mode == undefined) {
     mode = "off";
   }
@@ -1245,7 +1245,7 @@ function changeKeymapMode(mode, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function changeKeymapStyle(style, nosave) {
+export function changeKeymapStyle(style, nosave) {
   $(".keymap").removeClass("matrix");
   $(".keymap").removeClass("split");
   $(".keymap").removeClass("split_matrix");
@@ -1318,7 +1318,7 @@ function keymapShowIsoKey(tf) {
   }
 }
 
-function changeKeymapLayout(layout, nosave) {
+export function changeKeymapLayout(layout, nosave) {
   if (layout == null || layout == undefined) {
     layout = "qwerty";
   }
@@ -1406,7 +1406,7 @@ function changeKeymapLayout(layout, nosave) {
   // console.log(all.join());
 }
 
-function changeFontSize(fontSize, nosave) {
+export function changeFontSize(fontSize, nosave) {
   if (fontSize == null || fontSize == undefined) {
     fontSize = 1;
   }
