@@ -1,3 +1,5 @@
+import * as Util from "./util";
+
 let currentLeaderboard = "time_15";
 
 function showLeaderboards() {
@@ -31,7 +33,7 @@ function hideLeaderboards() {
         $("#leaderboardsWrapper").addClass("hidden");
       }
     );
-  focusWords();
+  Util.focusWords();
 }
 
 function updateLeaderboards() {
@@ -76,7 +78,7 @@ function updateLeaderboards() {
     uid = firebase.auth().currentUser.uid;
   }
 
-  showBackgroundLoader();
+  Util.showBackgroundLoader();
   Promise.all([
     firebase.functions().httpsCallable("getLeaderboard")({
       mode: boardinfo[0],
@@ -92,7 +94,7 @@ function updateLeaderboards() {
     }),
   ])
     .then((lbdata) => {
-      hideBackgroundLoader();
+      Util.hideBackgroundLoader();
       let dailyData = lbdata[0].data;
       let globalData = lbdata[1].data;
 
@@ -246,7 +248,7 @@ function updateLeaderboards() {
       }
     })
     .catch((e) => {
-      showNotification("Something went wrong", 3000);
+      Util.showNotification("Something went wrong", 3000);
     });
 }
 

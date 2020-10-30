@@ -2886,12 +2886,6 @@ function restartTest(withSameWordset = false, nosave = false) {
   // $(".active-key").classList.remove("active-key");
 }
 
-function focusWords() {
-  if (!$("#wordsWrapper").hasClass("hidden")) {
-    $("#wordsInput").focus();
-  }
-}
-
 function changeCustomText() {
   customText = prompt("Custom text").trim();
   customText = customText.replace(/[\n\r\t ]/gm, " ");
@@ -3456,14 +3450,6 @@ function hideEditTags() {
         }
       );
   }
-}
-
-function showBackgroundLoader() {
-  $("#backgroundLoader").stop(true, true).fadeIn(125);
-}
-
-function hideBackgroundLoader() {
-  $("#backgroundLoader").stop(true, true).fadeOut(125);
 }
 
 function updateTestModesNotice() {
