@@ -8,7 +8,16 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "rules": {},
+  "rules": {
+    "no-unused-vars": ["off"],
+    "no-empty": ["off"],
+    "no-dupe-keys": ["off"],
+    "no-func-assign": ["off"],
+    "no-useless-catch": ["off"],
+    "no-dupe-else-if": ["off"],
+    "no-redeclare": ["off"],
+    "no-unexpected-multiline": ["off"]
+  },
   "globals": {
     "$": "readonly",
     "jQuery": "readonly"
