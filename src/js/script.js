@@ -1,3 +1,9 @@
+import { layouts } from "./layouts";
+import * as Misc from "./misc";
+import * as Util from "./util";
+import { defaultConfig, UserConfig } from "./userconfig";
+import { UserData, db_saveLocalPB, db_getLocalPB } from "./db";
+
 let wordsList = [];
 let currentWordIndex = 0;
 let currentWordElementIndex = 0;
@@ -224,7 +230,10 @@ function refreshThemeColorObject() {
 
 function copyResultToClipboard() {
   if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
-    showNotification("Sorry, this feature is not supported in Firefox", 4000);
+    Util.showNotification(
+      "Sorry, this feature is not supported in Firefox",
+      4000
+    );
   } else {
     $(".pageTest .ssWatermark").removeClass("hidden");
     $(".pageTest .buttons").addClass("hidden");
@@ -256,14 +265,14 @@ function copyResultToClipboard() {
             ])
             .then((f) => {
               $(".notification").removeClass("hidden");
-              showNotification("Copied to clipboard", 1000);
+              Util.showNotification("Copied to clipboard", 1000);
               $(".pageTest .ssWatermark").addClass("hidden");
               $(".pageTest .buttons").removeClass("hidden");
               $(".pageTest .loginTip").removeClass("hidden");
             })
             .catch((f) => {
               $(".notification").removeClass("hidden");
-              showNotification("Error saving image to clipboard", 2000);
+              Util.showNotification("Error saving image to clipboard", 2000);
               $(".pageTest .ssWatermark").addClass("hidden");
               $(".pageTest .buttons").removeClass("hidden");
               $(".pageTest .loginTip").removeClass("hidden");
@@ -272,7 +281,7 @@ function copyResultToClipboard() {
       });
     } catch (e) {
       $(".notification").removeClass("hidden");
-      showNotification("Error creating image", 2000);
+      Util.showNotification("Error creating image", 2000);
       $(".pageTest .ssWatermark").addClass("hidden");
       $(".pageTest .buttons").removeClass("hidden");
       $(".pageTest .loginTip").removeClass("hidden");
@@ -282,7 +291,7 @@ function copyResultToClipboard() {
 
 function activateFunbox(funbox, mode) {
   if (testActive || resultVisible) {
-    showNotification(
+    Util.showNotification(
       "You can only change the funbox before starting a test.",
       4000
     );
@@ -290,7 +299,7 @@ function activateFunbox(funbox, mode) {
   }
   if (currentLanguage.ligatures) {
     if (funbox == "choo_choo" || funbox == "earthquake") {
-      showNotification(
+      Util.showNotification(
         "Current language does not support this funbox mode",
         3000
       );
@@ -320,14 +329,14 @@ function activateFunbox(funbox, mode) {
   } else if (mode === "script") {
     if (funbox === "tts") {
       $("#funBoxTheme").attr("href", `funbox/simon_says.css`);
-      config.keymapMode = "off";
+      UserConfig.config.keymapMode = "off";
       settingsGroups.keymapMode.updateButton();
       restartTest();
     } else if (funbox === "layoutfluid") {
-      config.keymapMode = "on";
+      UserConfig.config.keymapMode = "on";
       changeKeymapMode("next");
       settingsGroups.keymapMode.updateButton();
-      config.savedLayout = config.layout;
+      UserConfig.config.savedLayout = UserConfig.config.layout;
       changeLayout("qwerty");
       settingsGroups.layout.updateButton();
       changeKeymapLayout("qwerty");
@@ -342,8 +351,8 @@ function activateFunbox(funbox, mode) {
   }
 
   if (funbox !== "layoutfluid" || mode !== "script") {
-    if (config.layout !== config.savedLayout) {
-      changeLayout(config.savedLayout);
+    if (UserConfig.config.layout !== UserConfig.config.savedLayout) {
+      changeLayout(UserConfig.config.savedLayout);
       settingsGroups.layout.updateButton();
     }
   }
@@ -407,9 +416,9 @@ async function initWords() {
   currentCorrected = "";
   currentInput = "";
 
-  let language = await getLanguage(config);
+  let language = await getLanguage(UserConfig.config);
 
-  if (config.mode === "quote" && quotes === null) {
+  if (UserConfig.config.mode === "quote" && quotes === null) {
     showBackgroundLoader();
     $.ajax({
       url: "js/english_quotes.json",
@@ -430,69 +439,72 @@ async function initWords() {
   }
 
   if (!language) {
-    config.language = "english";
-    language = words[config.language];
+    UserConfig.config.language = "english";
+    language = words[UserConfig.config.language];
   }
 
   if (
-    config.mode == "time" ||
-    config.mode == "words" ||
-    config.mode == "custom"
+    UserConfig.config.mode == "time" ||
+    UserConfig.config.mode == "words" ||
+    UserConfig.config.mode == "custom"
   ) {
     // let wordsBound = config.mode == "time" ? 60 : config.words;
     let wordsBound = 100;
-    if (config.showAllLines) {
-      if (config.mode === "custom") {
+    if (UserConfig.config.showAllLines) {
+      if (UserConfig.config.mode === "custom") {
         if (customTextIsRandom) {
           wordsBound = customTextWordCount;
         } else {
           wordsBound = customText.length;
         }
-      } else if (config.mode != "time") {
-        wordsBound = config.words;
+      } else if (UserConfig.config.mode != "time") {
+        wordsBound = UserConfig.config.words;
       }
     } else {
-      if (config.mode === "words" && config.words < wordsBound) {
-        wordsBound = config.words;
+      if (
+        UserConfig.config.mode === "words" &&
+        UserConfig.config.words < wordsBound
+      ) {
+        wordsBound = UserConfig.config.words;
       }
       if (
-        config.mode == "custom" &&
+        UserConfig.config.mode == "custom" &&
         customTextIsRandom &&
         customTextWordCount < wordsBound
       ) {
         wordsBound = customTextWordCount;
       }
       if (
-        config.mode == "custom" &&
+        UserConfig.config.mode == "custom" &&
         !customTextIsRandom &&
         customText.length < wordsBound
       ) {
         wordsBound = customText.length;
       }
     }
-    if (config.mode === "words" && config.words === 0) {
+    if (UserConfig.config.mode === "words" && UserConfig.config.words === 0) {
       wordsBound = 100;
     }
     if (activeFunBox === "plus_one") {
       wordsBound = 2;
     }
     let wordset = language.words;
-    if (config.mode == "custom") {
+    if (UserConfig.config.mode == "custom") {
       wordset = customText;
     }
     for (let i = 0; i < wordsBound; i++) {
-      randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-      previousWord = wordsList[i - 1];
-      previousWord2 = wordsList[i - 2];
-      if (config.mode == "custom" && customTextIsRandom) {
+      let randomWord = wordset[Math.floor(Math.random() * wordset.length)];
+      const previousWord = wordsList[i - 1];
+      const previousWord2 = wordsList[i - 2];
+      if (UserConfig.config.mode == "custom" && customTextIsRandom) {
         randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-      } else if (config.mode == "custom" && !customTextIsRandom) {
+      } else if (UserConfig.config.mode == "custom" && !customTextIsRandom) {
         randomWord = customText[i];
       } else {
         while (
           randomWord == previousWord ||
           randomWord == previousWord2 ||
-          (!config.punctuation && randomWord == "I") ||
+          (!UserConfig.config.punctuation && randomWord == "I") ||
           randomWord.indexOf(" ") > -1
         ) {
           randomWord = wordset[Math.floor(Math.random() * wordset.length)];
@@ -522,10 +534,10 @@ async function initWords() {
         randomWord = getASCII();
       }
 
-      if (config.punctuation && config.mode != "custom") {
+      if (UserConfig.config.punctuation && UserConfig.config.mode != "custom") {
         randomWord = punctuateWord(previousWord, randomWord, i, wordsBound);
       }
-      if (config.numbers && config.mode != "custom") {
+      if (UserConfig.config.numbers && UserConfig.config.mode != "custom") {
         if (Math.random() < 0.1) {
           randomWord = getNumbers(4);
         }
@@ -533,14 +545,14 @@ async function initWords() {
 
       wordsList.push(randomWord);
     }
-  } else if (config.mode == "quote") {
-    let group = config.quoteLength;
+  } else if (UserConfig.config.mode == "quote") {
+    let group = UserConfig.config.quoteLength;
 
-    if (config.quoteLength === -1) {
+    if (UserConfig.config.quoteLength === -1) {
       group = Math.floor(Math.random() * quotes.groups.length);
     }
 
-    rq =
+    let rq =
       quotes.groups[group][
         Math.floor(Math.random() * quotes.groups[group].length)
       ];
@@ -585,9 +597,10 @@ function setToggleSettings(state, nosave) {
 
 function emulateLayout(event) {
   function emulatedLayoutShouldShiftKey(event, newKeyPreview) {
-    if (config.capsLockBackspace) return event.shiftKey;
+    if (UserConfig.config.capsLockBackspace) return event.shiftKey;
     const isCapsLockHeld = event.originalEvent.getModifierState("CapsLock");
-    if (isCapsLockHeld) return isASCIILetter(newKeyPreview) !== event.shiftKey;
+    if (isCapsLockHeld)
+      return Misc.isASCIILetter(newKeyPreview) !== event.shiftKey;
     return event.shiftKey;
   }
   function replaceEventKey(event, keyCode) {
@@ -598,9 +611,9 @@ function emulateLayout(event) {
     event.key = newKey;
     event.code = "Key" + newKey.toUpperCase();
   }
-  if (config.layout === "default") {
+  if (UserConfig.config.layout === "default") {
     //override the caps lock modifier for the default layout if needed
-    if (config.capsLockBackspace && isASCIILetter(event.key)) {
+    if (UserConfig.config.capsLockBackspace && Misc.isASCIILetter(event.key)) {
       replaceEventKey(
         event,
         event.shiftKey
@@ -661,7 +674,7 @@ function emulateLayout(event) {
     "Slash",
     "Space",
   ];
-  const layoutMap = layouts[config.layout].keys;
+  const layoutMap = layouts[UserConfig.config.layout].keys;
 
   let mapIndex;
   for (let i = 0; i < keyEventCodes.length; i++) {
@@ -681,16 +694,16 @@ function punctuateWord(previousWord, currentWord, index, maxindex) {
 
   if (
     index == 0 ||
-    getLastChar(previousWord) == "." ||
-    getLastChar(previousWord) == "?" ||
-    getLastChar(previousWord) == "!"
+    Misc.getLastChar(previousWord) == "." ||
+    Misc.getLastChar(previousWord) == "?" ||
+    Misc.getLastChar(previousWord) == "!"
   ) {
     //always capitalise the first word or if there was a dot
-    word = capitalizeFirstLetter(word);
+    word = Misc.capitalizeFirstLetter(word);
   } else if (
     //10% chance to end a sentence
     (Math.random() < 0.1 &&
-      getLastChar(previousWord) != "." &&
+      Misc.getLastChar(previousWord) != "." &&
       index != maxindex - 2) ||
     index == maxindex - 1
   ) {
@@ -704,8 +717,8 @@ function punctuateWord(previousWord, currentWord, index, maxindex) {
     }
   } else if (
     Math.random() < 0.01 &&
-    getLastChar(previousWord) != "," &&
-    getLastChar(previousWord) != "."
+    Misc.getLastChar(previousWord) != "," &&
+    Misc.getLastChar(previousWord) != "."
   ) {
     //1% chance to add quotes
     word = `"${word}"`;
@@ -714,13 +727,13 @@ function punctuateWord(previousWord, currentWord, index, maxindex) {
     word = word + ":";
   } else if (
     Math.random() < 0.01 &&
-    getLastChar(previousWord) != "," &&
-    getLastChar(previousWord) != "." &&
+    Misc.getLastChar(previousWord) != "," &&
+    Misc.getLastChar(previousWord) != "." &&
     previousWord != "-"
   ) {
     //1% chance to add a dash
     word = "-";
-  } else if (Math.random() < 0.2 && getLastChar(previousWord) != ",") {
+  } else if (Math.random() < 0.2 && Misc.getLastChar(previousWord) != ",") {
     //2% chance to add a comma
     word += ",";
   }
@@ -732,19 +745,19 @@ function addWord() {
   if (activeFunBox === "plus_one") bound = 1;
   if (
     wordsList.length - inputHistory.length > bound ||
-    (config.mode === "words" &&
-      wordsList.length >= config.words &&
-      config.words > 0) ||
-    (config.mode === "custom" &&
+    (UserConfig.config.mode === "words" &&
+      wordsList.length >= UserConfig.config.words &&
+      UserConfig.config.words > 0) ||
+    (UserConfig.config.mode === "custom" &&
       customTextIsRandom &&
       wordsList.length >= customTextWordCount) ||
-    (config.mode === "custom" &&
+    (UserConfig.config.mode === "custom" &&
       !customTextIsRandom &&
       wordsList.length >= customText.length)
   )
     return;
   const language =
-    config.mode !== "custom"
+    UserConfig.config.mode !== "custom"
       ? currentLanguage
       : {
           //borrow the direction of the current language
@@ -753,22 +766,28 @@ function addWord() {
         };
   const wordset = language.words;
   let randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-  previousWord = wordsList[wordsList.length - 1];
-  previousWordStripped = previousWord.replace(/[.?!":\-,]/g, "").toLowerCase();
-  previousWord2Stripped = wordsList[wordsList.length - 2]
+  const previousWord = wordsList[wordsList.length - 1];
+  const previousWordStripped = previousWord
+    .replace(/[.?!":\-,]/g, "")
+    .toLowerCase();
+  const previousWord2Stripped = wordsList[wordsList.length - 2]
     .replace(/[.?!":\-,]/g, "")
     .toLowerCase();
 
-  if (config.mode === "custom" && customTextIsRandom && wordset.length < 3) {
+  if (
+    UserConfig.config.mode === "custom" &&
+    customTextIsRandom &&
+    wordset.length < 3
+  ) {
     randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-  } else if (config.mode == "custom" && !customTextIsRandom) {
+  } else if (UserConfig.config.mode == "custom" && !customTextIsRandom) {
     randomWord = customText[wordsList.length];
   } else {
     while (
       previousWordStripped == randomWord ||
       previousWord2Stripped == randomWord ||
       randomWord.indexOf(" ") > -1 ||
-      (!config.punctuation && randomWord == "I")
+      (!UserConfig.config.punctuation && randomWord == "I")
     ) {
       randomWord = wordset[Math.floor(Math.random() * wordset.length)];
     }
@@ -794,10 +813,10 @@ function addWord() {
     randomWord = getASCII();
   }
 
-  if (config.punctuation && config.mode != "custom") {
+  if (UserConfig.config.punctuation && UserConfig.config.mode != "custom") {
     randomWord = punctuateWord(previousWord, randomWord, wordsList.length, 0);
   }
-  if (config.numbers && config.mode != "custom") {
+  if (UserConfig.config.numbers && UserConfig.config.mode != "custom") {
     if (Math.random() < 0.1) {
       randomWord = getNumbers(4);
     }
@@ -828,7 +847,7 @@ function showWords() {
   $("#wordsWrapper").removeClass("hidden");
   const wordHeight = $(document.querySelector(".word")).outerHeight(true);
   const wordsHeight = $(document.querySelector("#words")).outerHeight(true);
-  if (config.showAllLines && config.mode != "time") {
+  if (UserConfig.config.showAllLines && UserConfig.config.mode != "time") {
     $("#words").css("height", "auto");
     $("#wordsWrapper").css("height", "auto");
     let nh = wordHeight * 3;
@@ -847,7 +866,7 @@ function showWords() {
     $(".outOfFocusWarning").css("line-height", wordHeight * 3 + "px");
   }
 
-  if (config.keymapMode === "next") {
+  if (UserConfig.config.keymapMode === "next") {
     updateHighlightedKeymapKey();
   }
 
@@ -856,7 +875,7 @@ function showWords() {
     memoryFunboxTimer = Math.round(Math.pow(wordsList.length, 1.2));
     memoryFunboxInterval = setInterval((fn) => {
       memoryFunboxTimer -= 1;
-      showNotification(memoryFunboxTimer);
+      Util.showNotification(memoryFunboxTimer);
       if (memoryFunboxTimer < 0) {
         memoryFunboxInterval = clearInterval(memoryFunboxInterval);
         memoryFunboxTimer = null;
@@ -872,7 +891,7 @@ function showWords() {
 function updateActiveElement() {
   let active = document.querySelector("#words .active");
   if (active !== null) {
-    if (config.highlightMode == "word") {
+    if (UserConfig.config.highlightMode == "word") {
       active.querySelectorAll("letter").forEach((e) => {
         e.classList.remove("correct");
       });
@@ -892,7 +911,7 @@ function updateActiveElement() {
 
     // activeWordTop = $("#words .word.active").position().top;
     activeWordTop = document.querySelector("#words .active").offsetTop;
-    if (config.highlightMode == "word") {
+    if (UserConfig.config.highlightMode == "word") {
       activeWord.querySelectorAll("letter").forEach((e) => {
         e.classList.add("correct");
       });
@@ -914,7 +933,7 @@ function compareInput(showError) {
   // }
   let ret = "";
 
-  if (config.highlightMode == "word") {
+  if (UserConfig.config.highlightMode == "word") {
     let correctSoFar = false;
     if (currentWord.slice(0, input.length) == input) {
       // this is when input so far is correct
@@ -934,7 +953,7 @@ function compareInput(showError) {
       }
 
       try {
-        if (config.language === "russian" && charCorrect === false) {
+        if (UserConfig.config.language === "russian" && charCorrect === false) {
           if (
             (currentWord[i].toLowerCase() === "е" &&
               input[i].toLowerCase() === "ё") ||
@@ -950,7 +969,7 @@ function compareInput(showError) {
         ret += '<letter class="correct">' + currentWord[i] + "</letter>";
         // $(letterElems[i]).removeClass('incorrect').addClass('correct');
       } else {
-        if (config.difficulty == "master") {
+        if (UserConfig.config.difficulty == "master") {
           if (!resultVisible) {
             inputHistory.push(currentInput);
             correctedHistory.push(currentCorrected);
@@ -961,7 +980,7 @@ function compareInput(showError) {
             showResult(true);
           }
           let testNow = Date.now();
-          let testSeconds = roundTo2((testNow - testStart) / 1000);
+          let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
           incompleteTestSeconds += testSeconds;
           restartCount++;
         }
@@ -978,7 +997,9 @@ function compareInput(showError) {
             ret +=
               '<letter class="incorrect">' +
               currentWord[i] +
-              (config.indicateTypos ? `<hint>${input[i]}</hint>` : "") +
+              (UserConfig.config.indicateTypos
+                ? `<hint>${input[i]}</hint>`
+                : "") +
               "</letter>";
           }
         }
@@ -997,7 +1018,7 @@ function compareInput(showError) {
 
   if (
     (currentWord == input ||
-      (config.quickEnd && currentWord.length == input.length)) &&
+      (UserConfig.config.quickEnd && currentWord.length == input.length)) &&
     lastindex == wordsList.length - 1
   ) {
     inputHistory.push(input);
@@ -1022,8 +1043,10 @@ function highlightBadWord(index, showError) {
 }
 
 function showTimer() {
-  let op = config.showTimerProgress ? config.timerOpacity : 0;
-  if (config.timerStyle === "bar") {
+  let op = UserConfig.config.showTimerProgress
+    ? UserConfig.config.timerOpacity
+    : 0;
+  if (UserConfig.config.timerStyle === "bar") {
     // let op = 0.25;
     // if (
     //   $("#timerNumber").hasClass("timerSub") ||
@@ -1038,7 +1061,7 @@ function showTimer() {
       },
       250
     );
-  } else if (config.timerStyle === "text") {
+  } else if (UserConfig.config.timerStyle === "text") {
     // let op = 0.25;
     // if (
     //   $("#timerNumber").hasClass("timerSub") ||
@@ -1053,7 +1076,7 @@ function showTimer() {
       },
       250
     );
-  } else if (config.timerStyle === "mini") {
+  } else if (UserConfig.config.timerStyle === "mini") {
     if (op > 0) {
       $("#miniTimerAndLiveWpm .time")
         .stop(true, true)
@@ -1130,15 +1153,18 @@ function changeTimerColor(color) {
 }
 
 function restartTimer() {
-  if (config.timerStyle === "bar") {
-    if (config.mode === "time") {
+  if (UserConfig.config.timerStyle === "bar") {
+    if (UserConfig.config.mode === "time") {
       $("#timer").stop(true, true).animate(
         {
           width: "100vw",
         },
         0
       );
-    } else if (config.mode === "words" || config.mode === "custom") {
+    } else if (
+      UserConfig.config.mode === "words" ||
+      UserConfig.config.mode === "custom"
+    ) {
       $("#timer").stop(true, true).animate(
         {
           width: "0vw",
@@ -1150,10 +1176,10 @@ function restartTimer() {
 }
 
 function updateTimer() {
-  if (!config.showTimerProgress) return;
-  if (config.mode === "time") {
-    if (config.timerStyle === "bar") {
-      let percent = 100 - ((time + 1) / config.time) * 100;
+  if (!UserConfig.config.showTimerProgress) return;
+  if (UserConfig.config.mode === "time") {
+    if (UserConfig.config.timerStyle === "bar") {
+      let percent = 100 - ((time + 1) / UserConfig.config.time) * 100;
       $("#timer")
         .stop(true, true)
         .animate(
@@ -1163,7 +1189,7 @@ function updateTimer() {
           1000,
           "linear"
         );
-    } else if (config.timerStyle === "text") {
+    } else if (UserConfig.config.timerStyle === "text") {
       // var displayTime = new Date(null);
       // displayTime.setSeconds(config.time - time);
       // displayTime = displayTime.toISOString().substr(11, 8);
@@ -1178,30 +1204,30 @@ function updateTimer() {
       //     displayTime = displayTime.substr(1);
       //   }
       // }
-      let displayTime = secondsToString(config.time - time);
-      if (config.time === 0) {
-        displayTime = secondsToString(time);
+      let displayTime = Misc.secondsToString(UserConfig.config.time - time);
+      if (UserConfig.config.time === 0) {
+        displayTime = Misc.secondsToString(time);
       }
       $("#timerNumber").html("<div>" + displayTime + "</div>");
       // $("#timerNumber").html(config.time - time);
-    } else if (config.timerStyle === "mini") {
-      let displayTime = secondsToString(config.time - time);
-      if (config.time === 0) {
-        displayTime = secondsToString(time);
+    } else if (UserConfig.config.timerStyle === "mini") {
+      let displayTime = Misc.secondsToString(UserConfig.config.time - time);
+      if (UserConfig.config.time === 0) {
+        displayTime = Misc.secondsToString(time);
       }
       $("#miniTimerAndLiveWpm .time").html(displayTime);
     }
   } else if (
-    config.mode === "words" ||
-    config.mode === "custom" ||
-    config.mode === "quote"
+    UserConfig.config.mode === "words" ||
+    UserConfig.config.mode === "custom" ||
+    UserConfig.config.mode === "quote"
   ) {
-    if (config.timerStyle === "bar") {
+    if (UserConfig.config.timerStyle === "bar") {
       let outof = wordsList.length;
-      if (config.mode === "words") {
-        outof = config.words;
+      if (UserConfig.config.mode === "words") {
+        outof = UserConfig.config.words;
       }
-      if (config.mode === "custom") {
+      if (UserConfig.config.mode === "custom") {
         if (customTextIsRandom) {
           outof = customTextWordCount;
         } else {
@@ -1217,19 +1243,19 @@ function updateTimer() {
           },
           250
         );
-    } else if (config.timerStyle === "text") {
+    } else if (UserConfig.config.timerStyle === "text") {
       let outof = wordsList.length;
-      if (config.mode === "words") {
-        outof = config.words;
+      if (UserConfig.config.mode === "words") {
+        outof = UserConfig.config.words;
       }
-      if (config.mode === "custom") {
+      if (UserConfig.config.mode === "custom") {
         if (customTextIsRandom) {
           outof = customTextWordCount;
         } else {
           outof = customText.length;
         }
       }
-      if (config.words === 0) {
+      if (UserConfig.config.words === 0) {
         $("#timerNumber").html("<div>" + `${inputHistory.length}` + "</div>");
       } else {
         $("#timerNumber").html(
@@ -1237,19 +1263,19 @@ function updateTimer() {
         );
       }
       // $("#timerNumber").html(config.time - time);
-    } else if (config.timerStyle === "mini") {
+    } else if (UserConfig.config.timerStyle === "mini") {
       let outof = wordsList.length;
-      if (config.mode === "words") {
-        outof = config.words;
+      if (UserConfig.config.mode === "words") {
+        outof = UserConfig.config.words;
       }
-      if (config.mode === "custom") {
+      if (UserConfig.config.mode === "custom") {
         if (customTextIsRandom) {
           outof = customTextWordCount;
         } else {
           outof = customText.length;
         }
       }
-      if (config.words === 0) {
+      if (UserConfig.config.words === 0) {
         $("#miniTimerAndLiveWpm .time").html(`${inputHistory.length}`);
       } else {
         $("#miniTimerAndLiveWpm .time").html(`${inputHistory.length}/${outof}`);
@@ -1315,7 +1341,7 @@ function flashPressedKeymapKey(key, correct) {
   // }
 
   let errorColor;
-  if (config.colorfulMode) {
+  if (UserConfig.config.colorfulMode) {
     errorColor = themeColors.colorfulError;
   } else {
     errorColor = themeColors.error;
@@ -1366,7 +1392,7 @@ function flashPressedKeymapKey(key, correct) {
   }
 
   try {
-    if (correct || config.blindMode) {
+    if (correct || UserConfig.config.blindMode) {
       $(key)
         .stop(true, true)
         .css({
@@ -1510,7 +1536,7 @@ function updateCaretPosition() {
     let smoothlinescroll = $("#words .smoothScroller").height();
     if (smoothlinescroll === undefined) smoothlinescroll = 0;
 
-    if (config.smoothCaret) {
+    if (UserConfig.config.smoothCaret) {
       caret.stop(true, false).animate(
         {
           top: newTop - smoothlinescroll,
@@ -1528,7 +1554,7 @@ function updateCaretPosition() {
       );
     }
 
-    if (config.showAllLines) {
+    if (UserConfig.config.showAllLines) {
       let browserHeight = window.innerHeight;
       let middlePos = browserHeight / 2 - $("#caret").outerHeight() / 2;
       let contentHeight = document.body.scrollHeight;
@@ -1603,7 +1629,7 @@ function countChars() {
       }
       correctChars += toAdd.correct;
       incorrectChars += toAdd.incorrect;
-      if (i === inputHistory.length - 1 && config.mode == "time") {
+      if (i === inputHistory.length - 1 && UserConfig.config.mode == "time") {
         //last word - check if it was all correct - add to correct word chars
         if (toAdd.incorrect === 0) correctWordChars += toAdd.correct;
       } else {
@@ -1634,7 +1660,7 @@ function calculateStats() {
   let chars = countChars();
   // let testNow = Date.now();
 
-  let wpm = roundTo2(
+  let wpm = Misc.roundTo2(
     ((chars.correctWordChars + chars.correctSpaces) * (60 / testSeconds)) / 5
   );
   // console.log(
@@ -1642,7 +1668,7 @@ function calculateStats() {
   //     ((chars.correctWordChars + chars.spaces) * (60 / testSeconds)) / 5
   //   )} (current ${wpm})`
   // );
-  let wpmraw = roundTo2(
+  let wpmraw = Misc.roundTo2(
     ((chars.allCorrectChars +
       chars.spaces +
       chars.incorrectChars +
@@ -1650,7 +1676,7 @@ function calculateStats() {
       (60 / testSeconds)) /
       5
   );
-  let acc = roundTo2(
+  let acc = Misc.roundTo2(
     (accuracyStats.correct /
       (accuracyStats.correct + accuracyStats.incorrect)) *
       100
@@ -1720,34 +1746,34 @@ function showResult(difficultyFailed = false) {
   clearTimeout(timer);
   let testtime = stats.time;
   let afkseconds = keypressPerSecond.filter((x) => x.count == 0).length;
-  let afkSecondsPercent = roundTo2((afkseconds / testtime) * 100);
+  let afkSecondsPercent = Misc.roundTo2((afkseconds / testtime) * 100);
 
   $("#result #resultWordsHistory").addClass("hidden");
 
-  if (config.alwaysShowDecimalPlaces) {
-    if (config.alwaysShowCPM == false) {
+  if (UserConfig.config.alwaysShowDecimalPlaces) {
+    if (UserConfig.config.alwaysShowCPM == false) {
       $("#result .stats .wpm .top").text("wpm");
-      $("#result .stats .wpm .bottom").text(roundTo2(stats.wpm));
-      $("#result .stats .raw .bottom").text(roundTo2(stats.wpmRaw));
+      $("#result .stats .wpm .bottom").text(Misc.roundTo2(stats.wpm));
+      $("#result .stats .raw .bottom").text(Misc.roundTo2(stats.wpmRaw));
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
-        roundTo2(stats.wpm * 5) + " cpm"
+        Misc.roundTo2(stats.wpm * 5) + " cpm"
       );
     } else {
       $("#result .stats .wpm .top").text("cpm");
-      $("#result .stats .wpm .bottom").text(roundTo2(stats.wpm * 5));
-      $("#result .stats .raw .bottom").text(roundTo2(stats.wpmRaw * 5));
+      $("#result .stats .wpm .bottom").text(Misc.roundTo2(stats.wpm * 5));
+      $("#result .stats .raw .bottom").text(Misc.roundTo2(stats.wpmRaw * 5));
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
-        roundTo2(stats.wpm) + " wpm"
+        Misc.roundTo2(stats.wpm) + " wpm"
       );
     }
 
-    $("#result .stats .acc .bottom").text(roundTo2(stats.acc) + "%");
+    $("#result .stats .acc .bottom").text(Misc.roundTo2(stats.acc) + "%");
     // $("#result .stats .time .bottom").text(roundTo2(testtime) + "s");
-    let time = roundTo2(testtime) + "s";
+    let time = Misc.roundTo2(testtime) + "s";
     if (testtime > 61) {
-      time = secondsToString(roundTo2(testtime));
+      time = Misc.secondsToString(Misc.roundTo2(testtime));
     }
     $("#result .stats .time .bottom .text").text(time);
 
@@ -1759,11 +1785,11 @@ function showResult(difficultyFailed = false) {
     );
   } else {
     //not showing decimal places
-    if (config.alwaysShowCPM == false) {
+    if (UserConfig.config.alwaysShowCPM == false) {
       $("#result .stats .wpm .top").text("wpm");
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
-        stats.wpm + ` (${roundTo2(stats.wpm * 5)} cpm)`
+        stats.wpm + ` (${Misc.roundTo2(stats.wpm * 5)} cpm)`
       );
       $("#result .stats .wpm .bottom").text(Math.round(stats.wpm));
       $("#result .stats .raw .bottom").text(Math.round(stats.wpmRaw));
@@ -1772,7 +1798,7 @@ function showResult(difficultyFailed = false) {
       $("#result .stats .wpm .top").text("cpm");
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
-        stats.wpm + ` (${roundTo2(stats.wpm)} wpm)`
+        stats.wpm + ` (${Misc.roundTo2(stats.wpm)} wpm)`
       );
       $("#result .stats .wpm .bottom").text(Math.round(stats.wpm * 5));
       $("#result .stats .raw .bottom").text(Math.round(stats.wpmRaw * 5));
@@ -1783,12 +1809,12 @@ function showResult(difficultyFailed = false) {
     $("#result .stats .acc .bottom").attr("aria-label", stats.acc + "%");
     let time = Math.round(testtime) + "s";
     if (testtime > 61) {
-      time = secondsToString(Math.round(testtime));
+      time = Misc.secondsToString(Math.round(testtime));
     }
     $("#result .stats .time .bottom .text").text(time);
     $("#result .stats .time .bottom").attr(
       "aria-label",
-      `${roundTo2(testtime)}s (${afkseconds}s afk ${afkSecondsPercent}%)`
+      `${Misc.roundTo2(testtime)}s (${afkseconds}s afk ${afkSecondsPercent}%)`
     );
   }
   $("#result .stats .time .bottom .afk").text("");
@@ -1796,7 +1822,7 @@ function showResult(difficultyFailed = false) {
     $("#result .stats .time .bottom .afk").text(afkSecondsPercent + "% afk");
   }
 
-  let correctcharpercent = roundTo2(
+  let correctcharpercent = Misc.roundTo2(
     ((stats.correctChars + stats.correctSpaces) /
       (stats.correctChars +
         stats.correctSpaces +
@@ -1834,13 +1860,13 @@ function showResult(difficultyFailed = false) {
   $("#result .stats .leaderboards").addClass("hidden");
 
   let mode2 = "";
-  if (config.mode === "time") {
-    mode2 = config.time;
-  } else if (config.mode === "words") {
-    mode2 = config.words;
-  } else if (config.mode === "custom") {
+  if (UserConfig.config.mode === "time") {
+    mode2 = UserConfig.config.time;
+  } else if (UserConfig.config.mode === "words") {
+    mode2 = UserConfig.config.words;
+  } else if (UserConfig.config.mode === "custom") {
     mode2 = "custom";
-  } else if (config.mode === "quote") {
+  } else if (UserConfig.config.mode === "quote") {
     mode2 = randomQuote.id;
   }
 
@@ -1863,7 +1889,7 @@ function showResult(difficultyFailed = false) {
   let labels = [];
   for (let i = 1; i <= wpmHistory.length; i++) {
     if (lastSecondNotRound && i === wpmHistory.length) {
-      labels.push(roundTo2(testtime).toString());
+      labels.push(Misc.roundTo2(testtime).toString());
     } else {
       labels.push(i.toString());
     }
@@ -1892,15 +1918,16 @@ function showResult(difficultyFailed = false) {
     Math.round((f.count / 5) * 60)
   );
 
-  let rawWpmPerSecond = smooth(rawWpmPerSecondRaw, 1);
+  let rawWpmPerSecond = Misc.smooth(rawWpmPerSecondRaw, 1);
 
-  let stddev = stdDev(rawWpmPerSecondRaw);
-  let avg = mean(rawWpmPerSecondRaw);
+  let stddev = Misc.stdDev(rawWpmPerSecondRaw);
+  let avg = Misc.mean(rawWpmPerSecondRaw);
 
-  let consistency = roundTo2(kogasa(stddev / avg));
-  let keyConsistency = roundTo2(
-    kogasa(
-      stdDev(keypressStats.spacing.array) / mean(keypressStats.spacing.array)
+  let consistency = Misc.roundTo2(Misc.kogasa(stddev / avg));
+  let keyConsistency = Misc.roundTo2(
+    Misc.kogasa(
+      Misc.stdDev(keypressStats.spacing.array) /
+        Misc.mean(keypressStats.spacing.array)
     )
   );
 
@@ -1908,8 +1935,10 @@ function showResult(difficultyFailed = false) {
     consistency = 0;
   }
 
-  if (config.alwaysShowDecimalPlaces) {
-    $("#result .stats .consistency .bottom").text(roundTo2(consistency) + "%");
+  if (UserConfig.config.alwaysShowDecimalPlaces) {
+    $("#result .stats .consistency .bottom").text(
+      Misc.roundTo2(consistency) + "%"
+    );
     $("#result .stats .consistency .bottom").attr(
       "aria-label",
       `${keyConsistency}% key`
@@ -1946,7 +1975,7 @@ function showResult(difficultyFailed = false) {
     ...[Math.min(...rawWpmPerSecond), Math.min(...wpmHistory)]
   );
 
-  if (!config.startGraphsAtZero) {
+  if (!UserConfig.config.startGraphsAtZero) {
     wpmOverTimeChart.options.scales.yAxes[0].ticks.min = minChartVal;
     wpmOverTimeChart.options.scales.yAxes[1].ticks.min = minChartVal;
   } else {
@@ -1979,15 +2008,15 @@ function showResult(difficultyFailed = false) {
   if (bailout) afkDetected = false;
 
   if (difficultyFailed) {
-    showNotification("Test failed", 2000);
+    Util.showNotification("Test failed", 2000);
   } else if (afkDetected) {
-    showNotification("Test invalid - AFK detected", 2000);
+    Util.showNotification("Test invalid - AFK detected", 2000);
   } else if (sameWordset) {
-    showNotification("Test invalid - repeated", 2000);
+    Util.showNotification("Test invalid - repeated", 2000);
   } else {
     let activeTags = [];
     try {
-      dbSnapshot.tags.forEach((tag) => {
+      UserData.dbSnapshot.tags.forEach((tag) => {
         if (tag.active === true) {
           activeTags.push(tag.id);
         }
@@ -2013,19 +2042,19 @@ function showResult(difficultyFailed = false) {
       incorrectChars: stats.incorrectChars,
       allChars: stats.allChars,
       acc: stats.acc,
-      mode: config.mode,
+      mode: UserConfig.config.mode,
       mode2: mode2,
-      punctuation: config.punctuation,
-      numbers: config.numbers,
+      punctuation: UserConfig.config.punctuation,
+      numbers: UserConfig.config.numbers,
       timestamp: Date.now(),
-      language: config.language,
+      language: UserConfig.config.language,
       restartCount: restartCount,
       incompleteTestSeconds: incompleteTestSeconds,
-      difficulty: config.difficulty,
+      difficulty: UserConfig.config.difficulty,
       testDuration: testtime,
-      blindMode: config.blindMode,
+      blindMode: UserConfig.config.blindMode,
       // readAheadMode: config.readAheadMode,
-      theme: config.theme,
+      theme: UserConfig.config.theme,
       tags: activeTags,
       keySpacing: keypressStats.spacing.array,
       keyDuration: keypressStats.duration.array,
@@ -2036,8 +2065,9 @@ function showResult(difficultyFailed = false) {
       chartData: chartData,
     };
     if (
-      config.difficulty == "normal" ||
-      ((config.difficulty == "master" || config.difficulty == "expert") &&
+      UserConfig.config.difficulty == "normal" ||
+      ((UserConfig.config.difficulty == "master" ||
+        UserConfig.config.difficulty == "expert") &&
         !difficultyFailed)
     ) {
       // console.log(incompleteTestSeconds);
@@ -2055,23 +2085,23 @@ function showResult(difficultyFailed = false) {
         completedEvent.uid = firebase.auth().currentUser.uid;
 
         //check local pb
-        accountIconLoading(true);
+        Util.accountIconLoading(true);
         let localPb = false;
         let dontShowCrown = false;
         let pbDiff = 0;
         db_getLocalPB(
-          config.mode,
+          UserConfig.config.mode,
           mode2,
-          config.punctuation,
-          config.language,
-          config.difficulty
+          UserConfig.config.punctuation,
+          UserConfig.config.language,
+          UserConfig.config.difficulty
         ).then((lpb) => {
           db_getUserHighestWpm(
-            config.mode,
+            UserConfig.config.mode,
             mode2,
-            config.punctuation,
-            config.language,
-            config.difficulty
+            UserConfig.config.punctuation,
+            UserConfig.config.language,
+            UserConfig.config.difficulty
           ).then((highestwpm) => {
             hideCrown();
             $("#result .stats .wpm .crown").attr("aria-label", "");
@@ -2086,7 +2116,7 @@ function showResult(difficultyFailed = false) {
                 showCrown();
                 $("#result .stats .wpm .crown").attr(
                   "aria-label",
-                  "+" + roundTo2(pbDiff)
+                  "+" + Misc.roundTo2(pbDiff)
                 );
               }
               localPb = true;
@@ -2114,35 +2144,35 @@ function showResult(difficultyFailed = false) {
             })
               .then((e) => {
                 // console.log(e.data);
-                accountIconLoading(false);
+                Util.accountIconLoading(false);
                 // console.log(JSON.stringify(e.data));
                 if (e.data == null) {
-                  showNotification(
+                  Util.showNotification(
                     "Unexpected response from the server.",
                     4000
                   );
                   return;
                 }
                 if (e.data.resultCode === -1) {
-                  showNotification("Could not save result", 3000);
+                  Util.showNotification("Could not save result", 3000);
                 } else if (e.data.resultCode === -2) {
-                  showNotification(
+                  Util.showNotification(
                     "Possible bot detected. Result not saved.",
                     4000
                   );
                 } else if (e.data.resultCode === -3) {
-                  showNotification(
+                  Util.showNotification(
                     "Could not verify keypress stats. Result not saved.",
                     4000
                   );
                 } else if (e.data.resultCode === -4) {
-                  showNotification(
+                  Util.showNotification(
                     "Result data does not make sense. Result not saved.",
                     4000
                   );
                 } else if (e.data.resultCode === -999) {
                   console.error("internal error: " + e.data.message);
-                  showNotification(
+                  Util.showNotification(
                     "Internal error. Result might not be saved. " +
                       e.data.message,
                     6000
@@ -2152,24 +2182,31 @@ function showResult(difficultyFailed = false) {
                   if (e.data.resultCode === 2) {
                     completedEvent.isPb = true;
                   }
-                  if (dbSnapshot !== null && dbSnapshot.results !== undefined) {
-                    dbSnapshot.results.unshift(completedEvent);
-                    if (dbSnapshot.globalStats.time == undefined) {
-                      dbSnapshot.globalStats.time =
+                  if (
+                    UserData.dbSnapshot !== null &&
+                    UserData.dbSnapshot.results !== undefined
+                  ) {
+                    UserData.dbSnapshot.results.unshift(completedEvent);
+                    if (UserData.dbSnapshot.globalStats.time == undefined) {
+                      UserData.dbSnapshot.globalStats.time =
                         testtime + completedEvent.incompleteTestSeconds;
                     } else {
-                      dbSnapshot.globalStats.time +=
+                      UserData.dbSnapshot.globalStats.time +=
                         testtime + completedEvent.incompleteTestSeconds;
                     }
-                    if (dbSnapshot.globalStats.started == undefined) {
-                      dbSnapshot.globalStats.started = restartCount + 1;
+                    if (UserData.dbSnapshot.globalStats.started == undefined) {
+                      UserData.dbSnapshot.globalStats.started =
+                        restartCount + 1;
                     } else {
-                      dbSnapshot.globalStats.started += restartCount + 1;
+                      UserData.dbSnapshot.globalStats.started +=
+                        restartCount + 1;
                     }
-                    if (dbSnapshot.globalStats.completed == undefined) {
-                      dbSnapshot.globalStats.completed = 1;
+                    if (
+                      UserData.dbSnapshot.globalStats.completed == undefined
+                    ) {
+                      UserData.dbSnapshot.globalStats.completed = 1;
                     } else {
-                      dbSnapshot.globalStats.completed += 1;
+                      UserData.dbSnapshot.globalStats.completed += 1;
                     }
                   }
                   try {
@@ -2181,9 +2218,9 @@ function showResult(difficultyFailed = false) {
                   }
 
                   if (
-                    config.mode === "time" &&
+                    UserConfig.config.mode === "time" &&
                     (mode2 == "15" || mode2 == "60") &&
-                    dbSnapshot !== null
+                    UserData.dbSnapshot !== null
                   ) {
                     const lbUpIcon = `<i class="fas fa-angle-up"></i>`;
                     const lbDownIcon = `<i class="fas fa-angle-down"></i>`;
@@ -2193,7 +2230,9 @@ function showResult(difficultyFailed = false) {
                     let globalLbString = "";
                     const glb = e.data.globalLeaderboard;
                     const glbMemory =
-                      dbSnapshot.lbMemory[config.mode + mode2].global;
+                      UserData.dbSnapshot.lbMemory[
+                        UserConfig.config.mode + mode2
+                      ].global;
                     let dontShowGlobalDiff =
                       glbMemory == null || glbMemory === -1 ? true : false;
                     let globalLbDiff = null;
@@ -2203,7 +2242,7 @@ function showResult(difficultyFailed = false) {
                       dontShowGlobalDiff = true;
                       globalLbDiff = glbMemory - glb.insertedAt;
                       updateLbMemory(
-                        config.mode,
+                        UserConfig.config.mode,
                         mode2,
                         "global",
                         glb.insertedAt
@@ -2214,7 +2253,7 @@ function showResult(difficultyFailed = false) {
                       if (glb.newBest) {
                         globalLbDiff = glbMemory - glb.insertedAt;
                         updateLbMemory(
-                          config.mode,
+                          UserConfig.config.mode,
                           mode2,
                           "global",
                           glb.insertedAt
@@ -2224,7 +2263,7 @@ function showResult(difficultyFailed = false) {
                       } else {
                         globalLbDiff = glbMemory - glb.foundAt;
                         updateLbMemory(
-                          config.mode,
+                          UserConfig.config.mode,
                           mode2,
                           "global",
                           glb.foundAt
@@ -2249,7 +2288,9 @@ function showResult(difficultyFailed = false) {
                     let dailyLbString = "";
                     const dlb = e.data.dailyLeaderboard;
                     const dlbMemory =
-                      dbSnapshot.lbMemory[config.mode + mode2].daily;
+                      UserData.dbSnapshot.lbMemory[
+                        UserConfig.config.mode + mode2
+                      ].daily;
                     let dontShowDailyDiff =
                       dlbMemory == null || dlbMemory === -1 ? true : false;
                     let dailyLbDiff = null;
@@ -2305,12 +2346,12 @@ function showResult(difficultyFailed = false) {
 
                     saveLbMemory({
                       uid: firebase.auth().currentUser.uid,
-                      obj: dbSnapshot.lbMemory,
+                      obj: UserData.dbSnapshot.lbMemory,
                     }).then((d) => {
                       if (d.data.returnCode === 1) {
                         // showNotification('config saved to db',1000);
                       } else {
-                        showNotification(
+                        Util.showNotification(
                           `Error saving lb memory ${d.data.message}`,
                           4000
                         );
@@ -2352,11 +2393,11 @@ function showResult(difficultyFailed = false) {
                       // );
                     }
                     db_saveLocalPB(
-                      config.mode,
+                      UserConfig.config.mode,
                       mode2,
-                      config.punctuation,
-                      config.language,
-                      config.difficulty,
+                      UserConfig.config.punctuation,
+                      UserConfig.config.language,
+                      UserConfig.config.difficulty,
                       stats.wpm,
                       stats.acc,
                       stats.wpmRaw,
@@ -2364,7 +2405,7 @@ function showResult(difficultyFailed = false) {
                     );
                   } else if (e.data.resultCode === 1) {
                     if (localPb) {
-                      showNotification(
+                      Util.showNotification(
                         "Local PB data is out of sync! Refresh the page to resync it or contact Miodec on Discord.",
                         15000
                       );
@@ -2374,7 +2415,7 @@ function showResult(difficultyFailed = false) {
               })
               .catch((e) => {
                 console.error(e);
-                showNotification("Could not save result. " + e, 5000);
+                Util.showNotification("Could not save result. " + e, 5000);
               });
           });
         });
@@ -2389,7 +2430,7 @@ function showResult(difficultyFailed = false) {
         // showNotification("Sign in to save your result",3000);
       }
     } else {
-      showNotification("Test invalid", 3000);
+      Util.showNotification("Test invalid", 3000);
       testInvalid = true;
       try {
         firebase.analytics().logEvent("testCompletedInvalid", completedEvent);
@@ -2408,40 +2449,40 @@ function showResult(difficultyFailed = false) {
 
   let testType = "";
 
-  if (config.mode === "quote") {
+  if (UserConfig.config.mode === "quote") {
     let qlen = "";
-    if (config.quoteLength === 0) {
+    if (UserConfig.config.quoteLength === 0) {
       qlen = "short ";
-    } else if (config.quoteLength === 1) {
+    } else if (UserConfig.config.quoteLength === 1) {
       qlen = "medium ";
-    } else if (config.quoteLength === 2) {
+    } else if (UserConfig.config.quoteLength === 2) {
       qlen = "long ";
-    } else if (config.quoteLength === 3) {
+    } else if (UserConfig.config.quoteLength === 3) {
       qlen = "thicc ";
     }
-    testType += qlen + config.mode;
+    testType += qlen + UserConfig.config.mode;
   } else {
-    testType += config.mode;
+    testType += UserConfig.config.mode;
   }
-  if (config.mode == "time") {
-    testType += " " + config.time;
-  } else if (config.mode == "words") {
-    testType += " " + config.words;
+  if (UserConfig.config.mode == "time") {
+    testType += " " + UserConfig.config.time;
+  } else if (UserConfig.config.mode == "words") {
+    testType += " " + UserConfig.config.words;
   }
   if (
-    config.mode != "custom" &&
+    UserConfig.config.mode != "custom" &&
     activeFunBox !== "gibberish" &&
     activeFunBox !== "58008"
   ) {
-    testType += "<br>" + config.language.replace(/_/g, " ");
+    testType += "<br>" + UserConfig.config.language.replace(/_/g, " ");
   }
-  if (config.punctuation) {
+  if (UserConfig.config.punctuation) {
     testType += "<br>punctuation";
   }
-  if (config.numbers) {
+  if (UserConfig.config.numbers) {
     testType += "<br>numbers";
   }
-  if (config.blindMode) {
+  if (UserConfig.config.blindMode) {
     testType += "<br>blind";
   }
   // if (config.readAheadMode) {
@@ -2450,17 +2491,17 @@ function showResult(difficultyFailed = false) {
   if (activeFunBox !== "none") {
     testType += "<br>" + activeFunBox.replace(/_/g, " ");
   }
-  if (config.difficulty == "expert") {
+  if (UserConfig.config.difficulty == "expert") {
     testType += "<br>expert";
-  } else if (config.difficulty == "master") {
+  } else if (UserConfig.config.difficulty == "master") {
     testType += "<br>master";
   }
 
   $("#result .stats .testType .bottom").html(testType);
 
   let otherText = "";
-  if (config.layout !== "default") {
-    otherText += "<br>" + config.layout;
+  if (UserConfig.config.layout !== "default") {
+    otherText += "<br>" + UserConfig.config.layout;
   }
   if (difficultyFailed) {
     otherText += "<br>failed";
@@ -2488,7 +2529,7 @@ function showResult(difficultyFailed = false) {
 
   let tagsText = "";
   try {
-    dbSnapshot.tags.forEach((tag) => {
+    UserData.dbSnapshot.tags.forEach((tag) => {
       if (tag.active === true) {
         tagsText += "<br>" + tag.name;
       }
@@ -2512,7 +2553,7 @@ function showResult(difficultyFailed = false) {
     $("#result .stats .infoAndTags").removeClass("hidden");
   }
 
-  if (config.mode === "quote") {
+  if (UserConfig.config.mode === "quote") {
     $("#result .stats .source").removeClass("hidden");
     $("#result .stats .source .bottom").html(randomQuote.source);
   } else {
@@ -2528,7 +2569,7 @@ function showResult(difficultyFailed = false) {
     resultCalculating = false;
     $("#words").empty();
     wpmOverTimeChart.resize();
-    if (config.alwaysShowWordsHistory) {
+    if (UserConfig.config.alwaysShowWordsHistory) {
       toggleResultWordsDisplay();
     }
     // if (config.blindMode) {
@@ -2554,9 +2595,9 @@ function showResult(difficultyFailed = false) {
 }
 
 function startTest() {
-  if (!dbConfigLoaded) {
+  if (!UserConfig.dbConfigLoaded) {
     // console.log("config changed before db loaded!");
-    configChangedBeforeDb = true;
+    UserConfig.configChangedBeforeDb = true;
   }
   try {
     if (firebase.auth().currentUser != null) {
@@ -2596,7 +2637,7 @@ function startTest() {
   }
 
   try {
-    if (config.paceCaret !== "off")
+    if (UserConfig.config.paceCaret !== "off")
       movePaceCaret(performance.now() + paceCaret.spc * 1000);
   } catch (e) {}
   //use a recursive self-adjusting timer to avoid time drift
@@ -2606,7 +2647,7 @@ function startTest() {
     timer = setTimeout(function () {
       time++;
       // if(config.paceCaret !== "off") movePaceCaret();
-      if (config.mode === "time") {
+      if (UserConfig.config.mode === "time") {
         updateTimer();
       }
       // console.time("livewpm");
@@ -2620,32 +2661,35 @@ function startTest() {
       wpmHistory.push(wpmAndRaw.wpm);
       rawHistory.push(wpmAndRaw.raw);
 
-      if (activeFunBox === "layoutfluid" && config.mode === "time") {
+      if (activeFunBox === "layoutfluid" && UserConfig.config.mode === "time") {
         const layouts = ["qwerty", "dvorak", "colemak"];
         let index = 0;
-        index = Math.floor(time / (config.time / 3));
+        index = Math.floor(time / (UserConfig.config.time / 3));
 
         if (
-          time == Math.floor(config.time / 3) - 3 ||
-          time == (config.time / 3) * 2 - 3
+          time == Math.floor(UserConfig.config.time / 3) - 3 ||
+          time == (UserConfig.config.time / 3) * 2 - 3
         ) {
-          showNotification("3", 1000);
+          Util.showNotification("3", 1000);
         }
         if (
-          time == Math.floor(config.time / 3) - 2 ||
-          time == Math.floor(config.time / 3) * 2 - 2
+          time == Math.floor(UserConfig.config.time / 3) - 2 ||
+          time == Math.floor(UserConfig.config.time / 3) * 2 - 2
         ) {
-          showNotification("2", 1000);
+          Util.showNotification("2", 1000);
         }
         if (
-          time == Math.floor(config.time / 3) - 1 ||
-          time == Math.floor(config.time / 3) * 2 - 1
+          time == Math.floor(UserConfig.config.time / 3) - 1 ||
+          time == Math.floor(UserConfig.config.time / 3) * 2 - 1
         ) {
-          showNotification("1", 1000);
+          Util.showNotification("1", 1000);
         }
 
-        if (config.layout !== layouts[index] && layouts[index] !== undefined) {
-          showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
+        if (
+          UserConfig.config.layout !== layouts[index] &&
+          layouts[index] !== undefined
+        ) {
+          Util.showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
         }
         changeLayout(layouts[index]);
         changeKeymapLayout(layouts[index]);
@@ -2680,8 +2724,8 @@ function startTest() {
       //   afkDetected = true;
       // }
       if (
-        config.minWpm === "custom" &&
-        wpmAndRaw.wpm < parseInt(config.minWpmCustomSpeed)
+        UserConfig.config.minWpm === "custom" &&
+        wpmAndRaw.wpm < parseInt(UserConfig.config.minWpmCustomSpeed)
       ) {
         clearTimeout(timer);
         hideCaret();
@@ -2691,8 +2735,8 @@ function startTest() {
         showResult(true);
         return;
       }
-      if (config.mode == "time") {
-        if (time >= config.time && config.time !== 0) {
+      if (UserConfig.config.mode == "time") {
+        if (time >= UserConfig.config.time && UserConfig.config.time !== 0) {
           //times up
           clearTimeout(timer);
           hideCaret();
@@ -2712,18 +2756,22 @@ function startTest() {
 function restartTest(withSameWordset = false, nosave = false) {
   if (!manualRestart) {
     if (
-      (config.mode === "words" && config.words < 1000 && config.words > 0) ||
-      (config.mode === "time" && config.time < 3600 && config.time > 0) ||
-      config.mode === "quote" ||
-      (config.mode === "custom" &&
+      (UserConfig.config.mode === "words" &&
+        UserConfig.config.words < 1000 &&
+        UserConfig.config.words > 0) ||
+      (UserConfig.config.mode === "time" &&
+        UserConfig.config.time < 3600 &&
+        UserConfig.config.time > 0) ||
+      UserConfig.config.mode === "quote" ||
+      (UserConfig.config.mode === "custom" &&
         customTextIsRandom &&
         customTextWordCount < 1000) ||
-      (config.mode === "custom" &&
+      (UserConfig.config.mode === "custom" &&
         !customTextIsRandom &&
         customText.length < 1000)
     ) {
     } else {
-      showNotification(
+      Util.showNotification(
         "Restart disabled for long tests. Use your mouse to confirm.",
         4000
       );
@@ -2732,7 +2780,7 @@ function restartTest(withSameWordset = false, nosave = false) {
   }
 
   if (modeBeforePractise !== null && !withSameWordset) {
-    showNotification("Reverting to previous settings.", 1500);
+    Util.showNotification("Reverting to previous settings.", 1500);
     changeMode(modeBeforePractise);
     modeBeforePractise = null;
   }
@@ -2790,12 +2838,12 @@ function restartTest(withSameWordset = false, nosave = false) {
   }
   if (resultVisible) {
     if (
-      config.randomTheme !== "off" &&
+      UserConfig.config.randomTheme !== "off" &&
       !pageTransition &&
-      !config.customTheme
+      !UserConfig.config.customTheme
     ) {
       randomiseTheme();
-      showNotification(config.theme.replace(/_/g, " "), 1500);
+      Util.showNotification(UserConfig.config.theme.replace(/_/g, " "), 1500);
     }
   }
   resultVisible = false;
@@ -2827,7 +2875,7 @@ function restartTest(withSameWordset = false, nosave = false) {
         initPaceCaret();
         showWords();
       }
-      if (config.keymapMode !== "off") {
+      if (UserConfig.config.keymapMode !== "off") {
         showKeymap();
       } else {
         hideKeymap();
@@ -2906,7 +2954,10 @@ function changeCustomText() {
   customText = customText.replace(/ +/gm, " ");
   customText = customText.split(" ");
   if (customText.length >= 10000) {
-    showNotification("Custom text cannot be longer than 10000 words.", 4000);
+    Util.showNotification(
+      "Custom text cannot be longer than 10000 words.",
+      4000
+    );
     changeMode("time");
     customText = "The quick brown fox jumped over the lazy dog".split(" ");
   }
@@ -3005,28 +3056,28 @@ function changePage(page) {
 
 function changeMode(mode, nosave) {
   if (mode !== "words" && activeFunBox === "memory") {
-    showNotification("Memory funbox can only be used with words mode.");
+    Util.showNotification("Memory funbox can only be used with words mode.");
     return;
   }
 
-  config.mode = mode;
+  UserConfig.config.mode = mode;
   $("#top .config .mode .text-button").removeClass("active");
   $("#top .config .mode .text-button[mode='" + mode + "']").addClass("active");
-  if (config.mode == "time") {
+  if (UserConfig.config.mode == "time") {
     $("#top .config .wordCount").addClass("hidden");
     $("#top .config .time").removeClass("hidden");
     $("#top .config .customText").addClass("hidden");
     $("#top .config .punctuationMode").removeClass("hidden");
     $("#top .config .numbersMode").removeClass("hidden");
     $("#top .config .quoteLength").addClass("hidden");
-  } else if (config.mode == "words") {
+  } else if (UserConfig.config.mode == "words") {
     $("#top .config .wordCount").removeClass("hidden");
     $("#top .config .time").addClass("hidden");
     $("#top .config .customText").addClass("hidden");
     $("#top .config .punctuationMode").removeClass("hidden");
     $("#top .config .numbersMode").removeClass("hidden");
     $("#top .config .quoteLength").addClass("hidden");
-  } else if (config.mode == "custom") {
+  } else if (UserConfig.config.mode == "custom") {
     if (
       activeFunBox === "58008" ||
       activeFunBox === "gibberish" ||
@@ -3043,7 +3094,7 @@ function changeMode(mode, nosave) {
     $("#top .config .quoteLength").addClass("hidden");
     setPunctuation(false, true);
     setNumbers(false, true);
-  } else if (config.mode == "quote") {
+  } else if (UserConfig.config.mode == "quote") {
     setToggleSettings(false, nosave);
     $("#top .config .wordCount").addClass("hidden");
     $("#top .config .time").addClass("hidden");
@@ -3113,17 +3164,17 @@ function liveWpmAndRaw() {
 }
 
 function updateLiveWpm(wpm, raw) {
-  if (!testActive || !config.showLiveWpm) {
+  if (!testActive || !UserConfig.config.showLiveWpm) {
     hideLiveWpm();
   } else {
     showLiveWpm();
   }
   // let wpmstring = wpm < 100 ? `&nbsp;${wpm}` : `${wpm}`;
   let number = wpm;
-  if (config.blindMode) {
+  if (UserConfig.config.blindMode) {
     number = raw;
   }
-  if (config.alwaysShowCPM) {
+  if (UserConfig.config.alwaysShowCPM) {
     number = Math.round(number * 5);
   }
   document.querySelector("#miniTimerAndLiveWpm .wpm").innerHTML = number;
@@ -3132,12 +3183,15 @@ function updateLiveWpm(wpm, raw) {
 }
 
 function showLiveWpm() {
-  if (!config.showLiveWpm) return;
+  if (!UserConfig.config.showLiveWpm) return;
   if (!testActive) return;
-  if (config.timerStyle === "mini") {
-    $("#miniTimerAndLiveWpm .wpm").css("opacity", config.timerOpacity);
+  if (UserConfig.config.timerStyle === "mini") {
+    $("#miniTimerAndLiveWpm .wpm").css(
+      "opacity",
+      UserConfig.config.timerOpacity
+    );
   } else {
-    $("#liveWpm").css("opacity", config.timerOpacity);
+    $("#liveWpm").css("opacity", UserConfig.config.timerOpacity);
   }
   // if (config.timerStyle === "text") {
   //   $("#timerNumber").css("opacity", config.timerOpacity);
@@ -3267,7 +3321,7 @@ async function loadWordsHistory() {
     let input = inputHistory[i];
     let wordEl = "";
     try {
-      if (input === "") throw Exception;
+      if (input === "") throw new Error("empty input word");
       if (correctedHistory[i] !== undefined && correctedHistory[i] !== "") {
         wordEl = `<div class='word' input="${correctedHistory[i].replace(
           /"/g,
@@ -3296,7 +3350,7 @@ async function loadWordsHistory() {
             word.missed++;
           }
         }
-        if (word.incorrect !== 0 || config.mode !== "time") {
+        if (word.incorrect !== 0 || UserConfig.config.mode !== "time") {
           if (input !== wordsList[i]) {
             wordEl = `<div class='word error' input="${input.replace(
               /"/g,
@@ -3469,42 +3523,47 @@ function updateTestModesNotice() {
     );
   }
 
-  if (config.language === "english_1k" || config.language === "english_10k") {
+  if (
+    UserConfig.config.language === "english_1k" ||
+    UserConfig.config.language === "english_10k"
+  ) {
     $(".pageTest #testModesNotice").append(
-      `<div class="text-button" commands="commandsLanguages"><i class="fas fa-globe-americas"></i>${config.language.replace(
+      `<div class="text-button" commands="commandsLanguages"><i class="fas fa-globe-americas"></i>${UserConfig.config.language.replace(
         "_",
         " "
       )}</div>`
     );
   }
 
-  if (config.difficulty === "expert") {
+  if (UserConfig.config.difficulty === "expert") {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" commands="commandsDifficulty"><i class="fas fa-star-half-alt"></i>expert</div>`
     );
-  } else if (config.difficulty === "master") {
+  } else if (UserConfig.config.difficulty === "master") {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" commands="commandsDifficulty"><i class="fas fa-star"></i>master</div>`
     );
   }
 
-  if (config.blindMode) {
+  if (UserConfig.config.blindMode) {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" onClick="toggleBlindMode()"><i class="fas fa-eye-slash"></i>blind</div>`
     );
   }
 
-  if (config.paceCaret !== "off") {
+  if (UserConfig.config.paceCaret !== "off") {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" commands="commandsPaceCaret"><i class="fas fa-tachometer-alt"></i>${
-        config.paceCaret === "pb" ? "pb" : config.paceCaretCustomSpeed + " wpm"
+        UserConfig.config.paceCaret === "pb"
+          ? "pb"
+          : UserConfig.config.paceCaretCustomSpeed + " wpm"
       } pace</div>`
     );
   }
 
-  if (config.minWpm !== "off") {
+  if (UserConfig.config.minWpm !== "off") {
     $(".pageTest #testModesNotice").append(
-      `<div class="text-button" commands="commandsMinWpm"><i class="fas fa-bomb"></i>min ${config.minWpmCustomSpeed} wpm</div>`
+      `<div class="text-button" commands="commandsMinWpm"><i class="fas fa-bomb"></i>min ${UserConfig.config.minWpmCustomSpeed} wpm</div>`
     );
   }
 
@@ -3523,37 +3582,37 @@ function updateTestModesNotice() {
     );
   }
 
-  if (config.confidenceMode === "on") {
+  if (UserConfig.config.confidenceMode === "on") {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" commands="commandsConfidenceMode"><i class="fas fa-backspace"></i>confidence</div>`
     );
   }
-  if (config.confidenceMode === "max") {
+  if (UserConfig.config.confidenceMode === "max") {
     $(".pageTest #testModesNotice").append(
       `<div class="text-button" commands="commandsConfidenceMode"><i class="fas fa-backspace"></i>max confidence</div>`
     );
   }
 
-  if (config.stopOnError != "off") {
+  if (UserConfig.config.stopOnError != "off") {
     $(".pageTest #testModesNotice").append(
-      `<div class="text-button" commands="commandsStopOnError"><i class="fas fa-hand-paper"></i>stop on ${config.stopOnError}</div>`
+      `<div class="text-button" commands="commandsStopOnError"><i class="fas fa-hand-paper"></i>stop on ${UserConfig.config.stopOnError}</div>`
     );
   }
 
-  if (config.layout !== "default") {
+  if (UserConfig.config.layout !== "default") {
     $(".pageTest #testModesNotice").append(
-      `<div class="text-button" commands="commandsLayouts"><i class="fas fa-keyboard"></i>${config.layout}</div>`
+      `<div class="text-button" commands="commandsLayouts"><i class="fas fa-keyboard"></i>${UserConfig.config.layout}</div>`
     );
   }
 
-  tagsString = "";
+  let tagsString = "";
   // $.each($('.pageSettings .section.tags .tagsList .tag'), (index, tag) => {
   //     if($(tag).children('.active').attr('active') === 'true'){
   //         tagsString += $(tag).children('.title').text() + ', ';
   //     }
   // })
   try {
-    dbSnapshot.tags.forEach((tag) => {
+    UserData.dbSnapshot.tags.forEach((tag) => {
       if (tag.active === true) {
         tagsString += tag.name + ", ";
       }
@@ -3613,8 +3672,8 @@ function tagsEdit() {
         hideBackgroundLoader();
         let status = e.data.resultCode;
         if (status === 1) {
-          showNotification("Tag added", 2000);
-          dbSnapshot.tags.push({
+          Util.showNotification("Tag added", 2000);
+          UserData.dbSnapshot.tags.push({
             name: inputVal,
             id: e.data.id,
           });
@@ -3622,9 +3681,9 @@ function tagsEdit() {
           updateSettingsPage();
           updateFilterTags();
         } else if (status === -1) {
-          showNotification("Invalid tag name", 3000);
+          Util.showNotification("Invalid tag name", 3000);
         } else if (status < -1) {
-          showNotification("Unknown error", 3000);
+          Util.showNotification("Unknown error", 3000);
         }
       }
     );
@@ -3638,8 +3697,8 @@ function tagsEdit() {
       hideBackgroundLoader();
       let status = e.data.resultCode;
       if (status === 1) {
-        showNotification("Tag updated", 2000);
-        dbSnapshot.tags.forEach((tag) => {
+        Util.showNotification("Tag updated", 2000);
+        UserData.dbSnapshot.tags.forEach((tag) => {
           if (tag.id === tagid) {
             tag.name = inputVal;
           }
@@ -3648,9 +3707,9 @@ function tagsEdit() {
         updateSettingsPage();
         updateFilterTags();
       } else if (status === -1) {
-        showNotification("Invalid tag name", 3000);
+        Util.showNotification("Invalid tag name", 3000);
       } else if (status < -1) {
-        showNotification("Unknown error", 3000);
+        Util.showNotification("Unknown error", 3000);
       }
     });
   } else if (action === "remove") {
@@ -3660,10 +3719,10 @@ function tagsEdit() {
         hideBackgroundLoader();
         let status = e.data.resultCode;
         if (status === 1) {
-          showNotification("Tag removed", 2000);
-          dbSnapshot.tags.forEach((tag, index) => {
+          Util.showNotification("Tag removed", 2000);
+          UserData.dbSnapshot.tags.forEach((tag, index) => {
             if (tag.id === tagid) {
-              dbSnapshot.tags.splice(index, 1);
+              UserData.dbSnapshot.tags.splice(index, 1);
             }
           });
           updateResultEditTagsPanelButtons();
@@ -3671,7 +3730,7 @@ function tagsEdit() {
           updateFilterTags();
           updateActiveTags();
         } else if (status < -1) {
-          showNotification("Unknown error", 3000);
+          Util.showNotification("Unknown error", 3000);
         }
       }
     );
@@ -3810,13 +3869,13 @@ function hideCustomMode2Popup() {
 }
 
 function playClickSound() {
-  if (config.playSoundOnClick === "off") return;
+  if (UserConfig.config.playSoundOnClick === "off") return;
   if (clickSounds === null) initClickSounds();
 
   let rand = Math.floor(
-    Math.random() * clickSounds[config.playSoundOnClick].length
+    Math.random() * clickSounds[UserConfig.config.playSoundOnClick].length
   );
-  let randomSound = clickSounds[config.playSoundOnClick][rand];
+  let randomSound = clickSounds[UserConfig.config.playSoundOnClick][rand];
   randomSound.counter++;
   if (randomSound.counter === 2) randomSound.counter = 0;
   randomSound.sounds[randomSound.counter].currentTime = 0;
@@ -3827,33 +3886,33 @@ function playClickSound() {
 }
 
 function playErrorSound() {
-  if (!config.playSoundOnError) return;
+  if (!UserConfig.config.playSoundOnError) return;
   errorSound.currentTime = 0;
   errorSound.play();
 }
 
 async function initPaceCaret(nosave = false) {
   let mode2 = "";
-  if (config.mode === "time") {
-    mode2 = config.time;
-  } else if (config.mode === "words") {
-    mode2 = config.words;
-  } else if (config.mode === "custom") {
+  if (UserConfig.config.mode === "time") {
+    mode2 = UserConfig.config.time;
+  } else if (UserConfig.config.mode === "words") {
+    mode2 = UserConfig.config.words;
+  } else if (UserConfig.config.mode === "custom") {
     mode2 = "custom";
-  } else if (config.mode === "quote") {
+  } else if (UserConfig.config.mode === "quote") {
     mode2 = randomQuote.id;
   }
   let wpm;
-  if (config.paceCaret === "pb") {
+  if (UserConfig.config.paceCaret === "pb") {
     wpm = await db_getLocalPB(
-      config.mode,
+      UserConfig.config.mode,
       mode2,
-      config.punctuation,
-      config.language,
-      config.difficulty
+      UserConfig.config.punctuation,
+      UserConfig.config.language,
+      UserConfig.config.difficulty
     );
-  } else if (config.paceCaret === "custom") {
-    wpm = config.paceCaretCustomSpeed;
+  } else if (UserConfig.config.paceCaret === "custom") {
+    wpm = UserConfig.config.paceCaretCustomSpeed;
   }
 
   if (wpm < 1 || wpm == false || wpm == undefined || Number.isNaN(wpm)) {
@@ -4006,7 +4065,7 @@ function movePaceCaret(expectedStepEnd) {
       paceCaret.currentLetterIndex = -1;
       paceCaret.currentWordIndex++;
     }
-    if (!config.blindMode) {
+    if (!UserConfig.config.blindMode) {
       if (paceCaret.correction < 0) {
         // paceCaret.correction++;
 
@@ -4088,7 +4147,7 @@ function movePaceCaret(expectedStepEnd) {
     let duration = expectedStepEnd - performance.now();
     // console.log(duration);
 
-    if (config.smoothCaret) {
+    if (UserConfig.config.smoothCaret) {
       caret.stop(true, true).animate(
         {
           left: newLeft,
@@ -4121,7 +4180,7 @@ function movePaceCaret(expectedStepEnd) {
 }
 
 function resetPaceCaret() {
-  if (config.paceCaret === "off") return;
+  if (UserConfig.config.paceCaret === "off") return;
   if (!$("#paceCaret").hasClass("hidden")) {
     $("#paceCaret").addClass("hidden");
   }
@@ -4158,7 +4217,7 @@ $("#customMode2Popup .button").click((e) => {
 });
 
 function updateKeytips() {
-  if (config.swapEscAndTab) {
+  if (UserConfig.config.swapEscAndTab) {
     $(".pageSettings .tip").html(`
     tip: You can also change all these settings quickly using the
     command line (
@@ -4189,15 +4248,15 @@ function applyMode2Popup() {
       manualRestart = true;
       restartTest();
       if (val >= 1800) {
-        showNotification("Stay safe and take breaks!", 3000);
+        Util.showNotification("Stay safe and take breaks!", 3000);
       } else if (val == 0) {
-        showNotification(
+        Util.showNotification(
           "Infinite time! Make sure to use Bail Out from the command line to save your result.",
           5000
         );
       }
     } else {
-      showNotification("Custom time must be at least 1", 3000);
+      Util.showNotification("Custom time must be at least 1", 3000);
     }
   } else if (mode == "words") {
     if (val !== null && !isNaN(val) && val >= 0) {
@@ -4205,15 +4264,15 @@ function applyMode2Popup() {
       manualRestart = true;
       restartTest();
       if (val > 2000) {
-        showNotification("Stay safe and take breaks!", 3000);
+        Util.showNotification("Stay safe and take breaks!", 3000);
       } else if (val == 0) {
-        showNotification(
+        Util.showNotification(
           "Infinite words! Make sure to use Bail Out from the command line to save your result.",
           5000
         );
       }
     } else {
-      showNotification("Custom word amount must be at least 1", 3000);
+      Util.showNotification("Custom word amount must be at least 1", 3000);
     }
   }
 
@@ -4225,7 +4284,7 @@ $(document).on("click", "#top .logo", (e) => {
 });
 
 $(document).on("click", "#top .config .wordCount .text-button", (e) => {
-  wrd = $(e.currentTarget).attr("wordCount");
+  const wrd = $(e.currentTarget).attr("wordCount");
   if (wrd == "custom") {
     //   let newWrd = prompt("Custom word amount");
     //   if (newWrd !== null && !isNaN(newWrd) && newWrd > 0 && newWrd <= 10000) {
@@ -4307,7 +4366,7 @@ $("#wordsWrapper").on("click", (e) => {
 
 $(document).on("click", "#top .config .mode .text-button", (e) => {
   if ($(e.currentTarget).hasClass("active")) return;
-  mode = $(e.currentTarget).attr("mode");
+  const mode = $(e.currentTarget).attr("mode");
   changeMode(mode);
   manualRestart = true;
   restartTest();
@@ -4318,7 +4377,7 @@ $(document).on("click", "#top #menu .icon-button", (e) => {
   if ($(e.currentTarget).hasClass("leaderboards")) {
     showLeaderboards();
   } else {
-    href = $(e.currentTarget).attr("href");
+    const href = $(e.currentTarget).attr("href");
     manualRestart = true;
     changePage(href.replace("/", ""));
   }
@@ -4344,25 +4403,25 @@ $(window).on("popstate", (e) => {
 $(document).on("keypress", "#restartTestButton", (event) => {
   if (event.keyCode == 13) {
     if (
-      (config.mode === "words" && config.words < 1000) ||
-      (config.mode === "time" && config.time < 3600) ||
-      config.mode === "quote" ||
-      (config.mode === "custom" &&
+      (UserConfig.config.mode === "words" && UserConfig.config.words < 1000) ||
+      (UserConfig.config.mode === "time" && UserConfig.config.time < 3600) ||
+      UserConfig.config.mode === "quote" ||
+      (UserConfig.config.mode === "custom" &&
         customTextIsRandom &&
         customTextWordCount < 1000) ||
-      (config.mode === "custom" &&
+      (UserConfig.config.mode === "custom" &&
         !customTextIsRandom &&
         customText.length < 1000)
     ) {
       if (testActive) {
         let testNow = Date.now();
-        let testSeconds = roundTo2((testNow - testStart) / 1000);
+        let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
         incompleteTestSeconds += testSeconds;
         restartCount++;
       }
       restartTest();
     } else {
-      showNotification("Quick restart disabled for long tests", 2000);
+      Util.showNotification("Quick restart disabled for long tests", 2000);
     }
   }
 });
@@ -4373,7 +4432,7 @@ $(document.body).on("click", "#restartTestButton", (event) => {
 });
 
 function initPractiseMissedWords() {
-  let currentMode = config.mode;
+  let currentMode = UserConfig.config.mode;
   changeMode("custom");
   let newCustomText = [];
   Object.keys(missedWords).forEach((missedWord) => {
@@ -4395,7 +4454,7 @@ $(document).on("keypress", "#practiseMissedWordsButton", (event) => {
     if (Object.keys(missedWords).length > 0) {
       initPractiseMissedWords();
     } else {
-      showNotification("You haven't missed any words.", 2000);
+      Util.showNotification("You haven't missed any words.", 2000);
     }
   }
 });
@@ -4404,7 +4463,7 @@ $(document.body).on("click", "#practiseMissedWordsButton", (event) => {
   if (Object.keys(missedWords).length > 0) {
     initPractiseMissedWords();
   } else {
-    showNotification("You haven't missed any words.", 2000);
+    Util.showNotification("You haven't missed any words.", 2000);
   }
 });
 
@@ -4474,7 +4533,7 @@ function clearTimeouts(timeouts) {
 }
 
 $("#wordsInput").on("focus", (event) => {
-  if (!resultVisible && config.showOutOfFocusWarning) {
+  if (!resultVisible && UserConfig.config.showOutOfFocusWarning) {
     $("#words").css("transition", "none").removeClass("blurred");
     $(".outOfFocusWarning").addClass("hidden");
     clearTimeouts(outOfFocusTimeouts);
@@ -4483,7 +4542,7 @@ $("#wordsInput").on("focus", (event) => {
 });
 
 $("#wordsInput").on("focusout", (event) => {
-  if (!resultVisible && config.showOutOfFocusWarning) {
+  if (!resultVisible && UserConfig.config.showOutOfFocusWarning) {
     outOfFocusTimeouts.push(
       setTimeout(() => {
         $("#words").css("transition", "0.25s").addClass("blurred");
@@ -4588,7 +4647,7 @@ $(document).keydown(function (event) {
   );
 
   if (
-    config.language === "russian" &&
+    UserConfig.config.language === "russian" &&
     (event["key"].toLowerCase() == "e" || event["key"].toLowerCase() == "ё")
   ) {
     if (
@@ -4625,7 +4684,7 @@ $(document).keydown(function (event) {
   if (thisCharCorrect) {
     playClickSound();
   } else {
-    if (!config.playSoundOnError || config.blindMode) {
+    if (!UserConfig.config.playSoundOnError || UserConfig.config.blindMode) {
       playClickSound();
     } else {
       playErrorSound();
@@ -4647,15 +4706,15 @@ $(document).keydown(function (event) {
   currentKeypress.count++;
   currentKeypress.words.push(currentWordIndex);
 
-  if (config.stopOnError == "letter" && !thisCharCorrect) {
-    if (config.difficulty == "master") {
+  if (UserConfig.config.stopOnError == "letter" && !thisCharCorrect) {
+    if (UserConfig.config.difficulty == "master") {
       //failed due to master diff when pressing a key
       inputHistory.push(currentInput);
       correctedHistory.push(currentCorrected);
       lastSecondNotRound = true;
       showResult(true);
       let testNow = Date.now();
-      let testSeconds = roundTo2((testNow - testStart) / 1000);
+      let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
       incompleteTestSeconds += testSeconds;
       restartCount++;
       return;
@@ -4673,7 +4732,7 @@ $(document).keydown(function (event) {
   setFocus(true);
   stopCaretAnimation();
   activeWordTopBeforeJump = activeWordTop;
-  compareInput(!config.blindMode);
+  compareInput(!UserConfig.config.blindMode);
 
   // let newActiveTop = $("#words .word.active").position().top;
 
@@ -4687,15 +4746,15 @@ $(document).keydown(function (event) {
 
   if (activeWordJumped && currentInput.length > 1) {
     currentInput = currentInput.slice(0, -1);
-    compareInput(!config.blindMode);
+    compareInput(!UserConfig.config.blindMode);
     activeWordJumped = false;
   }
 
   // console.timeEnd("offcheck2");
 
-  if (config.keymapMode === "react") {
+  if (UserConfig.config.keymapMode === "react") {
     flashPressedKeymapKey(event.key, thisCharCorrect);
-  } else if (config.keymapMode === "next") {
+  } else if (UserConfig.config.keymapMode === "next") {
     updateHighlightedKeymapKey();
   }
   updateCaretPosition();
@@ -4706,7 +4765,7 @@ $(document).keydown((event) => {
   // if ($(".pageTest").hasClass("active")) {
   try {
     if (
-      !config.capsLockBackspace &&
+      !UserConfig.config.capsLockBackspace &&
       event.originalEvent.getModifierState("CapsLock")
     ) {
       showCapsWarning();
@@ -4730,13 +4789,13 @@ $(document).keyup((event) => {
 window.addEventListener("beforeunload", (event) => {
   // Cancel the event as stated by the standard.
   if (
-    (config.mode === "words" && config.words < 1000) ||
-    (config.mode === "time" && config.time < 3600) ||
-    config.mode === "quote" ||
-    (config.mode === "custom" &&
+    (UserConfig.config.mode === "words" && UserConfig.config.words < 1000) ||
+    (UserConfig.config.mode === "time" && UserConfig.config.time < 3600) ||
+    UserConfig.config.mode === "quote" ||
+    (UserConfig.config.mode === "custom" &&
       customTextIsRandom &&
       customTextWordCount < 1000) ||
-    (config.mode === "custom" &&
+    (UserConfig.config.mode === "custom" &&
       !customTextIsRandom &&
       customText.length < 1000)
   ) {
@@ -4762,12 +4821,12 @@ $(document).keydown((event) => {
 
   //tab
   if (
-    (event.key == "Tab" && !config.swapEscAndTab) ||
-    (event.key == "Escape" && config.swapEscAndTab)
+    (event.key == "Tab" && !UserConfig.config.swapEscAndTab) ||
+    (event.key == "Escape" && UserConfig.config.swapEscAndTab)
   ) {
     if (
       !event.ctrlKey &&
-      config.quickTab &&
+      UserConfig.config.quickTab &&
       !$(".pageLogin").hasClass("active") &&
       !resultCalculating &&
       $("#commandLineWrapper").hasClass("hidden")
@@ -4775,25 +4834,27 @@ $(document).keydown((event) => {
       event.preventDefault();
       if ($(".pageTest").hasClass("active")) {
         if (
-          (config.mode === "words" && config.words < 1000) ||
-          (config.mode === "time" && config.time < 3600) ||
-          config.mode === "quote" ||
-          (config.mode === "custom" &&
+          (UserConfig.config.mode === "words" &&
+            UserConfig.config.words < 1000) ||
+          (UserConfig.config.mode === "time" &&
+            UserConfig.config.time < 3600) ||
+          UserConfig.config.mode === "quote" ||
+          (UserConfig.config.mode === "custom" &&
             customTextIsRandom &&
             customTextWordCount < 1000) ||
-          (config.mode === "custom" &&
+          (UserConfig.config.mode === "custom" &&
             !customTextIsRandom &&
             customText.length < 1000)
         ) {
           if (testActive) {
             let testNow = Date.now();
-            let testSeconds = roundTo2((testNow - testStart) / 1000);
+            let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
             incompleteTestSeconds += testSeconds;
             restartCount++;
           }
           restartTest();
         } else {
-          showNotification("Quick restart disabled for long tests", 2000);
+          Util.showNotification("Quick restart disabled for long tests", 2000);
         }
       } else {
         changePage("test");
@@ -4805,7 +4866,7 @@ $(document).keydown((event) => {
   if ($("#wordsInput").is(":focus")) {
     const isBackspace =
       event.key === "Backspace" ||
-      (config.capsLockBackspace && event.key === "CapsLock");
+      (UserConfig.config.capsLockBackspace && event.key === "CapsLock");
     if (isBackspace) {
       event.preventDefault();
       if (!testActive) return;
@@ -4817,12 +4878,15 @@ $(document).keydown((event) => {
         if (
           (inputHistory[currentWordIndex - 1] ==
             wordsList[currentWordIndex - 1] &&
-            !config.freedomMode) ||
+            !UserConfig.config.freedomMode) ||
           $($(".word")[currentWordIndex - 1]).hasClass("hidden")
         ) {
           return;
         } else {
-          if (config.confidenceMode === "on" || config.confidenceMode === "max")
+          if (
+            UserConfig.config.confidenceMode === "on" ||
+            UserConfig.config.confidenceMode === "max"
+          )
             return;
           if (event["ctrlKey"] || event["altKey"]) {
             currentInput = "";
@@ -4835,21 +4899,21 @@ $(document).keydown((event) => {
           currentWordIndex--;
           currentWordElementIndex--;
           updateActiveElement();
-          compareInput(!config.blindMode);
+          compareInput(!UserConfig.config.blindMode);
         }
       } else {
-        if (config.confidenceMode === "max") return;
+        if (UserConfig.config.confidenceMode === "max") return;
         if (event["ctrlKey"] || event["altKey"]) {
           currentInput = "";
         } else {
           currentInput = currentInput.substring(0, currentInput.length - 1);
         }
-        compareInput(!config.blindMode);
+        compareInput(!UserConfig.config.blindMode);
       }
       playClickSound();
-      if (config.keymapMode === "react") {
+      if (UserConfig.config.keymapMode === "react") {
         flashPressedKeymapKey(event.code, true);
-      } else if (config.keymapMode === "next") {
+      } else if (UserConfig.config.keymapMode === "next") {
         updateHighlightedKeymapKey();
       }
       updateCaretPosition();
@@ -4861,7 +4925,7 @@ $(document).keydown((event) => {
       event.preventDefault();
       let currentWord = wordsList[currentWordIndex];
       // if (config.mode == "time") {
-      if (!config.showAllLines || config.mode == "time") {
+      if (!UserConfig.config.showAllLines || UserConfig.config.mode == "time") {
         // let currentTop = Math.floor($($("#words .word")[currentWordIndex]).position().top);
         // let nextTop = Math.floor($($("#words .word")[currentWordIndex + 1]).position().top);
         let currentTop = Math.floor(
@@ -4902,7 +4966,7 @@ $(document).keydown((event) => {
             const wordHeight = $(document.querySelector(".word")).outerHeight(
               true
             );
-            if (config.smoothLineScroll && toHide.length > 0) {
+            if (UserConfig.config.smoothLineScroll && toHide.length > 0) {
               lineTransition = true;
               $("#words").prepend(
                 `<div class="smoothScroller" style="position: fixed;height:${wordHeight}px;width:100%"></div>`
@@ -4973,20 +5037,24 @@ $(document).keydown((event) => {
           currentTestLine++;
         }
       } //end of line wrap
-      if (activeFunBox === "layoutfluid" && config.mode !== "time") {
+      if (activeFunBox === "layoutfluid" && UserConfig.config.mode !== "time") {
         const layouts = ["qwerty", "dvorak", "colemak"];
         let index = 0;
         let outof = wordsList.length;
         index = Math.floor((inputHistory.length + 1) / (outof / 3));
-        if (config.layout !== layouts[index] && layouts[index] !== undefined) {
-          showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
+        if (
+          UserConfig.config.layout !== layouts[index] &&
+          layouts[index] !== undefined
+        ) {
+          Util.showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
         }
         changeLayout(layouts[index]);
         changeKeymapLayout(layouts[index]);
         updateHighlightedKeymapKey();
         settingsGroups.layout.updateButton();
       }
-      if (config.blindMode) $("#words .word.active letter").addClass("correct");
+      if (UserConfig.config.blindMode)
+        $("#words .word.active letter").addClass("correct");
       // document
       //   .querySelector("#words .word.active")
       //   .setAttribute("input", currentInput);
@@ -4995,7 +5063,7 @@ $(document).keydown((event) => {
         if (
           paceCaret !== null &&
           paceCaret.wordsStatus[currentWordIndex] === true &&
-          !config.blindMode
+          !UserConfig.config.blindMode
         ) {
           paceCaret.wordsStatus[currentWordIndex] = undefined;
           paceCaret.correction -= currentWord.length + 1;
@@ -5015,12 +5083,15 @@ $(document).keydown((event) => {
         if (
           paceCaret !== null &&
           paceCaret.wordsStatus[currentWordIndex] === undefined &&
-          !config.blindMode
+          !UserConfig.config.blindMode
         ) {
           paceCaret.wordsStatus[currentWordIndex] = true;
           paceCaret.correction += currentWord.length + 1;
         }
-        if (!config.playSoundOnError || config.blindMode) {
+        if (
+          !UserConfig.config.playSoundOnError ||
+          UserConfig.config.blindMode
+        ) {
           playClickSound();
         } else {
           playErrorSound();
@@ -5037,8 +5108,11 @@ $(document).keydown((event) => {
               currentCorrected.substring(cil + 1);
           }
         }
-        if (config.stopOnError != "off") {
-          if (config.difficulty == "expert" || config.difficulty == "master") {
+        if (UserConfig.config.stopOnError != "off") {
+          if (
+            UserConfig.config.difficulty == "expert" ||
+            UserConfig.config.difficulty == "master"
+          ) {
             //failed due to diff when pressing space
             inputHistory.push(currentInput);
             correctedHistory.push(currentCorrected);
@@ -5046,7 +5120,7 @@ $(document).keydown((event) => {
             showResult(true);
             // if (!afkDetected) {
             let testNow = Date.now();
-            let testSeconds = roundTo2((testNow - testStart) / 1000);
+            let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
             incompleteTestSeconds += testSeconds;
             restartCount++;
             // }
@@ -5055,11 +5129,14 @@ $(document).keydown((event) => {
           return;
         }
         inputHistory.push(currentInput);
-        highlightBadWord(currentWordElementIndex, !config.blindMode);
+        highlightBadWord(currentWordElementIndex, !UserConfig.config.blindMode);
         currentInput = "";
         currentWordIndex++;
         currentWordElementIndex++;
-        if (config.difficulty == "expert" || config.difficulty == "master") {
+        if (
+          UserConfig.config.difficulty == "expert" ||
+          UserConfig.config.difficulty == "master"
+        ) {
           correctedHistory.push(currentCorrected);
           currentCorrected = "";
           //submitted last word incorrect and failed test
@@ -5067,7 +5144,7 @@ $(document).keydown((event) => {
           showResult(true);
           // if (!afkDetected) {
           let testNow = Date.now();
-          let testSeconds = roundTo2((testNow - testStart) / 1000);
+          let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
           incompleteTestSeconds += testSeconds;
           restartCount++;
           // }
@@ -5085,15 +5162,15 @@ $(document).keydown((event) => {
       }
       correctedHistory.push(currentCorrected);
       currentCorrected = "";
-      if (config.keymapMode === "react") {
+      if (UserConfig.config.keymapMode === "react") {
         flashPressedKeymapKey(event.code, true);
-      } else if (config.keymapMode === "next") {
+      } else if (UserConfig.config.keymapMode === "next") {
         updateHighlightedKeymapKey();
       }
       if (
-        config.mode === "words" ||
-        config.mode === "custom" ||
-        config.mode === "quote"
+        UserConfig.config.mode === "words" ||
+        UserConfig.config.mode === "custom" ||
+        UserConfig.config.mode === "quote"
       ) {
         updateTimer();
       }
@@ -5103,9 +5180,9 @@ $(document).keydown((event) => {
       //   }
       // } else {
       if (
-        config.mode == "time" ||
-        config.mode == "words" ||
-        config.mode == "custom"
+        UserConfig.config.mode == "time" ||
+        UserConfig.config.mode == "words" ||
+        UserConfig.config.mode == "custom"
       ) {
         addWord();
       }
@@ -5124,7 +5201,7 @@ if (firebase.app().options.projectId === "monkey-type-dev-67af4") {
 
 if (window.location.hostname === "localhost") {
   window.onerror = function (error) {
-    this.showNotification(error, 3000);
+    Util.showNotification(error, 3000);
   };
   $("#top .logo .top").text("localhost");
   $("head title").text($("head title").text() + " (localhost)");
@@ -5148,7 +5225,7 @@ $(document).on("mouseenter", "#resultWordsHistory .words .word", (e) => {
 });
 
 $(document).on("click", "#bottom .leftright .right .current-theme", (e) => {
-  if (config.customTheme) {
+  if (UserConfig.config.customTheme) {
     togglePresetCustomTheme();
   }
   currentCommands.push(commandsThemes);
@@ -5168,7 +5245,7 @@ $(document).ready(() => {
   $("body").css("transition", ".25s");
   // manualRestart = true;
   // restartTest(false,true);
-  if (config.quickTab) {
+  if (UserConfig.config.quickTab) {
     $("#restartTestButton").addClass("hidden");
   }
   $("#centerContent")
@@ -5180,14 +5257,14 @@ $(document).ready(() => {
       if (theme !== null) {
         try {
           theme = theme.split(",");
-          config.customThemeColors = theme;
-          showNotification("Custom theme applied", 1000);
+          UserConfig.config.customThemeColors = theme;
+          Util.showNotification("Custom theme applied", 1000);
         } catch (e) {
-          showNotification(
+          Util.showNotification(
             "Something went wrong. Reverting to default custom colors.",
             3000
           );
-          config.customThemeColors = defaultConfig.customThemeColors;
+          UserConfig.config.customThemeColors = defaultConfig.customThemeColors;
         }
         setCustomTheme(true);
         setCustomThemeInputs();
@@ -5222,9 +5299,9 @@ $(".pageTest #copyWordsListButton").click(async (event) => {
     await navigator.clipboard.writeText(
       wordsList.slice(0, inputHistory.length).join(" ")
     );
-    showNotification("Copied to clipboard", 1000);
+    Util.showNotification("Copied to clipboard", 1000);
   } catch (e) {
-    showNotification("Could not copy to clipboard: " + e, 5000);
+    Util.showNotification("Could not copy to clipboard: " + e, 5000);
   }
 });
 

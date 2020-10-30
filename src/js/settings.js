@@ -1,6 +1,6 @@
-import * as UserData from "./db";
+import { UserData } from "./db";
 import { layouts } from "./layouts";
-import * as UserConfig from "./userconfig";
+import { defaultConfig, UserConfig } from "./userconfig";
 import * as Util from "./util";
 
 class SettingsGroup {
@@ -465,8 +465,7 @@ function hideCustomThemeShare() {
         "Something went wrong. Reverting to default custom colors.",
         3000
       );
-      UserConfig.config.customThemeColors =
-        UserConfig.defaultConfig.customThemeColors;
+      UserConfig.config.customThemeColors = defaultConfig.customThemeColors;
     }
     setCustomThemeInputs();
     applyCustomThemeColors();
