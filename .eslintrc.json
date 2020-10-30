@@ -1,7 +1,8 @@
 {
   "env": {
-    "browser": true,
-    "es2021": true
+    "commonjs": true,
+    "es2021": true,
+    "jquery": true
   },
   "extends": "eslint:recommended",
   "parserOptions": {
@@ -11,6 +12,7 @@
   "rules": {
     "no-unused-vars": ["off"],
     "no-empty": ["off"],
+    "no-prototype-builtins": ["off"],
     "no-dupe-keys": ["off"],
     "no-func-assign": ["off"],
     "no-useless-catch": ["off"],
@@ -19,7 +21,9 @@
     "no-unexpected-multiline": ["off"]
   },
   "globals": {
-    "$": "readonly",
-    "jQuery": "readonly"
+    "firebase": "readonly",
+    "Chart": "readonly",
+    "moment": "readonly",
+    "html2canvas": "readonly"
   }
 }
