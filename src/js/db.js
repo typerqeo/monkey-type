@@ -1,4 +1,5 @@
 const db = firebase.firestore();
+db.settings({ experimentalForceLongPolling: true });
 
 export const UserData = {
   dbSnapshot: null,

@@ -253,6 +253,10 @@ settingsGroups.alwaysShowDecimalPlaces = new SettingsGroup(
   "alwaysShowDecimalPlaces",
   setAlwaysShowDecimalPlaces
 );
+settingsGroups.alwaysShowCPM = new SettingsGroup(
+  "alwaysShowCPM",
+  setAlwaysShowCPM
+);
 
 fillSettingsPage();
 
@@ -530,6 +534,7 @@ function toggleFavouriteTheme(themename) {
   }
   saveConfigToCookie();
   refreshThemeButtons();
+  showFavouriteThemesAtTheTop();
 }
 
 function showAccountSettingsSection() {

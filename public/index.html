@@ -952,56 +952,47 @@
             </div>
             <div id="liveWpm">123</div>
             <div class="keymap hidden">
-              <!-- <div class="row r1">
-              <div class="keymap-key inactive hidden-key">
-                <span class="letter">`</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key1">
-                <span class="letter">1</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key2">
-                <span class="letter">2</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key3">
-                <span class="letter">3</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key4">
-                <span class="letter">4</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key5">
-                <span class="letter">5</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key6">
-                <span class="letter">6</span>
-              </div>
-                <div class="keymap-split-spacer"></div>
-
-              <div class="keymap-key inactive hidden-key" id="Key7">
-                <span class="letter">7</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key8">
-                <span class="letter">8</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key9">
-                <span class="letter">9</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key0">
-                <span class="letter">0</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key-">
-                <span class="letter">-</span>
-              </div>
-              <div class="keymap-key inactive hidden-key" id="Key=">
-                <span class="letter">=</span>
-              </div>
-              <div class="keymap-key inactive hidden-key">
-                <span class="letter">delete</span>
-              </div>
-            </div> -->
-              <div class="row r2">
-                <div class="keymap-key hidden-key">
-                  <span class="letter"></span>
+              <div class="row r1">
+                <div class="keymap-key" id="Key1">
+                  <span class="letter">1</span>
                 </div>
+                <div class="keymap-key" id="Key2">
+                  <span class="letter">2</span>
+                </div>
+                <div class="keymap-key" id="Key3">
+                  <span class="letter">3</span>
+                </div>
+                <div class="keymap-key" id="Key4">
+                  <span class="letter">4</span>
+                </div>
+                <div class="keymap-key" id="Key5">
+                  <span class="letter">5</span>
+                </div>
+                <div class="keymap-key" id="Key6">
+                  <span class="letter">6</span>
+                </div>
+                <div class="keymap-split-spacer"></div>
+                <div class="keymap-key" id="Key7">
+                  <span class="letter">7</span>
+                </div>
+                <div class="keymap-key" id="Key8">
+                  <span class="letter">8</span>
+                </div>
+                <div class="keymap-key" id="Key9">
+                  <span class="letter">9</span>
+                </div>
+                <div class="keymap-key" id="Key0">
+                  <span class="letter">0</span>
+                </div>
+                <div class="keymap-key" id="Key-">
+                  <span class="letter">-</span>
+                </div>
+                <div class="keymap-key" id="Key=">
+                  <span class="letter">=</span>
+                </div>
+              </div>
+              <div class="row r2">
+                <div></div>
                 <div class="keymap-key" id="KeyQ">
                   <span class="letter">q</span>
                 </div>
@@ -1044,9 +1035,7 @@
                 </div>
               </div>
               <div class="row r3">
-                <div class="keymap-key hidden-key">
-                  <span class="letter"></span>
-                </div>
+                <div></div>
                 <div class="keymap-key" id="KeyA">
                   <span class="letter">a</span>
                 </div>
@@ -1083,15 +1072,10 @@
                 <div class="keymap-key" id="KeyQuote">
                   <span class="letter">'</span>
                 </div>
-                <div class="keymap-key hidden-key">
-                  <span class="letter"></span>
-                </div>
               </div>
               <div class="row r4">
-                <div class="keymap-key hidden-key">
-                  <span class="letter"></span>
-                </div>
-                <div class="keymap-key" id="KeyZ">
+                <div></div>
+                <div class="keymap-key first" id="KeyZ">
                   <span class="letter">z</span>
                 </div>
                 <div class="keymap-key" id="KeyX">
@@ -1122,14 +1106,12 @@
                 <div class="keymap-key" id="KeySlash">
                   <span class="letter">/</span>
                 </div>
-                <div class="keymap-key hidden-key">
+                <div class="keymap-key last">
                   <span class="letter"></span>
                 </div>
               </div>
               <div class="row r5">
-                <div class="keymap-key hidden-key">
-                  <span class="letter"></span>
-                </div>
+                <div></div>
                 <div class="keymap-key key-split-space" id="KeySpace">
                   <span class="letter"></span>
                 </div>
@@ -2228,6 +2210,21 @@
               <div class="text">
                 Always shows decimal places for values on the result page,
                 without the need to hover over the stats.
+              </div>
+              <div class="buttons">
+                <div class="button off" tabindex="0" onclick="this.blur();">
+                  off
+                </div>
+                <div class="button on" tabindex="0" onclick="this.blur();">
+                  on
+                </div>
+              </div>
+            </div>
+            <div class="section alwaysShowCPM">
+              <h1>always show cpm</h1>
+              <div class="text">
+                Always shows characters per minute calculation instead of the
+                default words per minute calculation.
               </div>
               <div class="buttons">
                 <div class="button off" tabindex="0" onclick="this.blur();">

@@ -275,6 +275,13 @@ let commands = {
       },
     },
     {
+      id: "toggleAlwaysShowCPM",
+      display: "Toggle always show CPM",
+      exec: () => {
+        toggleAlwaysShowCPM();
+      },
+    },
+    {
       id: "toggleSwapEscAndTab",
       display: "Toggle swap esc and tab",
       exec: () => {
@@ -954,6 +961,26 @@ let commandsHighlightMode = {
   ],
 };
 
+let commandsAlwaysShowCPM = {
+  title: "Toggle always show cpm...",
+  list: [
+    {
+      id: "setAlwaysShowCPMTrue",
+      display: true,
+      exec: () => {
+        setAlwaysShowCPM(true);
+      },
+    },
+    {
+      id: "setAlwaysShowCPMFalse",
+      display: false,
+      exec: () => {
+        setHighlightMode(false);
+      },
+    },
+  ],
+};
+
 let commandsTimerStyle = {
   title: "Change timer/progress style...",
   list: [
@@ -1429,6 +1456,39 @@ getThemesList().then((themes) => {
   });
 });
 
+function showFavouriteThemesAtTheTop() {
+  if (config.favThemes.length > 0) {
+    commandsThemes.list = [];
+    config.favThemes.forEach((theme) => {
+      commandsThemes.list.push({
+        id: "changeTheme" + capitalizeFirstLetter(theme),
+        display: theme.replace(/_/g, " "),
+        hover: () => {
+          previewTheme(theme);
+        },
+        exec: () => {
+          setTheme(theme);
+        },
+      });
+    });
+    getThemesList().then((themes) => {
+      themes.forEach((theme) => {
+        if (config.favThemes.includes(theme.name)) return;
+        commandsThemes.list.push({
+          id: "changeTheme" + capitalizeFirstLetter(theme.name),
+          display: theme.name.replace(/_/g, " "),
+          hover: () => {
+            previewTheme(theme.name);
+          },
+          exec: () => {
+            setTheme(theme.name);
+          },
+        });
+      });
+    });
+  }
+}
+
 let commandsFonts = {
   title: "Change font...",
   list: [],
@@ -1562,7 +1622,7 @@ if (Object.keys(layouts).length > 0) {
   Object.keys(layouts).forEach((layout) => {
     if (layout.toString() != "default") {
       commandsKeymapLayouts.list.push({
-        id: "changeLayout" + capitalizeFirstLetter(layout),
+        id: "changeKeymapLayout" + capitalizeFirstLetter(layout),
         display: layout.replace("_", " "),
         exec: () => {
           changeKeymapLayout(layout);
