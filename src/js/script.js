@@ -421,7 +421,7 @@ async function initWords() {
   currentCorrected = "";
   currentInput = "";
 
-  let language = await getLanguage(config.language);
+  let language = await getLanguage(config);
 
   if (config.mode === "quote" && quotes === null) {
     showBackgroundLoader();
