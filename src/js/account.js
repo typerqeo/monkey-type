@@ -1,3 +1,8 @@
+import { UserData, db_getUserSnapshot, db_getUserResults } from "./db";
+import * as Misc from "./misc";
+import { UserConfig } from "./userconfig";
+import * as Util from "./util";
+
 $(".pageLogin .register input").keyup((e) => {
   if ($(".pageLogin .register .button").hasClass("disabled")) return;
   if (e.key == "Enter") {
@@ -12,13 +17,13 @@ $(".pageLogin .register .button").click((e) => {
 
 $(".pageLogin .login input").keyup((e) => {
   if (e.key == "Enter") {
-    configChangedBeforeDb = false;
+    UserConfig.configChangedBeforeDb = false;
     signIn();
   }
 });
 
 $(".pageLogin .login .button").click((e) => {
-  configChangedBeforeDb = false;
+  UserConfig.configChangedBeforeDb = false;
   signIn();
 });
 
@@ -38,11 +43,11 @@ $(".pageLogin #forgotPasswordButton").click((e) => {
       .sendPasswordResetEmail(email)
       .then(function () {
         // Email sent.
-        showNotification("Email sent", 2000);
+        Util.showNotification("Email sent", 2000);
       })
       .catch(function (error) {
         // An error happened.
-        showNotification(error.message, 5000);
+        Util.showNotification(error.message, 5000);
       });
   }
 });
@@ -73,7 +78,7 @@ function signIn() {
             changePage("test");
           })
           .catch(function (error) {
-            showNotification(error.message, 5000);
+            Util.showNotification(error.message, 5000);
             $(".pageLogin .preloader").addClass("hidden");
           });
       });
@@ -90,7 +95,7 @@ function signIn() {
             changePage("test");
           })
           .catch(function (error) {
-            showNotification(error.message, 5000);
+            Util.showNotification(error.message, 5000);
             $(".pageLogin .preloader").addClass("hidden");
           });
       });
@@ -108,7 +113,7 @@ function signUp() {
   let passwordVerify = $(".pageLogin .register input")[3].value;
 
   if (password != passwordVerify) {
-    showNotification("Passwords do not match", 3000);
+    Util.showNotification("Passwords do not match", 3000);
     $(".pageLogin .preloader").addClass("hidden");
     $(".pageLogin .register .button").removeClass("disabled");
     return;
@@ -118,12 +123,12 @@ function signUp() {
 
   namecheck({ name: nname }).then((d) => {
     if (d.data === -1) {
-      showNotification("Name unavailable", 3000);
+      Util.showNotification("Name unavailable", 3000);
       $(".pageLogin .preloader").addClass("hidden");
       $(".pageLogin .register .button").removeClass("disabled");
       return;
     } else if (d.data === -2) {
-      showNotification(
+      Util.showNotification(
         "Name cannot contain special characters or contain more than 14 characters. Can include _ . and -",
         8000
       );
@@ -152,7 +157,7 @@ function signUp() {
               reserveName({ name: nname, uid: usr.uid });
               usr.sendEmailVerification();
               clearGlobalStats();
-              showNotification("Account created", 2000);
+              Util.showNotification("Account created", 2000);
               $("#menu .icon-button.account .text").text(nname);
               try {
                 firebase.analytics().logEvent("accountCreated", usr.uid);
@@ -160,7 +165,7 @@ function signUp() {
                 console.log("Analytics unavailable");
               }
               $(".pageLogin .preloader").addClass("hidden");
-              dbSnapshot = {
+              UserData.dbSnapshot = {
                 results: [],
                 personalBests: {},
                 tags: [],
@@ -176,8 +181,8 @@ function signUp() {
                   uid: usr.uid,
                   obj: notSignedInLastResult,
                 });
-                dbSnapshot.results.push(notSignedInLastResult);
-                config.resultFilters = defaultAccountFilters;
+                UserData.dbSnapshot.results.push(notSignedInLastResult);
+                UserConfig.config.resultFilters = defaultAccountFilters;
               }
               changePage("account");
               usr.sendEmailVerification();
@@ -208,7 +213,7 @@ function signUp() {
           $(".pageLogin .register .button").removeClass("disabled");
           var errorCode = error.code;
           var errorMessage = error.message;
-          showNotification(errorMessage, 5000);
+          Util.showNotification(errorMessage, 5000);
           $(".pageLogin .preloader").addClass("hidden");
         });
     }
@@ -220,15 +225,15 @@ function signOut() {
     .auth()
     .signOut()
     .then(function () {
-      showNotification("Signed out", 2000);
+      Util.showNotification("Signed out", 2000);
       clearGlobalStats();
       hideAccountSettingsSection();
       updateAccountLoginButton();
       changePage("login");
-      dbSnapshot = null;
+      UserData.dbSnapshot = null;
     })
     .catch(function (error) {
-      showNotification(error.message, 5000);
+      Util.showNotification(error.message, 5000);
     });
 }
 
@@ -236,10 +241,10 @@ function sendVerificationEmail() {
   let cu = firebase.auth().currentUser;
   cu.sendEmailVerification()
     .then((e) => {
-      showNotification("Email sent to " + cu.email, 4000);
+      Util.showNotification("Email sent to " + cu.email, 4000);
     })
     .catch((e) => {
-      showNotification("Error: " + e.message, 3000);
+      Util.showNotification("Error: " + e.message, 3000);
       console.error(e.message);
     });
 }
@@ -269,12 +274,12 @@ firebase.auth().onAuthStateChanged(function (user) {
     showFavouriteThemesAtTheTop();
 
     if (verifyUserWhenLoggedIn !== null) {
-      showNotification("Verifying", 1000);
+      Util.showNotification("Verifying", 1000);
       verifyUserWhenLoggedIn.uid = user.uid;
       verifyUser(verifyUserWhenLoggedIn).then((data) => {
-        showNotification(data.data.message, 3000);
+        Util.showNotification(data.data.message, 3000);
         if (data.data.status === 1) {
-          dbSnapshot.discordId = data.data.did;
+          UserData.dbSnapshot.discordId = data.data.did;
           updateDiscordSettingsSection();
         }
       });
@@ -285,38 +290,40 @@ firebase.auth().onAuthStateChanged(function (user) {
 function getAccountDataAndInit() {
   db_getUserSnapshot()
     .then((e) => {
-      if (dbSnapshot === null) {
+      if (UserData.dbSnapshot === null) {
         throw "Missing db snapshot. Client likely could not connect to the backend.";
       }
       initPaceCaret(true);
-      if (!configChangedBeforeDb) {
-        if (cookieConfig === null) {
+      if (!UserConfig.configChangedBeforeDb) {
+        if (UserConfig.cookieConfig === null) {
           accountIconLoading(false);
-          applyConfig(dbSnapshot.config);
+          applyConfig(UserData.dbSnapshot.config);
           // showNotification('Applying db config',3000);
           updateSettingsPage();
           saveConfigToCookie(true);
           restartTest(false, true);
-        } else if (dbSnapshot.config !== undefined) {
+        } else if (UserData.dbSnapshot.config !== undefined) {
           let configsDifferent = false;
-          Object.keys(config).forEach((key) => {
+          Object.keys(UserConfig.config).forEach((key) => {
             if (!configsDifferent) {
               try {
                 if (key !== "resultFilters") {
-                  if (Array.isArray(config[key])) {
-                    config[key].forEach((arrval, index) => {
-                      if (arrval != dbSnapshot.config[key][index]) {
+                  if (Array.isArray(UserConfig.config[key])) {
+                    UserConfig.config[key].forEach((arrval, index) => {
+                      if (arrval != UserData.dbSnapshot.config[key][index]) {
                         configsDifferent = true;
                         console.log(
-                          `.config is different: ${arrval} != ${dbSnapshot.config[key][index]}`
+                          `.config is different: ${arrval} != ${UserData.dbSnapshot.config[key][index]}`
                         );
                       }
                     });
                   } else {
-                    if (config[key] != dbSnapshot.config[key]) {
+                    if (
+                      UserConfig.config[key] != UserData.dbSnapshot.config[key]
+                    ) {
                       configsDifferent = true;
                       console.log(
-                        `..config is different ${key}: ${config[key]} != ${dbSnapshot.config[key]}`
+                        `..config is different ${key}: ${UserConfig.config[key]} != ${UserData.dbSnapshot.config[key]}`
                       );
                     }
                   }
@@ -331,7 +338,7 @@ function getAccountDataAndInit() {
           if (configsDifferent) {
             console.log("applying config from db");
             accountIconLoading(false);
-            config = dbSnapshot.config;
+            UserConfig.config = UserData.dbSnapshot.config;
             applyConfig(config);
             updateSettingsPage();
             saveConfigToCookie(true);
@@ -344,21 +351,22 @@ function getAccountDataAndInit() {
       }
       try {
         if (
-          config.resultFilters === undefined ||
-          config.resultFilters === null ||
-          config.resultFilters.difficulty === undefined
+          UserConfig.config.resultFilters === undefined ||
+          UserConfig.config.resultFilters === null ||
+          UserConfig.config.resultFilters.difficulty === undefined
         ) {
           if (
-            dbSnapshot.config.resultFilters == null ||
-            dbSnapshot.config.resultFilters.difficulty === undefined
+            UserData.dbSnapshot.config.resultFilters == null ||
+            UserData.dbSnapshot.config.resultFilters.difficulty === undefined
           ) {
-            config.resultFilters = defaultAccountFilters;
+            UserConfig.config.resultFilters = defaultAccountFilters;
           } else {
-            config.resultFilters = dbSnapshot.config.resultFilters;
+            UserConfig.config.resultFilters =
+              UserData.dbSnapshot.config.resultFilters;
           }
         }
       } catch (e) {
-        config.resultFilters = defaultAccountFilters;
+        UserConfig.config.resultFilters = defaultAccountFilters;
       }
       if ($(".pageLogin").hasClass("active")) {
         changePage("account");
@@ -374,7 +382,7 @@ function getAccountDataAndInit() {
     .catch((e) => {
       accountIconLoading(false);
       console.error(e);
-      showNotification(
+      Util.showNotification(
         "Error downloading user data. Refresh to try again. If error persists contact Miodec.",
         5000
       );
@@ -912,7 +920,7 @@ function updateHoverChart(filteredId) {
   hoverChart.options.scales.yAxes[0].ticks.max = Math.round(maxChartVal);
   hoverChart.options.scales.yAxes[1].ticks.max = Math.round(maxChartVal);
 
-  if (!config.startGraphsAtZero) {
+  if (!UserConfig.config.startGraphsAtZero) {
     hoverChart.options.scales.yAxes[0].ticks.min = Math.round(minChartVal);
     hoverChart.options.scales.yAxes[1].ticks.min = Math.round(minChartVal);
   } else {
@@ -1042,14 +1050,14 @@ function updateFilterTags() {
   $(
     ".pageAccount .content .filterButtons .buttonsAndTitle.tags .buttons"
   ).empty();
-  if (dbSnapshot.tags.length > 0) {
+  if (UserData.dbSnapshot.tags.length > 0) {
     $(".pageAccount .content .filterButtons .buttonsAndTitle.tags").removeClass(
       "hidden"
     );
     $(
       ".pageAccount .content .filterButtons .buttonsAndTitle.tags .buttons"
     ).append(`<div class="button" filter="none">no tag</div>`);
-    dbSnapshot.tags.forEach((tag) => {
+    UserData.dbSnapshot.tags.forEach((tag) => {
       defaultAccountFilters.tags[tag.id] = true;
       $(
         ".pageAccount .content .filterButtons .buttonsAndTitle.tags .buttons"
@@ -1065,15 +1073,16 @@ function updateFilterTags() {
 
 function toggleFilter(group, filter) {
   if (group === "date") {
-    Object.keys(config.resultFilters.date).forEach((date) => {
+    Object.keys(UserConfig.config.resultFilters.date).forEach((date) => {
       setFilter("date", date, false);
     });
   }
-  config.resultFilters[group][filter] = !config.resultFilters[group][filter];
+  UserConfig.config.resultFilters[group][filter] = !UserConfig.config
+    .resultFilters[group][filter];
 }
 
 function setFilter(group, filter, set) {
-  config.resultFilters[group][filter] = set;
+  UserConfig.config.resultFilters[group][filter] = set;
 }
 
 // function toggleFilterButton(filter) {
@@ -1189,13 +1198,13 @@ function showActiveFilters() {
 
   let aboveChartDisplay = {};
 
-  Object.keys(config.resultFilters).forEach((group) => {
+  Object.keys(UserConfig.config.resultFilters).forEach((group) => {
     aboveChartDisplay[group] = {
       all: true,
       array: [],
     };
-    Object.keys(config.resultFilters[group]).forEach((filter) => {
-      if (config.resultFilters[group][filter]) {
+    Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
+      if (UserConfig.config.resultFilters[group][filter]) {
         aboveChartDisplay[group].array.push(filter);
       } else {
         aboveChartDisplay[group].all = false;
@@ -1210,7 +1219,7 @@ function showActiveFilters() {
           `.pageAccount .group.filterButtons .filterGroup[group="${group}"] .button[filter="${filter}"]`
         );
       }
-      if (config.resultFilters[group][filter]) {
+      if (UserConfig.config.resultFilters[group][filter]) {
         buttonEl.addClass("active");
       } else {
         buttonEl.removeClass("active");
@@ -1254,14 +1263,13 @@ function showActiveFilters() {
     if (aboveChartDisplay[group].all) {
       ret += "all";
     } else {
-      allall = false;
       if (group === "tags") {
         ret += aboveChartDisplay.tags.array
           .map((id) => {
             if (id == "none") return id;
-            let name = dbSnapshot.tags.filter((t) => t.id == id)[0];
+            let name = UserData.dbSnapshot.tags.filter((t) => t.id == id)[0];
             if (name !== undefined) {
-              return dbSnapshot.tags.filter((t) => t.id == id)[0].name;
+              return UserData.dbSnapshot.tags.filter((t) => t.id == id)[0].name;
             }
           })
           .join(", ");
@@ -1413,55 +1421,57 @@ function hideChartPreloader() {
 }
 
 $(".pageAccount .topFilters .button.allFilters").click((e) => {
-  Object.keys(config.resultFilters).forEach((group) => {
-    Object.keys(config.resultFilters[group]).forEach((filter) => {
+  Object.keys(UserConfig.config.resultFilters).forEach((group) => {
+    Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
       if (group === "date") {
-        config.resultFilters[group][filter] = false;
+        UserConfig.config.resultFilters[group][filter] = false;
       } else {
-        config.resultFilters[group][filter] = true;
+        UserConfig.config.resultFilters[group][filter] = true;
       }
     });
   });
-  config.resultFilters.date.all = true;
+  UserConfig.config.resultFilters.date.all = true;
   showActiveFilters();
   saveConfigToCookie();
 });
 
 $(".pageAccount .topFilters .button.currentConfigFilter").click((e) => {
-  Object.keys(config.resultFilters).forEach((group) => {
-    Object.keys(config.resultFilters[group]).forEach((filter) => {
-      config.resultFilters[group][filter] = false;
+  Object.keys(UserConfig.config.resultFilters).forEach((group) => {
+    Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
+      UserConfig.config.resultFilters[group][filter] = false;
     });
   });
 
-  config.resultFilters.difficulty[config.difficulty] = true;
-  config.resultFilters.mode[config.mode] = true;
-  if (config.mode === "time") {
-    config.resultFilters.time[config.time] = true;
-  } else if (config.mode === "words") {
-    config.resultFilters.words[config.words] = true;
+  UserConfig.config.resultFilters.difficulty[
+    UserConfig.config.difficulty
+  ] = true;
+  UserConfig.config.resultFilters.mode[UserConfig.config.mode] = true;
+  if (UserConfig.config.mode === "time") {
+    UserConfig.config.resultFilters.time[UserConfig.config.time] = true;
+  } else if (UserConfig.config.mode === "words") {
+    UserConfig.config.resultFilters.words[UserConfig.config.words] = true;
   }
-  if (config.punctuation) {
-    config.resultFilters.punctuation.on = true;
+  if (UserConfig.config.punctuation) {
+    UserConfig.config.resultFilters.punctuation.on = true;
   } else {
-    config.resultFilters.punctuation.off = true;
+    UserConfig.config.resultFilters.punctuation.off = true;
   }
-  if (config.numbers) {
-    config.resultFilters.numbers.on = true;
+  if (UserConfig.config.numbers) {
+    UserConfig.config.resultFilters.numbers.on = true;
   } else {
-    config.resultFilters.numbers.off = true;
+    UserConfig.config.resultFilters.numbers.off = true;
   }
-  config.resultFilters.language[config.language] = true;
-  config.resultFilters.funbox[activeFunBox] = true;
-  config.resultFilters.tags.none = true;
-  dbSnapshot.tags.forEach((tag) => {
+  UserConfig.config.resultFilters.language[UserConfig.config.language] = true;
+  UserConfig.config.resultFilters.funbox[activeFunBox] = true;
+  UserConfig.config.resultFilters.tags.none = true;
+  UserData.dbSnapshot.tags.forEach((tag) => {
     if (tag.active === true) {
-      config.resultFilters.tags.none = false;
-      config.resultFilters.tags[tag.id] = true;
+      UserConfig.config.resultFilters.tags.none = false;
+      UserConfig.config.resultFilters.tags[tag.id] = true;
     }
   });
 
-  config.resultFilters.date.all = true;
+  UserConfig.config.resultFilters.date.all = true;
 
   showActiveFilters();
   saveConfigToCookie();
@@ -1481,26 +1491,26 @@ $(
   const group = $(e.target).parents(".buttons").attr("group");
   // toggleFilterButton(filter);
   if ($(e.target).hasClass("allFilters")) {
-    Object.keys(config.resultFilters).forEach((group) => {
-      Object.keys(config.resultFilters[group]).forEach((filter) => {
+    Object.keys(UserConfig.config.resultFilters).forEach((group) => {
+      Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
         if (group === "date") {
-          config.resultFilters[group][filter] = false;
+          UserConfig.config.resultFilters[group][filter] = false;
         } else {
-          config.resultFilters[group][filter] = true;
+          UserConfig.config.resultFilters[group][filter] = true;
         }
       });
     });
-    config.resultFilters.date.all = true;
+    UserConfig.config.resultFilters.date.all = true;
   } else if ($(e.target).hasClass("noFilters")) {
-    Object.keys(config.resultFilters).forEach((group) => {
-      Object.keys(config.resultFilters[group]).forEach((filter) => {
-        config.resultFilters[group][filter] = false;
+    Object.keys(UserConfig.config.resultFilters).forEach((group) => {
+      Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
+        UserConfig.config.resultFilters[group][filter] = false;
       });
     });
   } else {
     if (e.shiftKey) {
-      Object.keys(config.resultFilters[group]).forEach((filter) => {
-        config.resultFilters[group][filter] = false;
+      Object.keys(UserConfig.config.resultFilters[group]).forEach((filter) => {
+        UserConfig.config.resultFilters[group][filter] = false;
       });
       setFilter(group, filter, true);
     } else {
@@ -1750,7 +1760,7 @@ let visibleTableLines = 0;
 function loadMoreLines() {
   if (filteredResults == [] || filteredResults.length == 0) return;
   for (let i = visibleTableLines; i < visibleTableLines + 10; i++) {
-    result = filteredResults[i];
+    let result = filteredResults[i];
     if (result == undefined) continue;
     let withpunc = "";
     // if (result.punctuation) {
@@ -1818,7 +1828,7 @@ function loadMoreLines() {
 
     if (result.tags !== undefined && result.tags.length > 0) {
       result.tags.forEach((tag) => {
-        dbSnapshot.tags.forEach((snaptag) => {
+        UserData.dbSnapshot.tags.forEach((snaptag) => {
           if (tag === snaptag.id) {
             tagNames += snaptag.name + ", ";
           }
@@ -1893,25 +1903,25 @@ function clearGlobalStats() {
 }
 
 function refreshGlobalStats() {
-  if (dbSnapshot.globalStats.time != undefined) {
-    let th = Math.floor(dbSnapshot.globalStats.time / 3600);
-    let tm = Math.floor((dbSnapshot.globalStats.time % 3600) / 60);
-    let ts = Math.floor((dbSnapshot.globalStats.time % 3600) % 60);
+  if (UserData.dbSnapshot.globalStats.time != undefined) {
+    let th = Math.floor(UserData.dbSnapshot.globalStats.time / 3600);
+    let tm = Math.floor((UserData.dbSnapshot.globalStats.time % 3600) / 60);
+    let ts = Math.floor((UserData.dbSnapshot.globalStats.time % 3600) % 60);
     $(".pageAccount .globalTimeTyping .val").text(`
-      
+
       ${th < 10 ? "0" + th : th}:${tm < 10 ? "0" + tm : tm}:${
       ts < 10 ? "0" + ts : ts
     }
   `);
   }
-  if (dbSnapshot.globalStats.started != undefined) {
+  if (UserData.dbSnapshot.globalStats.started != undefined) {
     $(".pageAccount .globalTestsStarted .val").text(
-      dbSnapshot.globalStats.started
+      UserData.dbSnapshot.globalStats.started
     );
   }
-  if (dbSnapshot.globalStats.completed != undefined) {
+  if (UserData.dbSnapshot.globalStats.completed != undefined) {
     $(".pageAccount .globalTestsCompleted .val").text(
-      dbSnapshot.globalStats.completed
+      UserData.dbSnapshot.globalStats.completed
     );
   }
 }
@@ -1962,7 +1972,7 @@ function refreshAccountPage() {
 
     filteredResults = [];
     $(".pageAccount .history table tbody").empty();
-    dbSnapshot.results.forEach((result) => {
+    UserData.dbSnapshot.results.forEach((result) => {
       let tt = 0;
       if (result.testDuration == undefined) {
         //test finished before testDuration field was introduced - estimate
@@ -1989,9 +1999,9 @@ function refreshAccountPage() {
           resdiff = "normal";
         }
         // if (!activeFilters.includes("difficulty_" + resdiff)) return;
-        if (!config.resultFilters.difficulty[resdiff]) return;
+        if (!UserConfig.config.resultFilters.difficulty[resdiff]) return;
         // if (!activeFilters.includes("mode_" + result.mode)) return;
-        if (!config.resultFilters.mode[result.mode]) return;
+        if (!UserConfig.config.resultFilters.mode[result.mode]) return;
 
         if (result.mode == "time") {
           let timefilter = "custom";
@@ -1999,23 +2009,24 @@ function refreshAccountPage() {
             timefilter = result.mode2;
           }
           // if (!activeFilters.includes(timefilter)) return;
-          if (!config.resultFilters.time[timefilter]) return;
+          if (!UserConfig.config.resultFilters.time[timefilter]) return;
         } else if (result.mode == "words") {
           let wordfilter = "custom";
           if ([10, 25, 50, 100, 200].includes(parseInt(result.mode2))) {
             wordfilter = result.mode2;
           }
           // if (!activeFilters.includes(wordfilter)) return;
-          if (!config.resultFilters.words[wordfilter]) return;
+          if (!UserConfig.config.resultFilters.words[wordfilter]) return;
         }
 
         // if (!activeFilters.includes("lang_" + result.language)) return;
 
-        let langFilter = config.resultFilters.language[result.language];
+        let langFilter =
+          UserConfig.config.resultFilters.language[result.language];
 
         if (
           result.language === "english_expanded" &&
-          config.resultFilters.language.english_1k
+          UserConfig.config.resultFilters.language.english_1k
         ) {
           langFilter = true;
         }
@@ -2025,36 +2036,36 @@ function refreshAccountPage() {
         if (result.punctuation) {
           puncfilter = "on";
         }
-        if (!config.resultFilters.punctuation[puncfilter]) return;
+        if (!UserConfig.config.resultFilters.punctuation[puncfilter]) return;
         // if (!activeFilters.includes(puncfilter)) return;
 
         let numfilter = "off";
         if (result.numbers) {
           numfilter = "on";
         }
-        if (!config.resultFilters.numbers[numfilter]) return;
+        if (!UserConfig.config.resultFilters.numbers[numfilter]) return;
 
         if (result.funbox === "none" || result.funbox === undefined) {
           // if (!activeFilters.includes("funbox_none")) return;
-          if (!config.resultFilters.funbox.none) return;
+          if (!UserConfig.config.resultFilters.funbox.none) return;
         } else {
           // if (!activeFilters.includes("funbox_" + result.funbox)) return;
-          if (!config.resultFilters.funbox[result.funbox]) return;
+          if (!UserConfig.config.resultFilters.funbox[result.funbox]) return;
         }
 
         let tagHide = true;
 
         if (result.tags === undefined || result.tags.length === 0) {
           //no tags, show when no tag is enabled
-          if (dbSnapshot.tags.length > 0) {
+          if (UserData.dbSnapshot.tags.length > 0) {
             // if (activeFilters.includes("tag_notag")) tagHide = false;
-            if (config.resultFilters.tags.none) tagHide = false;
+            if (UserConfig.config.resultFilters.tags.none) tagHide = false;
           } else {
             tagHide = false;
           }
         } else {
           //tags exist
-          let validTags = dbSnapshot.tags.map((t) => t.id);
+          let validTags = UserData.dbSnapshot.tags.map((t) => t.id);
           result.tags.forEach((tag) => {
             //check if i even need to check tags anymore
             if (!tagHide) return;
@@ -2062,10 +2073,10 @@ function refreshAccountPage() {
             if (validTags.includes(tag)) {
               //tag valid, check if filter is on
               // if (activeFilters.includes("tag_" + tag)) tagHide = false;
-              if (config.resultFilters.tags[tag]) tagHide = false;
+              if (UserConfig.config.resultFilters.tags[tag]) tagHide = false;
             } else {
               //tag not found in valid tags, meaning probably deleted
-              if (config.resultFilters.tags.none) tagHide = false;
+              if (UserConfig.config.resultFilters.tags.none) tagHide = false;
             }
           });
         }
@@ -2086,10 +2097,13 @@ function refreshAccountPage() {
         // }
 
         if (
-          config.resultFilters.date.all ||
-          (config.resultFilters.date.last_day && timeSinceTest <= 86400) ||
-          (config.resultFilters.date.last_week && timeSinceTest <= 604800) ||
-          (config.resultFilters.date.last_month && timeSinceTest <= 2592000)
+          UserConfig.config.resultFilters.date.all ||
+          (UserConfig.config.resultFilters.date.last_day &&
+            timeSinceTest <= 86400) ||
+          (UserConfig.config.resultFilters.date.last_week &&
+            timeSinceTest <= 604800) ||
+          (UserConfig.config.resultFilters.date.last_month &&
+            timeSinceTest <= 2592000)
         ) {
           datehide = false;
         }
@@ -2098,11 +2112,11 @@ function refreshAccountPage() {
 
         filteredResults.push(result);
       } catch (e) {
-        showNotification(
+        Util.showNotification(
           "Something went wrong when filtering. Resetting filters.",
           5000
         );
-        config.resultFilters = defaultAccountFilters;
+        UserConfig.config.resultFilters = defaultAccountFilters;
         saveConfigToCookie();
       }
 
@@ -2253,7 +2267,7 @@ function refreshAccountPage() {
       });
       activityChartData_avgWpm.push({
         x: parseInt(date),
-        y: roundTo2(
+        y: Misc.roundTo2(
           activityChartData[date].totalWpm / activityChartData[date].amount
         ),
       });
@@ -2319,7 +2333,7 @@ function refreshAccountPage() {
       maxAccuracyChartVal
     );
 
-    if (!config.startGraphsAtZero) {
+    if (!UserConfig.config.startGraphsAtZero) {
       resultHistoryChart.options.scales.yAxes[0].ticks.min = Math.floor(
         minWpmChartVal
       );
@@ -2352,7 +2366,7 @@ function refreshAccountPage() {
     let tm = Math.floor((totalSeconds % 3600) / 60);
     let ts = Math.floor((totalSeconds % 3600) % 60);
     $(".pageAccount .timeTotal .val").text(`
-      
+
       ${th < 10 ? "0" + th : th}:${tm < 10 ? "0" + tm : tm}:${
       ts < 10 ? "0" + ts : ts
     }
@@ -2364,7 +2378,7 @@ function refreshAccountPage() {
     let tfm = Math.floor((totalSecondsFiltered % 3600) / 60);
     let tfs = Math.floor((totalSecondsFiltered % 3600) % 60);
     $(".pageAccount .timeTotalFiltered .val").text(`
-      
+
     ${tfh < 10 ? "0" + tfh : tfh}:${tfm < 10 ? "0" + tfm : tfm}:${
       tfs < 10 ? "0" + tfs : tfs
     }
@@ -2469,7 +2483,7 @@ function refreshAccountPage() {
 
     $(".pageAccount .group.chart .below .text").text(
       `Speed change per hour spent typing: ${
-        plus + roundTo2(wpmChangePerHour)
+        plus + Misc.roundTo2(wpmChangePerHour)
       } wpm.`
     );
 
@@ -2478,10 +2492,10 @@ function refreshAccountPage() {
 
     swapElements($(".pageAccount .preloader"), $(".pageAccount .content"), 250);
   }
-  if (dbSnapshot === null) {
-    showNotification(`Missing account data. Please refresh.`, 5000);
+  if (UserData.adbSnapshot === null) {
+    Util.showNotification(`Missing account data. Please refresh.`, 5000);
     $(".pageAccount .preloader").html("Missing account data. Please refresh.");
-  } else if (dbSnapshot.results === undefined) {
+  } else if (UserData.dbSnapshot.results === undefined) {
     db_getUserResults().then((d) => {
       if (d) {
         // cont();
@@ -2499,7 +2513,7 @@ function refreshAccountPage() {
       cont();
     } catch (e) {
       console.error(e);
-      showNotification(`Something went wrong: ${e}`, 5000);
+      Util.showNotification(`Something went wrong: ${e}`, 5000);
     }
   }
 }
@@ -2540,7 +2554,7 @@ $(".pageAccount .toggleChartStyle").click((params) => {
 });
 
 $(document).on("click", ".pageAccount .group.history #resultEditTags", (f) => {
-  if (dbSnapshot.tags.length > 0) {
+  if (UserData.dbSnapshot.tags.length > 0) {
     let resultid = $(f.target).parents("span").attr("resultid");
     let tags = $(f.target).parents("span").attr("tags");
     $("#resultEditTagsPanel").attr("resultid", resultid);
@@ -2562,7 +2576,7 @@ $("#resultEditTagsPanelWrapper").click((e) => {
 
 function updateResultEditTagsPanelButtons() {
   $("#resultEditTagsPanel .buttons").empty();
-  dbSnapshot.tags.forEach((tag) => {
+  UserData.dbSnapshot.tags.forEach((tag) => {
     $("#resultEditTagsPanel .buttons").append(
       `<div class="button tag" tagid="${tag.id}">${tag.name}</div>`
     );
@@ -2608,8 +2622,8 @@ $("#resultEditTagsPanel .confirmButton").click((f) => {
   }).then((r) => {
     hideBackgroundLoader();
     if (r.data.resultCode === 1) {
-      showNotification("Tags updated.", 3000);
-      dbSnapshot.results.forEach((result) => {
+      Util.showNotification("Tags updated.", 3000);
+      UserData.dbSnapshot.results.forEach((result) => {
         if (result.id === resultid) {
           result.tags = newtags;
         }
@@ -2619,7 +2633,7 @@ $("#resultEditTagsPanel .confirmButton").click((f) => {
 
       if (newtags.length > 0) {
         newtags.forEach((tag) => {
-          dbSnapshot.tags.forEach((snaptag) => {
+          UserData.dbSnapshot.tags.forEach((snaptag) => {
             if (tag === snaptag.id) {
               tagNames += snaptag.name + ", ";
             }
@@ -2661,11 +2675,11 @@ $("#resultEditTagsPanel .confirmButton").click((f) => {
 
       // refreshAccountPage();
     } else {
-      showNotification("Error updating tags", 3000);
+      Util.showNotification("Error updating tags", 3000);
     }
   });
 });
 
 function updateLbMemory(mode, mode2, type, value) {
-  dbSnapshot.lbMemory[mode + mode2][type] = value;
+  UserData.dbSnapshot.lbMemory[mode + mode2][type] = value;
 }
