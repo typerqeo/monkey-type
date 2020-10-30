@@ -24,5 +24,10 @@
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
+  },
+  "dependencies": {
+    "jquery": "^3.5.1",
+    "jquery-color": "^2.2.0",
+    "jquery.cookie": "^1.4.1"
   }
 }
