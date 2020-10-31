@@ -176,13 +176,15 @@ function signUp() {
                   completed: undefined,
                 },
               };
-              if (notSignedInLastResult !== null) {
-                notSignedInLastResult.uid = usr.uid;
+              if (TypingTest.Globals.notSignedInLastResult !== null) {
+                TypingTest.Globals.notSignedInLastResult.uid = usr.uid;
                 FirebaseFunctions.testCompleted({
                   uid: usr.uid,
-                  obj: notSignedInLastResult,
+                  obj: TypingTest.Globals.notSignedInLastResult,
                 });
-                UserData.dbSnapshot.results.push(notSignedInLastResult);
+                UserData.dbSnapshot.results.push(
+                  TypingTest.Globals.notSignedInLastResult
+                );
                 UserConfig.config.resultFilters = defaultAccountFilters;
               }
               changePage("account");
@@ -228,8 +230,8 @@ function signOut() {
     .then(function () {
       Util.showNotification("Signed out", 2000);
       clearGlobalStats();
-      hideAccountSettingsSection();
-      updateAccountLoginButton();
+      Settings.hideAccountSettingsSection();
+      Util.updateAccountLoginButton();
       changePage("login");
       UserData.dbSnapshot = null;
     })
@@ -258,7 +260,7 @@ firebase.auth().onAuthStateChanged(function (user) {
         `<p style="text-align:center">Your account is not verified. Click <a onClick="sendVerificationEmail()">here</a> to resend the verification email.`
       );
     }
-    updateAccountLoginButton();
+    Util.updateAccountLoginButton();
     Util.accountIconLoading(true);
     getAccountDataAndInit();
     var displayName = user.displayName;
@@ -285,14 +287,16 @@ firebase.auth().onAuthStateChanged(function (user) {
 
     $(".pageAccount .group.createdDate").text(text);
 
-    if (verifyUserWhenLoggedIn !== null) {
+    if (TypingTest.Globals.verifyUserWhenLoggedIn !== null) {
       Util.showNotification("Verifying", 1000);
-      verifyUserWhenLoggedIn.uid = user.uid;
-      FirebaseFunctions.verifyUser(verifyUserWhenLoggedIn).then((data) => {
+      TypingTest.Globals.verifyUserWhenLoggedIn.uid = user.uid;
+      FirebaseFunctions.verifyUser(
+        TypingTest.Globals.verifyUserWhenLoggedIn
+      ).then((data) => {
         Util.showNotification(data.data.message, 3000);
         if (data.data.status === 1) {
           UserData.dbSnapshot.discordId = data.data.did;
-          updateDiscordSettingsSection();
+          Settings.updateDiscordSettingsSection();
         }
       });
     }
@@ -357,7 +361,7 @@ function getAccountDataAndInit() {
             restartTest(false, true);
           }
         }
-        dbConfigLoaded = true;
+        UserConfig.dbConfigLoaded = true;
       } else {
         Util.accountIconLoading(false);
       }
@@ -1458,7 +1462,7 @@ let totalSecondsFiltered = 0;
 
 export function refreshAccountPage() {
   function cont() {
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
     refreshGlobalStats();
     fillPbTables();
 
@@ -2028,7 +2032,11 @@ export function refreshAccountPage() {
     resultHistoryChart.update({ duration: 0 });
     activityChart.update({ duration: 0 });
 
-    swapElements($(".pageAccount .preloader"), $(".pageAccount .content"), 250);
+    Util.swapElements(
+      $(".pageAccount .preloader"),
+      $(".pageAccount .content"),
+      250
+    );
   }
   if (UserData.adbSnapshot === null) {
     Util.showNotification(`Missing account data. Please refresh.`, 5000);

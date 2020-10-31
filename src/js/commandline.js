@@ -1897,7 +1897,7 @@ function hideCommandLine() {
 }
 
 export function showCommandLine() {
-  setFocus(false);
+  TypingTest.setFocus(false);
   $("#commandLine").removeClass("hidden");
   $("#commandInput").addClass("hidden");
   if ($("#commandLineWrapper").hasClass("hidden")) {

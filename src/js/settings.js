@@ -582,7 +582,7 @@ function showAccountSettingsSection() {
   updateDiscordSettingsSection();
 }
 
-function hideAccountSettingsSection() {
+export function hideAccountSettingsSection() {
   $(`.sectionGroupTitle[group='account']`).addClass("hidden");
   $(`.settingsGroup.account`).addClass("hidden");
 }
@@ -625,7 +625,7 @@ function refreshTagsSettingsSection() {
   }
 }
 
-function setActiveFunboxButton() {
+export function setActiveFunboxButton() {
   $(`.pageSettings .section.funbox .button`).removeClass("active");
   $(
     `.pageSettings .section.funbox .button[funbox='${TypingTest.Globals.activeFunBox}']`
@@ -687,7 +687,7 @@ function toggleTag(tagid, nosave = false) {
   if (!nosave) Config.saveActiveTagsToCookie();
 }
 
-function updateDiscordSettingsSection() {
+export function updateDiscordSettingsSection() {
   //no code and no discord
   if (firebase.auth().currentUser == null) {
     $(".pageSettings .section.discordIntegration").addClass("hidden");
@@ -825,7 +825,7 @@ $(document).on(
 );
 
 $(document).on("click", ".pageSettings .section.tags .addTagButton", (e) => {
-  showEditTags("add");
+  Util.showEditTags("add");
 });
 
 $(document).on(
@@ -834,7 +834,7 @@ $(document).on(
   (e) => {
     let tagid = $(e.currentTarget).parent(".tag").attr("id");
     let name = $(e.currentTarget).siblings(".title").text();
-    showEditTags("edit", tagid, name);
+    Util.showEditTags("edit", tagid, name);
   }
 );
 
@@ -844,7 +844,7 @@ $(document).on(
   (e) => {
     let tagid = $(e.currentTarget).parent(".tag").attr("id");
     let name = $(e.currentTarget).siblings(".title").text();
-    showEditTags("remove", tagid, name);
+    Util.showEditTags("remove", tagid, name);
   }
 );
 
@@ -869,7 +869,7 @@ $(".pageSettings .section.themes .tabs .button").click((e) => {
   if ($target.attr("tab") == "preset") {
     Config.setCustomTheme(false, true);
     Config.applyCustomThemeColors();
-    swapElements(
+    Util.swapElements(
       $('.pageSettings .section.themes .tabContainer [tabContent="custom"]'),
       $('.pageSettings .section.themes .tabContainer [tabContent="preset"]'),
       250
@@ -877,7 +877,7 @@ $(".pageSettings .section.themes .tabs .button").click((e) => {
   } else {
     Config.setCustomTheme(true, true);
     Config.applyCustomThemeColors();
-    swapElements(
+    Util.swapElements(
       $('.pageSettings .section.themes .tabContainer [tabContent="preset"]'),
       $('.pageSettings .section.themes .tabContainer [tabContent="custom"]'),
       250
@@ -916,7 +916,7 @@ $(".pageSettings #loadCustomColorsFromPreset").click((e) => {
   });
 
   setTimeout((fn) => {
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
     colorVars.forEach((colorName) => {
       let color;
       if (colorName === "--bg-color") {

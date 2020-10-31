@@ -318,8 +318,11 @@ export function setPlaySoundOnClick(val, nosave) {
     val = "off";
   }
   UserConfig.config.playSoundOnClick = val;
-  if (clickSounds === null && UserConfig.config.playSoundOnClick !== "off")
-    initClickSounds();
+  if (
+    !ClickSound.haveClickSounds() &&
+    UserConfig.config.playSoundOnClick !== "off"
+  )
+    ClickSound.initClickSounds();
   if (!nosave) saveConfigToCookie();
 }
 
@@ -1065,7 +1068,7 @@ export function setIndicateTypos(it, nosave) {
 
 export function previewTheme(name, setIsPreviewingVar = true) {
   if (
-    (testActive || resultVisible) &&
+    (TypingTest.Globals.testActive || resultVisible) &&
     (UserConfig.config.theme === "nausea" ||
       UserConfig.config.theme === "round_round_baby")
   )
@@ -1075,13 +1078,13 @@ export function previewTheme(name, setIsPreviewingVar = true) {
   isPreviewingTheme = setIsPreviewingVar;
   $("#currentTheme").attr("href", `themes/${name}.css`);
   setTimeout(() => {
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
   }, 500);
 }
 
 export function setTheme(name, nosave) {
   if (
-    (testActive || resultVisible) &&
+    (TypingTest.Globals.testActive || resultVisible) &&
     (UserConfig.config.theme === "nausea" ||
       UserConfig.config.theme === "round_round_baby")
   ) {
@@ -1107,7 +1110,7 @@ export function setTheme(name, nosave) {
   applyCustomThemeColors();
   setTimeout(() => {
     $(".keymap-key").attr("style", "");
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
     $("#metaThemeColor").attr("content", themeColors.main);
   }, 500);
   if (!nosave) saveConfigToCookie();
@@ -1174,7 +1177,7 @@ export function applyCustomThemeColors() {
     });
   }
   setTimeout(() => {
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
     updateFavicon(32, 14);
     $(".keymap-key").attr("style", "");
   }, 500);
@@ -1186,7 +1189,7 @@ export function togglePresetCustomTheme() {
     applyCustomThemeColors();
     // $('[tabContent="custom"]').removeClass("reveal");
     // $('[tabContent="preset"]').addClass("reveal");
-    swapElements(
+    Util.swapElements(
       $('.pageSettings [tabContent="custom"]'),
       $('.pageSettings [tabContent="preset"]'),
       250
@@ -1194,7 +1197,7 @@ export function togglePresetCustomTheme() {
   } else {
     setCustomTheme(true);
     applyCustomThemeColors();
-    swapElements(
+    Util.swapElements(
       $('.pageSettings [tabContent="preset"]'),
       $('.pageSettings [tabContent="custom"]'),
       250

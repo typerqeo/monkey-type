@@ -27,7 +27,6 @@ let currentCorrected = "";
 let currentInput = "";
 let time = 0;
 let timer = null;
-let testActive = false;
 let testStart, testEnd;
 let wpmHistory = [];
 let rawHistory = [];
@@ -51,14 +50,10 @@ let activeWordTop = 0;
 let activeWordJumped = false;
 let sameWordset = false;
 let quotes = null;
-let focusState = false;
 let manualRestart = false;
-let notSignedInLastResult = null;
-let caretAnimating = true;
 let lastSecondNotRound = false;
 let paceCaret = null;
 let missedWords = [];
-let verifyUserWhenLoggedIn = null;
 let modeBeforePractise = null;
 let memoryFunboxTimer = null;
 let memoryFunboxInterval = null;
@@ -82,38 +77,6 @@ let keypressStats = {
 let isPreviewingTheme = false;
 
 let randomQuote = null;
-
-function refreshThemeColorObject() {
-  let st = getComputedStyle(document.body);
-
-  TypingTest.Globals.themeColors.bg = st
-    .getPropertyValue("--bg-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.main = st
-    .getPropertyValue("--main-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.caret = st
-    .getPropertyValue("--caret-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.sub = st
-    .getPropertyValue("--sub-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.text = st
-    .getPropertyValue("--text-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.error = st
-    .getPropertyValue("--error-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.errorExtra = st
-    .getPropertyValue("--error-extra-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.colorfulError = st
-    .getPropertyValue("--colorful-error-color")
-    .replace(" ", "");
-  TypingTest.Globals.themeColors.colorfulErrorExtra = st
-    .getPropertyValue("--colorful-error-extra-color")
-    .replace(" ", "");
-}
 
 function copyResultToClipboard() {
   if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
@@ -180,7 +143,7 @@ function copyResultToClipboard() {
 }
 
 function activateFunbox(funbox, mode) {
-  if (testActive || resultVisible) {
+  if (TypingTest.Globals.testActive || resultVisible) {
     Util.showNotification(
       "You can only change the funbox before starting a test.",
       4000
@@ -270,30 +233,8 @@ function getuid() {
   console.error("Only share this uid with Miodec and nobody else!");
 }
 
-function setFocus(foc) {
-  if (foc && !focusState) {
-    focusState = true;
-    stopCaretAnimation();
-    $("#top").addClass("focus");
-    $("#bottom").addClass("focus");
-    $("body").css("cursor", "none");
-    $("#middle").addClass("focus");
-  } else if (!foc && focusState) {
-    focusState = false;
-    if (testActive) {
-      stopCaretAnimation();
-    } else {
-      startCaretAnimation();
-    }
-    $("#top").removeClass("focus");
-    $("#bottom").removeClass("focus");
-    $("body").css("cursor", "default");
-    $("#middle").removeClass("focus");
-  }
-}
-
 async function initWords() {
-  testActive = false;
+  TypingTest.Globals.testActive = false;
   wordsList = [];
   currentWordIndex = 0;
   currentWordElementIndex = 0;
@@ -1191,22 +1132,7 @@ function showCaret() {
   if ($("#result").hasClass("hidden")) {
     updateCaretPosition();
     $("#caret").removeClass("hidden");
-    startCaretAnimation();
-  }
-}
-
-function stopCaretAnimation() {
-  if (caretAnimating === true) {
-    $("#caret").css("animation-name", "none");
-    $("#caret").css("opacity", "1");
-    caretAnimating = false;
-  }
-}
-
-function startCaretAnimation() {
-  if (caretAnimating === false) {
-    $("#caret").css("animation-name", "caretFlash");
-    caretAnimating = true;
+    TypingTest.startCaretAnimation();
   }
 }
 
@@ -1624,8 +1550,8 @@ function showResult(difficultyFailed = false) {
   resultCalculating = true;
   resultVisible = true;
   testEnd = Date.now();
-  testActive = false;
-  setFocus(false);
+  TypingTest.Globals.testActive = false;
+  TypingTest.setFocus(false);
   hideCaret();
   hideLiveWpm();
   hideTimer();
@@ -1799,7 +1725,7 @@ function showResult(difficultyFailed = false) {
   }
 
   if (TypingTest.Globals.themeColors.main == "") {
-    refreshThemeColorObject();
+    TypingTest.refreshThemeColorObject();
   }
 
   wpmOverTimeChart.options.scales.xAxes[0].ticks.minor.fontColor =
@@ -2332,7 +2258,7 @@ function showResult(difficultyFailed = false) {
         } catch (e) {
           console.log("Analytics unavailable");
         }
-        notSignedInLastResult = completedEvent;
+        TypingTest.Globals.notSignedInLastResult = completedEvent;
 
         // showNotification("Sign in to save your result",3000);
       }
@@ -2472,7 +2398,7 @@ function showResult(difficultyFailed = false) {
 
   wpmOverTimeChart.update({ duration: 0 });
   wpmOverTimeChart.resize();
-  swapElements($("#typingTest"), $("#result"), 250, () => {
+  Util.swapElements($("#typingTest"), $("#result"), 250, () => {
     resultCalculating = false;
     $("#words").empty();
     wpmOverTimeChart.resize();
@@ -2515,7 +2441,7 @@ function startTest() {
   } catch (e) {
     console.log("Analytics unavailable");
   }
-  testActive = true;
+  TypingTest.Globals.testActive = true;
   testStart = Date.now();
   // if (config.mode == "time") {
   restartTimer();
@@ -2639,7 +2565,7 @@ function startTest() {
       ) {
         clearTimeout(timer);
         hideCaret();
-        testActive = false;
+        TypingTest.Globals.testActive = false;
         inputHistory.push(currentInput);
         correctedHistory.push(currentCorrected);
         showResult(true);
@@ -2650,7 +2576,7 @@ function startTest() {
           //times up
           clearTimeout(timer);
           hideCaret();
-          testActive = false;
+          TypingTest.Globals.testActive = false;
           inputHistory.push(currentInput);
           correctedHistory.push(currentCorrected);
           showResult();
@@ -2704,9 +2630,9 @@ function restartTest(withSameWordset = false, nosave = false) {
   missedWords = {};
   correctedHistory = [];
   currentCorrected = "";
-  setFocus(false);
+  TypingTest.setFocus(false);
   hideCaret();
-  testActive = false;
+  TypingTest.Globals.testActive = false;
   hideLiveWpm();
   hideTimer();
   TypingTest.Globals.bailout = false;
@@ -2773,7 +2699,7 @@ function restartTest(withSameWordset = false, nosave = false) {
         initPaceCaret(nosave);
       } else {
         sameWordset = true;
-        testActive = false;
+        TypingTest.Globals.testActive = false;
         currentWordIndex = 0;
         currentWordElementIndex = 0;
         accuracyStats = {
@@ -2919,7 +2845,7 @@ function changePage(page) {
   $("#wordsInput").focusout();
   if (page == "test" || page == "") {
     pageTransition = true;
-    swapElements(activePage, $(".page.pageTest"), 250, () => {
+    Util.swapElements(activePage, $(".page.pageTest"), 250, () => {
       pageTransition = false;
       Util.focusWords();
       $(".page.pageTest").addClass("active");
@@ -2934,7 +2860,7 @@ function changePage(page) {
   } else if (page == "about") {
     pageTransition = true;
     restartTest();
-    swapElements(activePage, $(".page.pageAbout"), 250, () => {
+    Util.swapElements(activePage, $(".page.pageAbout"), 250, () => {
       pageTransition = false;
       history.pushState("about", null, "about");
       $(".page.pageAbout").addClass("active");
@@ -2944,7 +2870,7 @@ function changePage(page) {
   } else if (page == "settings") {
     pageTransition = true;
     restartTest();
-    swapElements(activePage, $(".page.pageSettings"), 250, () => {
+    Util.swapElements(activePage, $(".page.pageSettings"), 250, () => {
       pageTransition = false;
       history.pushState("settings", null, "settings");
       $(".page.pageSettings").addClass("active");
@@ -2958,7 +2884,7 @@ function changePage(page) {
     } else {
       pageTransition = true;
       restartTest();
-      swapElements(activePage, $(".page.pageAccount"), 250, () => {
+      Util.swapElements(activePage, $(".page.pageAccount"), 250, () => {
         pageTransition = false;
         history.pushState("account", null, "account");
         $(".page.pageAccount").addClass("active");
@@ -2973,7 +2899,7 @@ function changePage(page) {
     } else {
       pageTransition = true;
       restartTest();
-      swapElements(activePage, $(".page.pageLogin"), 250, () => {
+      Util.swapElements(activePage, $(".page.pageLogin"), 250, () => {
         pageTransition = false;
         history.pushState("login", null, "login");
         $(".page.pageLogin").addClass("active");
@@ -3094,7 +3020,7 @@ function liveWpmAndRaw() {
 }
 
 function updateLiveWpm(wpm, raw) {
-  if (!testActive || !UserConfig.config.showLiveWpm) {
+  if (!TypingTest.Globals.testActive || !UserConfig.config.showLiveWpm) {
     hideLiveWpm();
   } else {
     showLiveWpm();
@@ -3114,7 +3040,7 @@ function updateLiveWpm(wpm, raw) {
 
 function showLiveWpm() {
   if (!UserConfig.config.showLiveWpm) return;
-  if (!testActive) return;
+  if (!TypingTest.Globals.testActive) return;
   if (UserConfig.config.timerStyle === "mini") {
     $("#miniTimerAndLiveWpm .wpm").css(
       "opacity",
@@ -3131,86 +3057,6 @@ function showLiveWpm() {
 function hideLiveWpm() {
   $("#liveWpm").css("opacity", 0);
   $("#miniTimerAndLiveWpm .wpm").css("opacity", 0);
-}
-
-function swapElements(
-  el1,
-  el2,
-  totalDuration,
-  callback = function () {
-    return;
-  }
-) {
-  if (
-    (el1.hasClass("hidden") && !el2.hasClass("hidden")) ||
-    (!el1.hasClass("hidden") && el2.hasClass("hidden"))
-  ) {
-    //one of them is hidden and the other is visible
-    if (el1.hasClass("hidden")) {
-      callback();
-      return false;
-    }
-    $(el1)
-      .removeClass("hidden")
-      .css("opacity", 1)
-      .animate(
-        {
-          opacity: 0,
-        },
-        totalDuration / 2,
-        () => {
-          $(el1).addClass("hidden");
-          $(el2)
-            .removeClass("hidden")
-            .css("opacity", 0)
-            .animate(
-              {
-                opacity: 1,
-              },
-              totalDuration / 2,
-              () => {
-                callback();
-              }
-            );
-        }
-      );
-  } else if (el1.hasClass("hidden") && el2.hasClass("hidden")) {
-    //both are hidden, only fade in the second
-    $(el2)
-      .removeClass("hidden")
-      .css("opacity", 0)
-      .animate(
-        {
-          opacity: 1,
-        },
-        totalDuration,
-        () => {
-          callback();
-        }
-      );
-  } else {
-    callback();
-  }
-}
-
-function updateAccountLoginButton() {
-  if (firebase.auth().currentUser != null) {
-    swapElements(
-      $("#menu .icon-button.login"),
-      $("#menu .icon-button.account"),
-      250
-    );
-    // $("#menu .icon-button.account").removeClass('hidden');
-    // $("#menu .icon-button.login").addClass('hidden');
-  } else {
-    swapElements(
-      $("#menu .icon-button.account"),
-      $("#menu .icon-button.login"),
-      250
-    );
-    // $("#menu .icon-button.login").removeClass('hidden');
-    // $("#menu .icon-button.account").addClass('hidden');
-  }
 }
 
 function toggleResultWordsDisplay() {
@@ -3389,58 +3235,6 @@ function applyColorfulMode(tc) {
 //   }
 // }
 
-function showEditTags(action, id, name) {
-  if (action === "add") {
-    $("#tagsWrapper #tagsEdit").attr("action", "add");
-    $("#tagsWrapper #tagsEdit .title").html("Add new tag");
-    $("#tagsWrapper #tagsEdit .button").html(`<i class="fas fa-plus"></i>`);
-    $("#tagsWrapper #tagsEdit input").val("");
-    $("#tagsWrapper #tagsEdit input").removeClass("hidden");
-  } else if (action === "edit") {
-    $("#tagsWrapper #tagsEdit").attr("action", "edit");
-    $("#tagsWrapper #tagsEdit").attr("tagid", id);
-    $("#tagsWrapper #tagsEdit .title").html("Edit tag name");
-    $("#tagsWrapper #tagsEdit .button").html(`<i class="fas fa-pen"></i>`);
-    $("#tagsWrapper #tagsEdit input").val(name);
-    $("#tagsWrapper #tagsEdit input").removeClass("hidden");
-  } else if (action === "remove") {
-    $("#tagsWrapper #tagsEdit").attr("action", "remove");
-    $("#tagsWrapper #tagsEdit").attr("tagid", id);
-    $("#tagsWrapper #tagsEdit .title").html("Remove tag " + name);
-    $("#tagsWrapper #tagsEdit .button").html(`<i class="fas fa-check"></i>`);
-    $("#tagsWrapper #tagsEdit input").addClass("hidden");
-  }
-
-  if ($("#tagsWrapper").hasClass("hidden")) {
-    $("#tagsWrapper")
-      .stop(true, true)
-      .css("opacity", 0)
-      .removeClass("hidden")
-      .animate({ opacity: 1 }, 100, (e) => {
-        $("#tagsWrapper #tagsEdit input").focus();
-      });
-  }
-}
-
-function hideEditTags() {
-  if (!$("#tagsWrapper").hasClass("hidden")) {
-    $("#tagsWrapper #tagsEdit").attr("action", "");
-    $("#tagsWrapper #tagsEdit").attr("tagid", "");
-    $("#tagsWrapper")
-      .stop(true, true)
-      .css("opacity", 1)
-      .animate(
-        {
-          opacity: 0,
-        },
-        100,
-        (e) => {
-          $("#tagsWrapper").addClass("hidden");
-        }
-      );
-  }
-}
-
 function updateTestModesNotice() {
   let anim = false;
   if ($(".pageTest #testModesNotice").text() === "") anim = true;
@@ -3576,7 +3370,7 @@ function updateTestModesNotice() {
 
 $("#tagsWrapper").click((e) => {
   if ($(e.target).attr("id") === "tagsWrapper") {
-    hideEditTags();
+    Util.hideEditTags();
   }
 });
 
@@ -3594,7 +3388,7 @@ function tagsEdit() {
   let action = $("#tagsWrapper #tagsEdit").attr("action");
   let inputVal = $("#tagsWrapper #tagsEdit input").val();
   let tagid = $("#tagsWrapper #tagsEdit").attr("tagid");
-  hideEditTags();
+  Util.hideEditTags();
   if (action === "add") {
     Util.showBackgroundLoader();
     FirebaseFunctions.addTag({
@@ -3963,7 +3757,7 @@ async function initPaceCaret(nosave = false) {
 // }
 
 function movePaceCaret(expectedStepEnd) {
-  if (paceCaret === null || !testActive || resultVisible) {
+  if (paceCaret === null || !TypingTest.Globals.testActive || resultVisible) {
     return;
   }
   if ($("#paceCaret").hasClass("hidden")) {
@@ -4330,7 +4124,7 @@ $(document).on("keypress", "#restartTestButton", (event) => {
         !TypingTest.Globals.customTextIsRandom &&
         TypingTest.Globals.customText.length < 1000)
     ) {
-      if (testActive) {
+      if (TypingTest.Globals.testActive) {
         let testNow = Date.now();
         let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
         incompleteTestSeconds += testSeconds;
@@ -4479,7 +4273,7 @@ $(document).mousemove(function (event) {
     $("#top").hasClass("focus") &&
     (event.originalEvent.movementX > 0 || event.originalEvent.movementY > 0)
   ) {
-    setFocus(false);
+    TypingTest.setFocus(false);
   }
 });
 
@@ -4541,10 +4335,14 @@ $(document).keydown(function (event) {
   event = emulateLayout(event);
 
   //start the test
-  if (currentInput == "" && inputHistory.length == 0 && !testActive) {
+  if (
+    currentInput == "" &&
+    inputHistory.length == 0 &&
+    !TypingTest.Globals.testActive
+  ) {
     startTest();
   } else {
-    if (!testActive) return;
+    if (!TypingTest.Globals.testActive) return;
   }
 
   if (event.key === "Dead") {
@@ -4647,8 +4445,8 @@ $(document).keydown(function (event) {
 
   if (currentInput.length < wordsList[currentWordIndex].length + 20)
     currentInput += event["key"];
-  setFocus(true);
-  stopCaretAnimation();
+  TypingTest.setFocus(true);
+  TypingTest.stopCaretAnimation();
   activeWordTopBeforeJump = activeWordTop;
   compareInput(!UserConfig.config.blindMode);
 
@@ -4718,7 +4516,7 @@ window.addEventListener("beforeunload", (event) => {
       TypingTest.Globals.customText.length < 1000)
   ) {
   } else {
-    if (testActive) {
+    if (TypingTest.Globals.testActive) {
       event.preventDefault();
       // Chrome requires returnValue to be set.
       event.returnValue = "";
@@ -4764,7 +4562,7 @@ $(document).keydown((event) => {
             !TypingTest.Globals.customTextIsRandom &&
             TypingTest.Globals.customText.length < 1000)
         ) {
-          if (testActive) {
+          if (TypingTest.Globals.testActive) {
             let testNow = Date.now();
             let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
             incompleteTestSeconds += testSeconds;
@@ -4787,7 +4585,7 @@ $(document).keydown((event) => {
       (UserConfig.config.capsLockBackspace && event.key === "CapsLock");
     if (isBackspace) {
       event.preventDefault();
-      if (!testActive) return;
+      if (!TypingTest.Globals.testActive) return;
       if (
         currentInput == "" &&
         inputHistory.length > 0 &&
@@ -4838,7 +4636,7 @@ $(document).keydown((event) => {
     }
     //space
     if (event.key === " ") {
-      if (!testActive) return;
+      if (!TypingTest.Globals.testActive) return;
       if (currentInput == "") return;
       event.preventDefault();
       let currentWord = wordsList[currentWordIndex];
@@ -5197,7 +4995,7 @@ $(document).ready(() => {
         if (fragment.has("access_token")) {
           const accessToken = fragment.get("access_token");
           const tokenType = fragment.get("token_type");
-          verifyUserWhenLoggedIn = {
+          TypingTest.Globals.verifyUserWhenLoggedIn = {
             accessToken: accessToken,
             tokenType: tokenType,
           };
