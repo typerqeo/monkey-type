@@ -154,14 +154,16 @@ function copyResultToClipboard() {
               Util.showNotification("Copied to clipboard", 1000);
               $(".pageTest .ssWatermark").addClass("hidden");
               $(".pageTest .buttons").removeClass("hidden");
-              $(".pageTest .loginTip").removeClass("hidden");
+              if (firebase.auth().currentUser == null)
+                $(".pageTest .loginTip").removeClass("hidden");
             })
             .catch((f) => {
               $(".notification").removeClass("hidden");
               Util.showNotification("Error saving image to clipboard", 2000);
               $(".pageTest .ssWatermark").addClass("hidden");
               $(".pageTest .buttons").removeClass("hidden");
-              $(".pageTest .loginTip").removeClass("hidden");
+              if (firebase.auth().currentUser == null)
+                $(".pageTest .loginTip").removeClass("hidden");
             });
         });
       });
@@ -170,7 +172,8 @@ function copyResultToClipboard() {
       Util.showNotification("Error creating image", 2000);
       $(".pageTest .ssWatermark").addClass("hidden");
       $(".pageTest .buttons").removeClass("hidden");
-      $(".pageTest .loginTip").removeClass("hidden");
+      if (firebase.auth().currentUser == null)
+        $(".pageTest .loginTip").removeClass("hidden");
     }
   }
 }
@@ -1651,7 +1654,7 @@ function showResult(difficultyFailed = false) {
 
   if (UserConfig.config.alwaysShowDecimalPlaces) {
     if (UserConfig.config.alwaysShowCPM == false) {
-      $("#result .stats .wpm .top").text("wpm");
+      $("#result .stats .wpm .top .text").text("wpm");
       $("#result .stats .wpm .bottom").text(Misc.roundTo2(stats.wpm));
       $("#result .stats .raw .bottom").text(Misc.roundTo2(stats.wpmRaw));
       $("#result .stats .wpm .bottom").attr(
@@ -1659,7 +1662,7 @@ function showResult(difficultyFailed = false) {
         Misc.roundTo2(stats.wpm * 5) + " cpm"
       );
     } else {
-      $("#result .stats .wpm .top").text("cpm");
+      $("#result .stats .wpm .top .text").text("cpm");
       $("#result .stats .wpm .bottom").text(Misc.roundTo2(stats.wpm * 5));
       $("#result .stats .raw .bottom").text(Misc.roundTo2(stats.wpmRaw * 5));
       $("#result .stats .wpm .bottom").attr(
@@ -1685,7 +1688,7 @@ function showResult(difficultyFailed = false) {
   } else {
     //not showing decimal places
     if (UserConfig.config.alwaysShowCPM == false) {
-      $("#result .stats .wpm .top").text("wpm");
+      $("#result .stats .wpm .top .text").text("wpm");
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
         stats.wpm + ` (${Misc.roundTo2(stats.wpm * 5)} cpm)`
@@ -1694,7 +1697,7 @@ function showResult(difficultyFailed = false) {
       $("#result .stats .raw .bottom").text(Math.round(stats.wpmRaw));
       $("#result .stats .raw .bottom").attr("aria-label", stats.wpmRaw);
     } else {
-      $("#result .stats .wpm .top").text("cpm");
+      $("#result .stats .wpm .top .text").text("cpm");
       $("#result .stats .wpm .bottom").attr(
         "aria-label",
         stats.wpm + ` (${Misc.roundTo2(stats.wpm)} wpm)`
