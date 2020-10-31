@@ -2,6 +2,7 @@ import * as Account from "./account";
 import * as ClickSound from "./click-sound";
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
+import * as Leaderboards from "./leaderboards";
 import * as Misc from "./misc";
 import * as Settings from "./settings";
 import * as TypingTest from "./typing-test";
@@ -208,24 +209,24 @@ function activateFunbox(funbox, mode) {
 
     if (funbox === "simon_says") {
       Config.changeKeymapMode("next");
-      settingsGroups.keymapMode.updateButton();
+      Settings.settingsGroups.keymapMode.updateButton();
       restartTest();
     }
   } else if (mode === "script") {
     if (funbox === "tts") {
       $("#funBoxTheme").attr("href", `funbox/simon_says.css`);
       UserConfig.config.keymapMode = "off";
-      settingsGroups.keymapMode.updateButton();
+      Settings.settingsGroups.keymapMode.updateButton();
       restartTest();
     } else if (funbox === "layoutfluid") {
       UserConfig.config.keymapMode = "on";
       Config.changeKeymapMode("next");
-      settingsGroups.keymapMode.updateButton();
+      Settings.settingsGroups.keymapMode.updateButton();
       UserConfig.config.savedLayout = UserConfig.config.layout;
       Config.changeLayout("qwerty");
-      settingsGroups.layout.updateButton();
+      Settings.settingsGroups.layout.updateButton();
       Config.changeKeymapLayout("qwerty");
-      settingsGroups.keymapLayout.updateButton();
+      Settings.settingsGroups.keymapLayout.updateButton();
       restartTest();
     } else if (funbox === "memory") {
       changeMode("words");
@@ -238,7 +239,7 @@ function activateFunbox(funbox, mode) {
   if (funbox !== "layoutfluid" || mode !== "script") {
     if (UserConfig.config.layout !== UserConfig.config.savedLayout) {
       Config.changeLayout(UserConfig.config.savedLayout);
-      settingsGroups.layout.updateButton();
+      Settings.settingsGroups.layout.updateButton();
     }
   }
   updateTestModesNotice();
@@ -2599,7 +2600,7 @@ function startTest() {
         Config.changeLayout(layouts[index]);
         Config.changeKeymapLayout(layouts[index]);
         updateHighlightedKeymapKey();
-        settingsGroups.layout.updateButton();
+        Settings.settingsGroups.layout.updateButton();
       }
 
       // console.timeEnd("livewpm");
@@ -2790,9 +2791,9 @@ function restartTest(withSameWordset = false, nosave = false) {
 
       if (TypingTest.Globals.activeFunBox === "layoutfluid") {
         Config.changeLayout("qwerty");
-        settingsGroups.layout.updateButton();
+        Settings.settingsGroups.layout.updateButton();
         Config.changeKeymapLayout("qwerty");
-        settingsGroups.keymapLayout.updateButton();
+        Settings.settingsGroups.keymapLayout.updateButton();
         updateHighlightedKeymapKey();
       }
 
@@ -4287,7 +4288,7 @@ $(document).on("click", "#top .config .mode .text-button", (e) => {
 $(document).on("click", "#top #menu .icon-button", (e) => {
   if ($(e.currentTarget).hasClass("discord")) return;
   if ($(e.currentTarget).hasClass("leaderboards")) {
-    showLeaderboards();
+    Leaderboards.showLeaderboards();
   } else {
     const href = $(e.currentTarget).attr("href");
     manualRestart = true;
@@ -4967,7 +4968,7 @@ $(document).keydown((event) => {
         Config.changeLayout(layouts[index]);
         Config.changeKeymapLayout(layouts[index]);
         updateHighlightedKeymapKey();
-        settingsGroups.layout.updateButton();
+        Settings.settingsGroups.layout.updateButton();
       }
       if (UserConfig.config.blindMode)
         $("#words .word.active letter").addClass("correct");

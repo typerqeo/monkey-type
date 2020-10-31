@@ -25,6 +25,7 @@
     "firebase": "readonly",
     "Chart": "readonly",
     "moment": "readonly",
-    "html2canvas": "readonly"
+    "html2canvas": "readonly",
+    "ClipboardItem": "readonly"
   }
 }

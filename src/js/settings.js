@@ -80,7 +80,7 @@ class SettingsGroup {
   }
 }
 
-let settingsGroups = {};
+export const settingsGroups = {};
 
 settingsGroups.smoothCaret = new SettingsGroup(
   "smoothCaret",

@@ -2,7 +2,7 @@ import * as Util from "./util";
 
 let currentLeaderboard = "time_15";
 
-function showLeaderboards() {
+export function showLeaderboards() {
   if ($("#leaderboardsWrapper").hasClass("hidden")) {
     $("#leaderboardsWrapper")
       .stop(true, true)
@@ -20,7 +20,7 @@ function showLeaderboards() {
   }
 }
 
-function hideLeaderboards() {
+export function hideLeaderboards() {
   $("#leaderboardsWrapper")
     .stop(true, true)
     .css("opacity", 1)
