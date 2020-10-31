@@ -1,11 +1,9 @@
 import { layouts } from "./layouts";
+import * as Misc from "./misc";
+import * as Util from "./util";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
 const UserConfig = Config.UserConfig;
-
-function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 function addChildCommands(
   unifiedCommands,
@@ -536,7 +534,7 @@ let commands = {
       id: "toggleFullscreen",
       display: "Toggle Fullscreen",
       exec: () => {
-        toggleFullscreen();
+        Misc.toggleFullscreen();
       },
     },
     {
@@ -1448,10 +1446,10 @@ function updateCommandsTagsList() {
   }
 }
 
-getThemesList().then((themes) => {
+Misc.getThemesList().then((themes) => {
   themes.forEach((theme) => {
     commandsThemes.list.push({
-      id: "changeTheme" + capitalizeFirstLetter(theme.name),
+      id: "changeTheme" + Misc.capitalizeFirstLetter(theme.name),
       display: theme.name.replace(/_/g, " "),
       hover: () => {
         Config.previewTheme(theme.name);
@@ -1468,7 +1466,7 @@ function showFavouriteThemesAtTheTop() {
     commandsThemes.list = [];
     UserConfig.config.favThemes.forEach((theme) => {
       commandsThemes.list.push({
-        id: "changeTheme" + capitalizeFirstLetter(theme),
+        id: "changeTheme" + Misc.capitalizeFirstLetter(theme),
         display: theme.replace(/_/g, " "),
         hover: () => {
           Config.previewTheme(theme);
@@ -1478,11 +1476,11 @@ function showFavouriteThemesAtTheTop() {
         },
       });
     });
-    getThemesList().then((themes) => {
+    Misc.getThemesList().then((themes) => {
       themes.forEach((theme) => {
         if (UserConfig.config.favThemes.includes(theme.name)) return;
         commandsThemes.list.push({
-          id: "changeTheme" + capitalizeFirstLetter(theme.name),
+          id: "changeTheme" + Misc.capitalizeFirstLetter(theme.name),
           display: theme.name.replace(/_/g, " "),
           hover: () => {
             Config.previewTheme(theme.name);
@@ -1501,7 +1499,7 @@ let commandsFonts = {
   list: [],
 };
 
-getFontsList().then((fonts) => {
+Misc.getFontsList().then((fonts) => {
   fonts.forEach((font) => {
     commandsFonts.list.push({
       id: "changeFont" + font.name.replace(/ /g, "_"),
@@ -1531,7 +1529,7 @@ let commandsFunbox = {
   ],
 };
 
-getFunboxList().then((funboxes) => {
+Misc.getFunboxList().then((funboxes) => {
   funboxes.forEach((funbox) => {
     commandsFunbox.list.push({
       id: "changeFunbox" + funbox.name,
@@ -1562,11 +1560,11 @@ let commandsLanguages = {
 
 // if (getLanguageList().length > 0) {
 commandsLanguages.list = [];
-getLanguageList().then((languages) => {
+Misc.getLanguageList().then((languages) => {
   languages.forEach((language) => {
     // if (language === "english_10k") return;
     commandsLanguages.list.push({
-      id: "changeLanguage" + capitalizeFirstLetter(language),
+      id: "changeLanguage" + Misc.capitalizeFirstLetter(language),
       display: language.replace(/_/g, " "),
       exec: () => {
         Config.changeLanguage(language);
@@ -1603,7 +1601,7 @@ if (Object.keys(layouts).length > 0) {
   commandsLayouts.list = [];
   Object.keys(layouts).forEach((layout) => {
     commandsLayouts.list.push({
-      id: "changeLayout" + capitalizeFirstLetter(layout),
+      id: "changeLayout" + Misc.capitalizeFirstLetter(layout),
       display: layout.replace(/_/g, " "),
       exec: () => {
         Config.changeSavedLayout(layout);
@@ -1629,7 +1627,7 @@ if (Object.keys(layouts).length > 0) {
   Object.keys(layouts).forEach((layout) => {
     if (layout.toString() != "default") {
       commandsKeymapLayouts.list.push({
-        id: "changeKeymapLayout" + capitalizeFirstLetter(layout),
+        id: "changeKeymapLayout" + Misc.capitalizeFirstLetter(layout),
         display: layout.replace("_", " "),
         exec: () => {
           Config.changeKeymapLayout(layout);
@@ -1658,7 +1656,7 @@ $(document).ready((e) => {
       if (!$("#leaderboardsWrapper").hasClass("hidden")) {
         //maybe add more condition for closing other dialogs in the future as well
         event.preventDefault();
-        hideLeaderboards();
+        Leaderboards.hideLeaderboards();
         return;
       } else if ($("#commandLineWrapper").hasClass("hidden")) {
         if (UserConfig.config.singleListCommandLine == "on")
@@ -1879,10 +1877,10 @@ function hideCommandLine() {
       () => {
         $("#commandLineWrapper").addClass("hidden");
         $("#commandLine").removeClass("allCommands");
-        focusWords();
+        Util.focusWords();
       }
     );
-  focusWords();
+  Util.focusWords();
 }
 
 function showCommandLine() {

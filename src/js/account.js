@@ -1,7 +1,9 @@
 import { UserData, db_getUserSnapshot, db_getUserResults } from "./db";
+import * as FirebaseFunctions from "./firebase-functions";
 import * as Misc from "./misc";
-import { UserConfig } from "./userconfig";
 import * as Util from "./util";
+import * as Config from "./userconfig";
+const UserConfig = Config.UserConfig;
 
 $(".pageLogin .register input").keyup((e) => {
   if ($(".pageLogin .register .button").hasClass("disabled")) return;
@@ -154,7 +156,7 @@ function signUp() {
                 .collection("users")
                 .doc(usr.uid)
                 .set({ name: nname }, { merge: true });
-              reserveName({ name: nname, uid: usr.uid });
+              FirebaseFunctions.reserveName({ name: nname, uid: usr.uid });
               usr.sendEmailVerification();
               clearGlobalStats();
               Util.showNotification("Account created", 2000);
@@ -177,7 +179,7 @@ function signUp() {
               };
               if (notSignedInLastResult !== null) {
                 notSignedInLastResult.uid = usr.uid;
-                testCompleted({
+                FirebaseFunctions.testCompleted({
                   uid: usr.uid,
                   obj: notSignedInLastResult,
                 });
@@ -196,7 +198,7 @@ function signUp() {
                 .delete()
                 .then(function () {
                   // User deleted.
-                  showNotification(
+                  Util.showNotification(
                     "An error occured. Account not created.",
                     2000
                   );
@@ -258,7 +260,7 @@ firebase.auth().onAuthStateChanged(function (user) {
       );
     }
     updateAccountLoginButton();
-    accountIconLoading(true);
+    Util.accountIconLoading(true);
     getAccountDataAndInit();
     var displayName = user.displayName;
     var email = user.email;
@@ -276,7 +278,7 @@ firebase.auth().onAuthStateChanged(function (user) {
     if (verifyUserWhenLoggedIn !== null) {
       Util.showNotification("Verifying", 1000);
       verifyUserWhenLoggedIn.uid = user.uid;
-      verifyUser(verifyUserWhenLoggedIn).then((data) => {
+      FirebaseFunctions.verifyUser(verifyUserWhenLoggedIn).then((data) => {
         Util.showNotification(data.data.message, 3000);
         if (data.data.status === 1) {
           UserData.dbSnapshot.discordId = data.data.did;
@@ -296,11 +298,11 @@ function getAccountDataAndInit() {
       initPaceCaret(true);
       if (!UserConfig.configChangedBeforeDb) {
         if (UserConfig.cookieConfig === null) {
-          accountIconLoading(false);
-          applyConfig(UserData.dbSnapshot.config);
+          Util.accountIconLoading(false);
+          Config.applyConfig(UserData.dbSnapshot.config);
           // showNotification('Applying db config',3000);
           updateSettingsPage();
-          saveConfigToCookie(true);
+          Config.saveConfigToCookie(true);
           restartTest(false, true);
         } else if (UserData.dbSnapshot.config !== undefined) {
           let configsDifferent = false;
@@ -337,17 +339,17 @@ function getAccountDataAndInit() {
           });
           if (configsDifferent) {
             console.log("applying config from db");
-            accountIconLoading(false);
+            Util.accountIconLoading(false);
             UserConfig.config = UserData.dbSnapshot.config;
-            applyConfig(config);
+            Config.applyConfig(UserConfig.config);
             updateSettingsPage();
-            saveConfigToCookie(true);
+            Config.saveConfigToCookie(true);
             restartTest(false, true);
           }
         }
         dbConfigLoaded = true;
       } else {
-        accountIconLoading(false);
+        Util.accountIconLoading(false);
       }
       try {
         if (
@@ -372,7 +374,7 @@ function getAccountDataAndInit() {
         changePage("account");
       }
       refreshThemeButtons();
-      accountIconLoading(false);
+      Util.accountIconLoading(false);
       updateFilterTags();
       updateCommandsTagsList();
       loadActiveTagsFromCookie();
@@ -380,7 +382,7 @@ function getAccountDataAndInit() {
       showAccountSettingsSection();
     })
     .catch((e) => {
-      accountIconLoading(false);
+      Util.accountIconLoading(false);
       console.error(e);
       Util.showNotification(
         "Error downloading user data. Refresh to try again. If error persists contact Miodec.",
@@ -1015,7 +1017,7 @@ let defaultAccountFilters = {
   },
 };
 
-getLanguageList().then((languages) => {
+Misc.getLanguageList().then((languages) => {
   languages.forEach((language) => {
     $(
       ".pageAccount .content .filterButtons .buttonsAndTitle.languages .buttons"
@@ -1032,7 +1034,7 @@ getLanguageList().then((languages) => {
 $(
   ".pageAccount .content .filterButtons .buttonsAndTitle.funbox .buttons"
 ).append(`<div class="button" filter="none">none</div>`);
-getFunboxList().then((funboxModes) => {
+Misc.getFunboxList().then((funboxModes) => {
   funboxModes.forEach((funbox) => {
     $(
       ".pageAccount .content .filterButtons .buttonsAndTitle.funbox .buttons"
@@ -1432,7 +1434,7 @@ $(".pageAccount .topFilters .button.allFilters").click((e) => {
   });
   UserConfig.config.resultFilters.date.all = true;
   showActiveFilters();
-  saveConfigToCookie();
+  Config.saveConfigToCookie();
 });
 
 $(".pageAccount .topFilters .button.currentConfigFilter").click((e) => {
@@ -1474,7 +1476,7 @@ $(".pageAccount .topFilters .button.currentConfigFilter").click((e) => {
   UserConfig.config.resultFilters.date.all = true;
 
   showActiveFilters();
-  saveConfigToCookie();
+  Config.saveConfigToCookie();
 });
 
 $(".pageAccount .topFilters .button.toggleAdvancedFilters").click((e) => {
@@ -1518,7 +1520,7 @@ $(
     }
   }
   showActiveFilters();
-  saveConfigToCookie();
+  Config.saveConfigToCookie();
 });
 
 function fillPbTables() {
@@ -2117,7 +2119,7 @@ function refreshAccountPage() {
           5000
         );
         UserConfig.config.resultFilters = defaultAccountFilters;
-        saveConfigToCookie();
+        Config.saveConfigToCookie();
       }
 
       //filters done
@@ -2472,7 +2474,7 @@ function refreshAccountPage() {
 
     let wpmPoints = filteredResults.map((r) => r.wpm).reverse();
 
-    let trend = findLineByLeastSquares(wpmPoints);
+    let trend = Misc.findLineByLeastSquares(wpmPoints);
 
     let wpmChange = trend[1][1] - trend[0][1];
 
@@ -2546,11 +2548,11 @@ function hideResultEditTagsPanel() {
 }
 
 $(".pageAccount .toggleAccuracyOnChart").click((params) => {
-  toggleChartAccuracy();
+  Config.toggleChartAccuracy();
 });
 
 $(".pageAccount .toggleChartStyle").click((params) => {
-  toggleChartStyle();
+  Config.toggleChartStyle();
 });
 
 $(document).on("click", ".pageAccount .group.history #resultEditTags", (f) => {
@@ -2613,14 +2615,14 @@ $("#resultEditTagsPanel .confirmButton").click((f) => {
       newtags.push(tagid);
     }
   });
-  showBackgroundLoader();
+  Util.showBackgroundLoader();
   hideResultEditTagsPanel();
-  updateResultTags({
+  FirebaseFunctions.updateResultTags({
     uid: firebase.auth().currentUser.uid,
     tags: newtags,
     resultid: resultid,
   }).then((r) => {
-    hideBackgroundLoader();
+    Util.hideBackgroundLoader();
     if (r.data.resultCode === 1) {
       Util.showNotification("Tags updated.", 3000);
       UserData.dbSnapshot.results.forEach((result) => {

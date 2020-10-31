@@ -1,5 +1,6 @@
 import { UserData } from "./db";
 import { layouts } from "./layouts";
+import * as Misc from "./misc";
 import * as Util from "./util";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
@@ -296,7 +297,7 @@ async function fillSettingsPage() {
   refreshThemeButtons();
 
   let langEl = $(".pageSettings .section.language .buttons").empty();
-  getLanguageList().then((languages) => {
+  Misc.getLanguageList().then((languages) => {
     languages.forEach((language) => {
       langEl.append(
         `<div class="language button" language='${language}'>${language.replace(
@@ -331,7 +332,7 @@ async function fillSettingsPage() {
 
   let funboxEl = $(".pageSettings .section.funbox .buttons").empty();
   funboxEl.append(`<div class="funbox button" funbox='none'>none</div>`);
-  getFunboxList().then((funboxModes) => {
+  Misc.getFunboxList().then((funboxModes) => {
     funboxModes.forEach((funbox) => {
       if (funbox.name === "mirror") {
         funboxEl.append(
@@ -357,7 +358,7 @@ async function fillSettingsPage() {
   });
 
   let fontsEl = $(".pageSettings .section.fontFamily .buttons").empty();
-  getFontsList().then((fonts) => {
+  Misc.getFontsList().then((fonts) => {
     fonts.forEach((font) => {
       fontsEl.append(
         `<div class="button" style="font-family:${
@@ -382,7 +383,7 @@ function refreshThemeButtons() {
     activeThemeName = randomTheme;
   }
 
-  getSortedThemesList().then((themes) => {
+  Misc.getSortedThemesList().then((themes) => {
     //first show favourites
     if (UserConfig.config.favThemes.length > 0) {
       favThemesEl.css({ paddingBottom: "1rem" });
@@ -537,7 +538,8 @@ $("#shareCustomThemeButton").click((e) => {
     );
 
     let url =
-      "https://monkeytype.com?" + objectToQueryString({ customTheme: share });
+      "https://monkeytype.com?" +
+      Misc.objectToQueryString({ customTheme: share });
     navigator.clipboard.writeText(url).then(
       function () {
         Util.showNotification("URL Copied to clipboard", 2000);
@@ -750,10 +752,10 @@ $(document).on(
 $(
   ".pageSettings .section.discordIntegration .buttons .generateCodeButton"
 ).click((e) => {
-  showBackgroundLoader();
+  Util.showBackgroundLoader();
   generatePairingCode({ uid: firebase.auth().currentUser.uid })
     .then((ret) => {
-      hideBackgroundLoader();
+      Util.hideBackgroundLoader();
       if (ret.data.status === 1 || ret.data.status === 2) {
         UserData.dbSnapshot.pairingCode = ret.data.pairingCode;
         $(".pageSettings .section.discordIntegration .code .bottom").text(
@@ -766,7 +768,7 @@ $(
       }
     })
     .catch((e) => {
-      hideBackgroundLoader();
+      Util.hideBackgroundLoader();
       Util.showNotification("Something went wrong. Error: " + e.message, 4000);
     });
 });
@@ -774,9 +776,9 @@ $(
 $(".pageSettings .section.discordIntegration #unlinkDiscordButton").click(
   (e) => {
     if (confirm("Are you sure?")) {
-      showBackgroundLoader();
+      Util.showBackgroundLoader();
       unlinkDiscord({ uid: firebase.auth().currentUser.uid }).then((ret) => {
-        hideBackgroundLoader();
+        Util.hideBackgroundLoader();
         console.log(ret);
         if (ret.data.status === 1) {
           UserData.dbSnapshot.discordId = null;

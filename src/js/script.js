@@ -1,8 +1,10 @@
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Util from "./util";
-import { defaultConfig, UserConfig } from "./userconfig";
 import { UserData, db_saveLocalPB, db_getLocalPB } from "./db";
+import * as Config from "./userconfig";
+const defaultConfig = Config.defaultConfig;
+const UserConfig = Config.UserConfig;
 
 let wordsList = [];
 let currentWordIndex = 0;
@@ -322,7 +324,7 @@ function activateFunbox(funbox, mode) {
     }
 
     if (funbox === "simon_says") {
-      changeKeymapMode("next");
+      Config.changeKeymapMode("next");
       settingsGroups.keymapMode.updateButton();
       restartTest();
     }
@@ -334,17 +336,17 @@ function activateFunbox(funbox, mode) {
       restartTest();
     } else if (funbox === "layoutfluid") {
       UserConfig.config.keymapMode = "on";
-      changeKeymapMode("next");
+      Config.changeKeymapMode("next");
       settingsGroups.keymapMode.updateButton();
       UserConfig.config.savedLayout = UserConfig.config.layout;
-      changeLayout("qwerty");
+      Config.changeLayout("qwerty");
       settingsGroups.layout.updateButton();
-      changeKeymapLayout("qwerty");
+      Config.changeKeymapLayout("qwerty");
       settingsGroups.keymapLayout.updateButton();
       restartTest();
     } else if (funbox === "memory") {
       changeMode("words");
-      setShowAllLines(true, true);
+      Config.setShowAllLines(true, true);
       restartTest(false, true);
     }
     activeFunBox = funbox;
@@ -352,7 +354,7 @@ function activateFunbox(funbox, mode) {
 
   if (funbox !== "layoutfluid" || mode !== "script") {
     if (UserConfig.config.layout !== UserConfig.config.savedLayout) {
-      changeLayout(UserConfig.config.savedLayout);
+      Config.changeLayout(UserConfig.config.savedLayout);
       settingsGroups.layout.updateButton();
     }
   }
@@ -416,15 +418,15 @@ async function initWords() {
   currentCorrected = "";
   currentInput = "";
 
-  let language = await getLanguage(UserConfig.config);
+  let language = await Misc.getLanguage(UserConfig.config);
 
   if (UserConfig.config.mode === "quote" && quotes === null) {
-    showBackgroundLoader();
+    Util.showBackgroundLoader();
     $.ajax({
       url: "js/english_quotes.json",
       async: false,
       success: function (data) {
-        hideBackgroundLoader();
+        Util.hideBackgroundLoader();
         quotes = data;
         quotes.groups.forEach((qg, i) => {
           let lower = qg[0];
@@ -522,16 +524,16 @@ async function initWords() {
         }
         randomWord = randomcaseword;
       } else if (activeFunBox === "gibberish") {
-        randomWord = getGibberish();
+        randomWord = Misc.getGibberish();
       } else if (activeFunBox === "58008") {
         setToggleSettings(false, true);
-        randomWord = getNumbers(7);
+        randomWord = Misc.getNumbers(7);
       } else if (activeFunBox === "specials") {
         setToggleSettings(false, true);
-        randomWord = getSpecials();
+        randomWord = Misc.getSpecials();
       } else if (activeFunBox === "ascii") {
         setToggleSettings(false, true);
-        randomWord = getASCII();
+        randomWord = Misc.getASCII();
       }
 
       if (UserConfig.config.punctuation && UserConfig.config.mode != "custom") {
@@ -539,7 +541,7 @@ async function initWords() {
       }
       if (UserConfig.config.numbers && UserConfig.config.mode != "custom") {
         if (Math.random() < 0.1) {
-          randomWord = getNumbers(4);
+          randomWord = Misc.getNumbers(4);
         }
       }
 
@@ -804,13 +806,13 @@ function addWord() {
     }
     randomWord = randomcaseword;
   } else if (activeFunBox === "gibberish") {
-    randomWord = getGibberish();
+    randomWord = Misc.getGibberish();
   } else if (activeFunBox === "58008") {
-    randomWord = getNumbers(7);
+    randomWord = Misc.getNumbers(7);
   } else if (activeFunBox === "specials") {
-    randomWord = getSpecials();
+    randomWord = Misc.getSpecials();
   } else if (activeFunBox === "ascii") {
-    randomWord = getASCII();
+    randomWord = Misc.getASCII();
   }
 
   if (UserConfig.config.punctuation && UserConfig.config.mode != "custom") {
@@ -818,7 +820,7 @@ function addWord() {
   }
   if (UserConfig.config.numbers && UserConfig.config.mode != "custom") {
     if (Math.random() < 0.1) {
-      randomWord = getNumbers(4);
+      randomWord = Misc.getNumbers(4);
     }
   }
 
@@ -2258,7 +2260,7 @@ function showResult(difficultyFailed = false) {
                           "global",
                           glb.insertedAt
                         );
-                        let str = getPositionString(glb.insertedAt + 1);
+                        let str = Misc.getPositionString(glb.insertedAt + 1);
                         globalLbString = `global: ${str}`;
                       } else {
                         globalLbDiff = glbMemory - glb.foundAt;
@@ -2268,7 +2270,7 @@ function showResult(difficultyFailed = false) {
                           "global",
                           glb.foundAt
                         );
-                        let str = getPositionString(glb.foundAt + 1);
+                        let str = Misc.getPositionString(glb.foundAt + 1);
                         globalLbString = `global: ${str}`;
                       }
                     }
@@ -2315,7 +2317,7 @@ function showResult(difficultyFailed = false) {
                           "daily",
                           dlb.insertedAt
                         );
-                        let str = getPositionString(dlb.insertedAt + 1);
+                        let str = Misc.getPositionString(dlb.insertedAt + 1);
                         dailyLbString = `daily: ${str}`;
                       } else {
                         dailyLbDiff = dlbMemory - dlb.foundAt;
@@ -2325,7 +2327,7 @@ function showResult(difficultyFailed = false) {
                           "daily",
                           dlb.foundAt
                         );
-                        let str = getPositionString(dlb.foundAt + 1);
+                        let str = Misc.getPositionString(dlb.foundAt + 1);
                         dailyLbString = `daily: ${str}`;
                       }
                     }
@@ -2691,8 +2693,8 @@ function startTest() {
         ) {
           Util.showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
         }
-        changeLayout(layouts[index]);
-        changeKeymapLayout(layouts[index]);
+        Config.changeLayout(layouts[index]);
+        Config.changeKeymapLayout(layouts[index]);
         updateHighlightedKeymapKey();
         settingsGroups.layout.updateButton();
       }
@@ -2884,9 +2886,9 @@ function restartTest(withSameWordset = false, nosave = false) {
       document.querySelector("#liveWpm").innerHTML = "0";
 
       if (activeFunBox === "layoutfluid") {
-        changeLayout("qwerty");
+        Config.changeLayout("qwerty");
         settingsGroups.layout.updateButton();
-        changeKeymapLayout("qwerty");
+        Config.changeKeymapLayout("qwerty");
         settingsGroups.keymapLayout.updateButton();
         updateHighlightedKeymapKey();
       }
@@ -2911,7 +2913,7 @@ function restartTest(withSameWordset = false, nosave = false) {
             resetPaceCaret();
             hideCrown();
             clearTimeout(timer);
-            if ($("#commandLineWrapper").hasClass("hidden")) focusWords();
+            if ($("#commandLineWrapper").hasClass("hidden")) Util.focusWords();
             wpmOverTimeChart.options.annotation.annotations[0].value = "-30";
             wpmOverTimeChart.update();
             updateTestModesNotice();
@@ -2991,7 +2993,7 @@ function changePage(page) {
     pageTransition = true;
     swapElements(activePage, $(".page.pageTest"), 250, () => {
       pageTransition = false;
-      focusWords();
+      Util.focusWords();
       $(".page.pageTest").addClass("active");
       history.pushState("/", null, "/");
     });
@@ -3666,10 +3668,10 @@ function tagsEdit() {
   let tagid = $("#tagsWrapper #tagsEdit").attr("tagid");
   hideEditTags();
   if (action === "add") {
-    showBackgroundLoader();
+    Util.showBackgroundLoader();
     addTag({ uid: firebase.auth().currentUser.uid, name: inputVal }).then(
       (e) => {
-        hideBackgroundLoader();
+        Util.hideBackgroundLoader();
         let status = e.data.resultCode;
         if (status === 1) {
           Util.showNotification("Tag added", 2000);
@@ -3688,13 +3690,13 @@ function tagsEdit() {
       }
     );
   } else if (action === "edit") {
-    showBackgroundLoader();
+    Util.showBackgroundLoader();
     editTag({
       uid: firebase.auth().currentUser.uid,
       name: inputVal,
       tagid: tagid,
     }).then((e) => {
-      hideBackgroundLoader();
+      Util.hideBackgroundLoader();
       let status = e.data.resultCode;
       if (status === 1) {
         Util.showNotification("Tag updated", 2000);
@@ -3713,10 +3715,10 @@ function tagsEdit() {
       }
     });
   } else if (action === "remove") {
-    showBackgroundLoader();
+    Util.showBackgroundLoader();
     removeTag({ uid: firebase.auth().currentUser.uid, tagid: tagid }).then(
       (e) => {
-        hideBackgroundLoader();
+        Util.hideBackgroundLoader();
         let status = e.data.resultCode;
         if (status === 1) {
           Util.showNotification("Tag removed", 2000);
@@ -4244,7 +4246,7 @@ function applyMode2Popup() {
 
   if (mode == "time") {
     if (val !== null && !isNaN(val) && val >= 0) {
-      changeTimeConfig(val);
+      Config.changeTimeConfig(val);
       manualRestart = true;
       restartTest();
       if (val >= 1800) {
@@ -4260,7 +4262,7 @@ function applyMode2Popup() {
     }
   } else if (mode == "words") {
     if (val !== null && !isNaN(val) && val >= 0) {
-      changeWordCount(val);
+      Config.changeWordCount(val);
       manualRestart = true;
       restartTest();
       if (val > 2000) {
@@ -4326,7 +4328,7 @@ $(document).on("click", "#top .config .time .text-button", (e) => {
     //   }
     showCustomMode2Popup("time");
   } else {
-    changeTimeConfig(mode);
+    Config.changeTimeConfig(mode);
     manualRestart = true;
 
     restartTest();
@@ -4335,7 +4337,7 @@ $(document).on("click", "#top .config .time .text-button", (e) => {
 
 $(document).on("click", "#top .config .quoteLength .text-button", (e) => {
   let len = $(e.currentTarget).attr("quoteLength");
-  changeQuoteLength(len);
+  Config.changeQuoteLength(len);
   manualRestart = true;
   restartTest();
 });
@@ -4347,21 +4349,21 @@ $(document).on("click", "#top .config .customText .text-button", (e) => {
 });
 
 $(document).on("click", "#top .config .punctuationMode .text-button", (e) => {
-  togglePunctuation();
+  Config.togglePunctuation();
   manualRestart = true;
 
   restartTest();
 });
 
 $(document).on("click", "#top .config .numbersMode .text-button", (e) => {
-  toggleNumbers();
+  Config.toggleNumbers();
   manualRestart = true;
 
   restartTest();
 });
 
 $("#wordsWrapper").on("click", (e) => {
-  focusWords();
+  Util.focusWords();
 });
 
 $(document).on("click", "#top .config .mode .text-button", (e) => {
@@ -5048,8 +5050,8 @@ $(document).keydown((event) => {
         ) {
           Util.showNotification(`--- !!! ${layouts[index]} !!! ---`, 3000);
         }
-        changeLayout(layouts[index]);
-        changeKeymapLayout(layouts[index]);
+        Config.changeLayout(layouts[index]);
+        Config.changeKeymapLayout(layouts[index]);
         updateHighlightedKeymapKey();
         settingsGroups.layout.updateButton();
       }
@@ -5212,9 +5214,9 @@ if (window.location.hostname === "localhost") {
 }
 
 manualRestart = true;
-loadConfigFromCookie();
-getReleasesFromGitHub();
-getPatreonNames();
+Config.loadConfigFromCookie();
+Misc.getReleasesFromGitHub();
+Misc.getPatreonNames();
 
 $(document).on("mouseenter", "#resultWordsHistory .words .word", (e) => {
   if (resultVisible) {
@@ -5226,7 +5228,7 @@ $(document).on("mouseenter", "#resultWordsHistory .words .word", (e) => {
 
 $(document).on("click", "#bottom .leftright .right .current-theme", (e) => {
   if (UserConfig.config.customTheme) {
-    togglePresetCustomTheme();
+    Config.togglePresetCustomTheme();
   }
   currentCommands.push(commandsThemes);
   showCommandLine();
@@ -5253,7 +5255,7 @@ $(document).ready(() => {
     .removeClass("hidden")
     .stop(true, true)
     .animate({ opacity: 1 }, 250, () => {
-      let theme = findGetParameter("customTheme");
+      let theme = Misc.findGetParameter("customTheme");
       if (theme !== null) {
         try {
           theme = theme.split(",");

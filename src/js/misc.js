@@ -1,7 +1,7 @@
 import * as Util from "./util";
 
 let themesList = null;
-async function getThemesList() {
+export async function getThemesList() {
   if (themesList == null) {
     return $.getJSON("themes/list.json", function (data) {
       const list = data.sort(function (a, b) {
@@ -20,7 +20,7 @@ async function getThemesList() {
 }
 
 let sortedThemesList = null;
-async function getSortedThemesList() {
+export async function getSortedThemesList() {
   if (sortedThemesList == null) {
     if (themesList == null) {
       await getThemesList();
@@ -38,7 +38,7 @@ async function getSortedThemesList() {
 }
 
 let funboxList = null;
-async function getFunboxList() {
+export async function getFunboxList() {
   if (funboxList == null) {
     return $.getJSON("funbox/list.json", function (data) {
       funboxList = data.sort(function (a, b) {
@@ -56,7 +56,7 @@ async function getFunboxList() {
 }
 
 let fontsList = null;
-async function getFontsList() {
+export async function getFontsList() {
   if (fontsList == null) {
     return $.getJSON("js/fonts.json", function (data) {
       fontsList = data.sort(function (a, b) {
@@ -74,7 +74,7 @@ async function getFontsList() {
 }
 
 let languageList = null;
-async function getLanguageList() {
+export async function getLanguageList() {
   if (languageList == null) {
     return $.getJSON("languages/list.json", function (data) {
       languageList = data;
@@ -86,7 +86,7 @@ async function getLanguageList() {
 }
 
 let currentLanguage = null;
-async function getLanguage(config) {
+export async function getLanguage(config) {
   const lang = config.language;
   try {
     if (currentLanguage == null || currentLanguage.name !== lang) {
@@ -108,7 +108,7 @@ async function getLanguage(config) {
   }
 }
 
-function smooth(arr, windowSize, getter = (value) => value, setter) {
+export function smooth(arr, windowSize, getter = (value) => value, setter) {
   const get = getter;
   const result = [];
 
@@ -130,7 +130,7 @@ function smooth(arr, windowSize, getter = (value) => value, setter) {
   return result;
 }
 
-function stdDev(array) {
+export function stdDev(array) {
   try {
     const n = array.length;
     const mean = array.reduce((a, b) => a + b) / n;
@@ -142,7 +142,7 @@ function stdDev(array) {
   }
 }
 
-function mean(array) {
+export function mean(array) {
   try {
     return (
       array.reduce((previous, current) => (current += previous)) / array.length
@@ -152,7 +152,7 @@ function mean(array) {
   }
 }
 
-function getReleasesFromGitHub() {
+export function getReleasesFromGitHub() {
   $.getJSON(
     "https://api.github.com/repos/Miodec/monkeytype/releases",
     (data) => {
@@ -175,7 +175,7 @@ function getReleasesFromGitHub() {
   );
 }
 
-function getPatreonNames() {
+export function getPatreonNames() {
   let namesel = $(".pageAbout .section .supporters");
   firebase
     .functions()
@@ -188,19 +188,19 @@ function getPatreonNames() {
     });
 }
 
-function getLastChar(word) {
+export function getLastChar(word) {
   return word.charAt(word.length - 1);
 }
 
-function capitalizeFirstLetter(str) {
+export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function isASCIILetter(c) {
+export function isASCIILetter(c) {
   return c.length === 1 && /[a-z]/i.test(c);
 }
 
-function kogasa(cov) {
+export function kogasa(cov) {
   return (
     100 * (1 - Math.tanh(cov + Math.pow(cov, 3) / 3 + Math.pow(cov, 5) / 5))
   );
@@ -253,11 +253,11 @@ function hexToHSL(H) {
   };
 }
 
-function roundTo2(num) {
+export function roundTo2(num) {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }
 
-function findLineByLeastSquares(values_y) {
+export function findLineByLeastSquares(values_y) {
   var sum_x = 0;
   var sum_y = 0;
   var sum_xy = 0;
@@ -307,7 +307,7 @@ function calculateSlope([[x1, y1], [x2, y2]]) {
   return (y1 - y2) / (x1 - x2);
 }
 
-function getGibberish() {
+export function getGibberish() {
   let randLen = Math.floor(Math.random() * 7) + 1;
   let ret = "";
   for (let i = 0; i < randLen; i++) {
@@ -316,7 +316,7 @@ function getGibberish() {
   return ret;
 }
 
-function secondsToString(sec) {
+export function secondsToString(sec) {
   const hours = Math.floor(sec / 3600);
   const minutes = Math.floor((sec % 3600) / 60);
   const seconds = roundTo2((sec % 3600) % 60);
@@ -336,7 +336,7 @@ function secondsToString(sec) {
   return ret;
 }
 
-function getNumbers(len) {
+export function getNumbers(len) {
   let randLen = Math.floor(Math.random() * len) + 1;
   let ret = "";
   for (let i = 0; i < randLen; i++) {
@@ -346,7 +346,7 @@ function getNumbers(len) {
   return ret;
 }
 
-function getSpecials() {
+export function getSpecials() {
   let randLen = Math.floor(Math.random() * 7) + 1;
   let ret = "";
   let specials = [
@@ -380,7 +380,7 @@ function getSpecials() {
   return ret;
 }
 
-function getASCII() {
+export function getASCII() {
   let randLen = Math.floor(Math.random() * 10) + 1;
   let ret = "";
   for (let i = 0; i < randLen; i++) {
@@ -389,7 +389,7 @@ function getASCII() {
   return ret;
 }
 
-function getPositionString(number) {
+export function getPositionString(number) {
   let numend = "th";
   let t = number % 10;
   let h = number % 100;
@@ -405,7 +405,7 @@ function getPositionString(number) {
   return number + numend;
 }
 
-function findGetParameter(parameterName) {
+export function findGetParameter(parameterName) {
   var result = null,
     tmp = [];
   location.search
@@ -418,7 +418,7 @@ function findGetParameter(parameterName) {
   return result;
 }
 
-function objectToQueryString(obj) {
+export function objectToQueryString(obj) {
   var str = [];
   for (var p in obj)
     if (obj.hasOwnProperty(p)) {
@@ -427,7 +427,7 @@ function objectToQueryString(obj) {
   return str.join("&");
 }
 
-function toggleFullscreen(elem) {
+export function toggleFullscreen(elem) {
   elem = elem || document.documentElement;
 
   if (

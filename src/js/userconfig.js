@@ -148,7 +148,7 @@ export function saveActiveTagsToCookie() {
   } catch (e) {}
 }
 
-function loadConfigFromCookie() {
+export function loadConfigFromCookie() {
   let newConfig = $.cookie("config");
   if (newConfig !== undefined) {
     newConfig = JSON.parse(newConfig);
@@ -340,7 +340,7 @@ function updateChartStyle() {
   resultHistoryChart.update();
 }
 
-function toggleChartAccuracy() {
+export function toggleChartAccuracy() {
   if (UserConfig.config.chartAccuracy) {
     UserConfig.config.chartAccuracy = false;
   } else {
@@ -359,7 +359,7 @@ function setChartAccuracy(chartAccuracy, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function toggleChartStyle() {
+export function toggleChartStyle() {
   if (UserConfig.config.chartStyle == "scatter") {
     UserConfig.config.chartStyle = "line";
   } else {
@@ -1213,7 +1213,7 @@ export function toggleCapsLockBackspace() {
   setCapsLockBackspace(!UserConfig.config.capsLockBackspace, false);
 }
 
-function changeLayout(layout, nosave) {
+export function changeLayout(layout, nosave) {
   if (layout == null || layout == undefined) {
     layout = "qwerty";
   }
