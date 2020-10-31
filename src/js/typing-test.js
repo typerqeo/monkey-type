@@ -1,5 +1,6 @@
 export const Globals = {
   restartCount: 0,
+  activeFunBox: "none",
   customText: "The quick brown fox jumps over the lazy dog".split(" "),
   customTextIsRandom: false,
   customTextWordCount: 1,

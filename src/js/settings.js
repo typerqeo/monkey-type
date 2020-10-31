@@ -4,6 +4,7 @@ import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Util from "./util";
+import * as TypingTest from "./typing-test";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
 const UserConfig = Config.UserConfig;
@@ -626,9 +627,9 @@ function refreshTagsSettingsSection() {
 
 function setActiveFunboxButton() {
   $(`.pageSettings .section.funbox .button`).removeClass("active");
-  $(`.pageSettings .section.funbox .button[funbox='${activeFunBox}']`).addClass(
-    "active"
-  );
+  $(
+    `.pageSettings .section.funbox .button[funbox='${TypingTest.Globals.activeFunBox}']`
+  ).addClass("active");
 }
 
 function setActiveThemeButton() {
@@ -919,23 +920,23 @@ $(".pageSettings #loadCustomColorsFromPreset").click((e) => {
     colorVars.forEach((colorName) => {
       let color;
       if (colorName === "--bg-color") {
-        color = themeColors.bg;
+        color = TypingTest.Globals.themeColors.bg;
       } else if (colorName === "--main-color") {
-        color = themeColors.main;
+        color = TypingTest.Globals.themeColors.main;
       } else if (colorName === "--sub-color") {
-        color = themeColors.sub;
+        color = TypingTest.Globals.themeColors.sub;
       } else if (colorName === "--caret-color") {
-        color = themeColors.caret;
+        color = TypingTest.Globals.themeColors.caret;
       } else if (colorName === "--text-color") {
-        color = themeColors.text;
+        color = TypingTest.Globals.themeColors.text;
       } else if (colorName === "--error-color") {
-        color = themeColors.error;
+        color = TypingTest.Globals.themeColors.error;
       } else if (colorName === "--error-extra-color") {
-        color = themeColors.errorExtra;
+        color = TypingTest.Globals.themeColors.errorExtra;
       } else if (colorName === "--colorful-error-color") {
-        color = themeColors.colorfulError;
+        color = TypingTest.Globals.themeColors.colorfulError;
       } else if (colorName === "--colorful-error-extra-color") {
-        color = themeColors.colorfulErrorExtra;
+        color = TypingTest.Globals.themeColors.colorfulErrorExtra;
       }
       $(".colorPicker #" + colorName).attr("value", color);
       $(".colorPicker #" + colorName).val(color);

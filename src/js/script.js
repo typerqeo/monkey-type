@@ -50,7 +50,6 @@ let activeWordJumped = false;
 let sameWordset = false;
 let quotes = null;
 let focusState = false;
-let activeFunBox = "none";
 let manualRestart = false;
 let notSignedInLastResult = null;
 let caretAnimating = true;
@@ -195,7 +194,7 @@ function activateFunbox(funbox, mode) {
   }
   $("#funBoxTheme").attr("href", ``);
   if (funbox === "none") {
-    activeFunBox = "none";
+    TypingTest.Globals.activeFunBox = "none";
     memoryFunboxInterval = clearInterval(memoryFunboxInterval);
     memoryFunboxTimer = null;
     $("#wordsWrapper").removeClass("hidden");
@@ -204,7 +203,7 @@ function activateFunbox(funbox, mode) {
   if (mode === "style") {
     if (funbox != undefined) {
       $("#funBoxTheme").attr("href", `funbox/${funbox}.css`);
-      activeFunBox = funbox;
+      TypingTest.Globals.activeFunBox = funbox;
     }
 
     if (funbox === "simon_says") {
@@ -233,7 +232,7 @@ function activateFunbox(funbox, mode) {
       Config.setShowAllLines(true, true);
       restartTest(false, true);
     }
-    activeFunBox = funbox;
+    TypingTest.Globals.activeFunBox = funbox;
   }
 
   if (funbox !== "layoutfluid" || mode !== "script") {
@@ -247,7 +246,7 @@ function activateFunbox(funbox, mode) {
 }
 
 function toggleScriptFunbox(...params) {
-  if (activeFunBox === "tts") {
+  if (TypingTest.Globals.activeFunBox === "tts") {
     var msg = new SpeechSynthesisUtterance();
     // var voices = window.speechSynthesis.getVoices();
     // msg.voice = voices[0];
@@ -371,7 +370,7 @@ async function initWords() {
     if (UserConfig.config.mode === "words" && UserConfig.config.words === 0) {
       wordsBound = 100;
     }
-    if (activeFunBox === "plus_one") {
+    if (TypingTest.Globals.activeFunBox === "plus_one") {
       wordsBound = 2;
     }
     let wordset = language.words;
@@ -403,7 +402,7 @@ async function initWords() {
         }
       }
 
-      if (activeFunBox === "rAnDoMcAsE") {
+      if (TypingTest.Globals.activeFunBox === "rAnDoMcAsE") {
         let randomcaseword = "";
         for (let i = 0; i < randomWord.length; i++) {
           if (i % 2 != 0) {
@@ -413,15 +412,15 @@ async function initWords() {
           }
         }
         randomWord = randomcaseword;
-      } else if (activeFunBox === "gibberish") {
+      } else if (TypingTest.Globals.activeFunBox === "gibberish") {
         randomWord = Misc.getGibberish();
-      } else if (activeFunBox === "58008") {
+      } else if (TypingTest.Globals.activeFunBox === "58008") {
         setToggleSettings(false, true);
         randomWord = Misc.getNumbers(7);
-      } else if (activeFunBox === "specials") {
+      } else if (TypingTest.Globals.activeFunBox === "specials") {
         setToggleSettings(false, true);
         randomWord = Misc.getSpecials();
-      } else if (activeFunBox === "ascii") {
+      } else if (TypingTest.Globals.activeFunBox === "ascii") {
         setToggleSettings(false, true);
         randomWord = Misc.getASCII();
       }
@@ -634,18 +633,18 @@ function punctuateWord(previousWord, currentWord, index, maxindex) {
 
 function addWord() {
   let bound = 100;
-  if (activeFunBox === "plus_one") bound = 1;
+  if (TypingTest.Globals.activeFunBox === "plus_one") bound = 1;
   if (
     wordsList.length - inputHistory.length > bound ||
     (UserConfig.config.mode === "words" &&
       wordsList.length >= UserConfig.config.words &&
       UserConfig.config.words > 0) ||
     (UserConfig.config.mode === "custom" &&
-      customTextIsRandom &&
-      wordsList.length >= customTextWordCount) ||
+      TypingTest.Globals.customTextIsRandom &&
+      wordsList.length >= TypingTest.Globals.customTextWordCount) ||
     (UserConfig.config.mode === "custom" &&
-      !customTextIsRandom &&
-      wordsList.length >= customText.length)
+      !TypingTest.Globals.customTextIsRandom &&
+      wordsList.length >= TypingTest.Globals.customText.length)
   )
     return;
   const language =
@@ -654,7 +653,7 @@ function addWord() {
       : {
           //borrow the direction of the current language
           leftToRight: Misc.getLanguage(UserConfig.config).leftToRight,
-          words: customText,
+          words: TypingTest.Globals.customText,
         };
   const wordset = language.words;
   let randomWord = wordset[Math.floor(Math.random() * wordset.length)];
@@ -688,7 +687,7 @@ function addWord() {
     }
   }
 
-  if (activeFunBox === "rAnDoMcAsE") {
+  if (TypingTest.Globals.activeFunBox === "rAnDoMcAsE") {
     let randomcaseword = "";
     for (let i = 0; i < randomWord.length; i++) {
       if (i % 2 != 0) {
@@ -698,13 +697,13 @@ function addWord() {
       }
     }
     randomWord = randomcaseword;
-  } else if (activeFunBox === "gibberish") {
+  } else if (TypingTest.Globals.activeFunBox === "gibberish") {
     randomWord = Misc.getGibberish();
-  } else if (activeFunBox === "58008") {
+  } else if (TypingTest.Globals.activeFunBox === "58008") {
     randomWord = Misc.getNumbers(7);
-  } else if (activeFunBox === "specials") {
+  } else if (TypingTest.Globals.activeFunBox === "specials") {
     randomWord = Misc.getSpecials();
-  } else if (activeFunBox === "ascii") {
+  } else if (TypingTest.Globals.activeFunBox === "ascii") {
     randomWord = Misc.getASCII();
   }
 
@@ -765,7 +764,7 @@ function showWords() {
     updateHighlightedKeymapKey();
   }
 
-  if (activeFunBox === "memory") {
+  if (TypingTest.Globals.activeFunBox === "memory") {
     memoryFunboxInterval = clearInterval(memoryFunboxInterval);
     memoryFunboxTimer = Math.round(Math.pow(wordsList.length, 1.2));
     memoryFunboxInterval = setInterval((fn) => {
@@ -1963,7 +1962,7 @@ function showResult(difficultyFailed = false) {
       keyDuration: keypressStats.duration.array,
       consistency: consistency,
       keyConsistency: keyConsistency,
-      funbox: activeFunBox,
+      funbox: TypingTest.Globals.activeFunBox,
       bailedOut: TypingTest.Globals.bailout,
       chartData: chartData,
     };
@@ -2374,8 +2373,8 @@ function showResult(difficultyFailed = false) {
   }
   if (
     UserConfig.config.mode != "custom" &&
-    activeFunBox !== "gibberish" &&
-    activeFunBox !== "58008"
+    TypingTest.Globals.activeFunBox !== "gibberish" &&
+    TypingTest.Globals.activeFunBox !== "58008"
   ) {
     testType += "<br>" + UserConfig.config.language.replace(/_/g, " ");
   }
@@ -2391,8 +2390,8 @@ function showResult(difficultyFailed = false) {
   // if (config.readAheadMode) {
   //   testType += "<br>read_ahead";
   // }
-  if (activeFunBox !== "none") {
-    testType += "<br>" + activeFunBox.replace(/_/g, " ");
+  if (TypingTest.Globals.activeFunBox !== "none") {
+    testType += "<br>" + TypingTest.Globals.activeFunBox.replace(/_/g, " ");
   }
   if (UserConfig.config.difficulty == "expert") {
     testType += "<br>expert";
@@ -2533,7 +2532,7 @@ function startTest() {
     },
   };
 
-  if (activeFunBox === "memory") {
+  if (TypingTest.Globals.activeFunBox === "memory") {
     memoryFunboxInterval = clearInterval(memoryFunboxInterval);
     memoryFunboxTimer = null;
     $("#wordsWrapper").addClass("hidden");
@@ -2564,7 +2563,10 @@ function startTest() {
       wpmHistory.push(wpmAndRaw.wpm);
       rawHistory.push(wpmAndRaw.raw);
 
-      if (activeFunBox === "layoutfluid" && UserConfig.config.mode === "time") {
+      if (
+        TypingTest.Globals.activeFunBox === "layoutfluid" &&
+        UserConfig.config.mode === "time"
+      ) {
         const layouts = ["qwerty", "dvorak", "colemak"];
         let index = 0;
         index = Math.floor(time / (UserConfig.config.time / 3));
@@ -2786,7 +2788,7 @@ function restartTest(withSameWordset = false, nosave = false) {
       document.querySelector("#miniTimerAndLiveWpm .wpm").innerHTML = "0";
       document.querySelector("#liveWpm").innerHTML = "0";
 
-      if (activeFunBox === "layoutfluid") {
+      if (TypingTest.Globals.activeFunBox === "layoutfluid") {
         Config.changeLayout("qwerty");
         settingsGroups.layout.updateButton();
         Config.changeKeymapLayout("qwerty");
@@ -2978,7 +2980,7 @@ function changePage(page) {
 }
 
 function changeMode(mode, nosave) {
-  if (mode !== "words" && activeFunBox === "memory") {
+  if (mode !== "words" && TypingTest.Globals.activeFunBox === "memory") {
     Util.showNotification("Memory funbox can only be used with words mode.");
     return;
   }
@@ -3002,11 +3004,11 @@ function changeMode(mode, nosave) {
     $("#top .config .quoteLength").addClass("hidden");
   } else if (UserConfig.config.mode == "custom") {
     if (
-      activeFunBox === "58008" ||
-      activeFunBox === "gibberish" ||
-      activeFunBox === "ascii"
+      TypingTest.Globals.activeFunBox === "58008" ||
+      TypingTest.Globals.activeFunBox === "gibberish" ||
+      TypingTest.Globals.activeFunBox === "ascii"
     ) {
-      activeFunBox = "none";
+      TypingTest.Globals.activeFunBox = "none";
       updateTestModesNotice();
     }
     $("#top .config .wordCount").addClass("hidden");
@@ -3496,9 +3498,9 @@ function updateTestModesNotice() {
   //   );
   // }
 
-  if (activeFunBox !== "none") {
+  if (TypingTest.Globals.activeFunBox !== "none") {
     $(".pageTest #testModesNotice").append(
-      `<div class="text-button" commands="commandsFunbox"><i class="fas fa-gamepad"></i>${activeFunBox.replace(
+      `<div class="text-button" commands="commandsFunbox"><i class="fas fa-gamepad"></i>${TypingTest.Globals.activeFunBox.replace(
         /_/g,
         " "
       )}</div>`
@@ -4948,7 +4950,10 @@ $(document).keydown((event) => {
           currentTestLine++;
         }
       } //end of line wrap
-      if (activeFunBox === "layoutfluid" && UserConfig.config.mode !== "time") {
+      if (
+        TypingTest.Globals.activeFunBox === "layoutfluid" &&
+        UserConfig.config.mode !== "time"
+      ) {
         const layouts = ["qwerty", "dvorak", "colemak"];
         let index = 0;
         let outof = wordsList.length;

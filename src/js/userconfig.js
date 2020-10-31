@@ -1,3 +1,4 @@
+import { resultHistoryChart } from "./account-charts";
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Util from "./util";
