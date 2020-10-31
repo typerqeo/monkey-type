@@ -587,11 +587,11 @@ export function setQuickEnd(qe, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
-function setEnableAds(val, nosave) {
+export function setEnableAds(val, nosave) {
   if (val == undefined) {
     val = false;
   }
-  config.enableAds = val;
+  UserConfig.config.enableAds = val;
   if (!nosave) saveConfigToCookie();
 }
 
