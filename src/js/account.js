@@ -1,6 +1,7 @@
 import { UserData, db_getUserSnapshot, db_getUserResults } from "./db";
 import * as FirebaseFunctions from "./firebase-functions";
 import * as Misc from "./misc";
+import * as Settings from "./settings";
 import * as Util from "./util";
 import * as Config from "./userconfig";
 const UserConfig = Config.UserConfig;
@@ -53,14 +54,6 @@ $(".pageLogin #forgotPasswordButton").click((e) => {
       });
   }
 });
-
-function showSignOutButton() {
-  $(".signOut").removeClass("hidden").css("opacity", 1);
-}
-
-function hideSignOutButton() {
-  $(".signOut").css("opacity", 0).addClass("hidden");
-}
 
 function signIn() {
   $(".pageLogin .preloader").removeClass("hidden");
@@ -301,7 +294,7 @@ function getAccountDataAndInit() {
           Util.accountIconLoading(false);
           Config.applyConfig(UserData.dbSnapshot.config);
           // showNotification('Applying db config',3000);
-          updateSettingsPage();
+          Settings.updateSettingsPage();
           Config.saveConfigToCookie(true);
           restartTest(false, true);
         } else if (UserData.dbSnapshot.config !== undefined) {
@@ -342,7 +335,7 @@ function getAccountDataAndInit() {
             Util.accountIconLoading(false);
             UserConfig.config = UserData.dbSnapshot.config;
             Config.applyConfig(UserConfig.config);
-            updateSettingsPage();
+            Settings.updateSettingsPage();
             Config.saveConfigToCookie(true);
             restartTest(false, true);
           }
@@ -1930,7 +1923,7 @@ function refreshGlobalStats() {
 
 let totalSecondsFiltered = 0;
 
-function refreshAccountPage() {
+export function refreshAccountPage() {
   function cont() {
     refreshThemeColorObject();
     refreshGlobalStats();
@@ -2681,7 +2674,3 @@ $("#resultEditTagsPanel .confirmButton").click((f) => {
     }
   });
 });
-
-function updateLbMemory(mode, mode2, type, value) {
-  UserData.dbSnapshot.lbMemory[mode + mode2][type] = value;
-}

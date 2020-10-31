@@ -1,7 +1,15 @@
+import * as Account from "./account";
+import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
+import * as Settings from "./settings";
 import * as Util from "./util";
-import { UserData, db_saveLocalPB, db_getLocalPB } from "./db";
+import {
+  UserData,
+  db_saveLocalPB,
+  db_getLocalPB,
+  db_getUserHighestWpm,
+} from "./db";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
 const UserConfig = Config.UserConfig;
@@ -299,7 +307,7 @@ function activateFunbox(funbox, mode) {
     );
     return false;
   }
-  if (currentLanguage.ligatures) {
+  if (Misc.getLanguage(UserConfig.config).ligatures) {
     if (funbox == "choo_choo" || funbox == "earthquake") {
       Util.showNotification(
         "Current language does not support this funbox mode",
@@ -760,10 +768,10 @@ function addWord() {
     return;
   const language =
     UserConfig.config.mode !== "custom"
-      ? currentLanguage
+      ? Misc.getLanguage(UserConfig.config)
       : {
           //borrow the direction of the current language
-          leftToRight: currentLanguage.leftToRight,
+          leftToRight: Misc.getLanguage(UserConfig.config).leftToRight,
           words: customText,
         };
   const wordset = language.words;
@@ -1515,7 +1523,8 @@ function updateCaretPosition() {
       .querySelectorAll("letter")[currentLetterIndex];
 
     if ($(currentLetter).length == 0) return;
-    const isLanguageLeftToRight = currentLanguage.leftToRight;
+    const isLanguageLeftToRight = Misc.getLanguage(UserConfig.config)
+      .leftToRight;
     let currentLetterPosLeft = isLanguageLeftToRight
       ? currentLetter.offsetLeft
       : currentLetter.offsetLeft + $(currentLetter).width();
@@ -1720,6 +1729,9 @@ function showCrown() {
 }
 let resultCalculating = false;
 function showResult(difficultyFailed = false) {
+  function updateLbMemory(mode, mode2, type, value) {
+    UserData.dbSnapshot.lbMemory[mode + mode2][type] = value;
+  }
   resultCalculating = true;
   resultVisible = true;
   testEnd = Date.now();
@@ -1729,7 +1741,7 @@ function showResult(difficultyFailed = false) {
   hideLiveWpm();
   hideTimer();
   hideKeymap();
-  testInvalid = false;
+  let testInvalid = false;
   let stats = calculateStats();
   if (stats === undefined) {
     stats = {
@@ -2140,7 +2152,7 @@ function showResult(difficultyFailed = false) {
             }
             $("#result .stats .leaderboards").removeClass("hidden");
             $("#result .stats .leaderboards .bottom").html("checking...");
-            testCompleted({
+            FirebaseFunctions.testCompleted({
               uid: firebase.auth().currentUser.uid,
               obj: completedEvent,
             })
@@ -2346,7 +2358,7 @@ function showResult(difficultyFailed = false) {
                       globalLbString + "<br>" + dailyLbString
                     );
 
-                    saveLbMemory({
+                    FirebaseFunctions.saveLbMemory({
                       uid: firebase.auth().currentUser.uid,
                       obj: UserData.dbSnapshot.lbMemory,
                     }).then((d) => {
@@ -2844,7 +2856,7 @@ function restartTest(withSameWordset = false, nosave = false) {
       !pageTransition &&
       !UserConfig.config.customTheme
     ) {
-      randomiseTheme();
+      Config.randomiseTheme();
       Util.showNotification(UserConfig.config.theme.replace(/_/g, " "), 1500);
     }
   }
@@ -2983,6 +2995,18 @@ function cleanTypographySymbols(textToClean) {
 }
 
 function changePage(page) {
+  function showTestConfig() {
+    $("#top .config").removeClass("hidden").css("opacity", 1);
+  }
+  function hideTestConfig() {
+    $("#top .config").css("opacity", 0).addClass("hidden");
+  }
+  function showSignOutButton() {
+    $(".signOut").removeClass("hidden").css("opacity", 1);
+  }
+  function hideSignOutButton() {
+    $(".signOut").css("opacity", 0).addClass("hidden");
+  }
   if (pageTransition) {
     return;
   }
@@ -3021,7 +3045,7 @@ function changePage(page) {
       history.pushState("settings", null, "settings");
       $(".page.pageSettings").addClass("active");
     });
-    updateSettingsPage();
+    Settings.updateSettingsPage();
     hideTestConfig();
     hideSignOutButton();
   } else if (page == "account") {
@@ -3035,7 +3059,7 @@ function changePage(page) {
         history.pushState("account", null, "account");
         $(".page.pageAccount").addClass("active");
       });
-      refreshAccountPage();
+      Account.refreshAccountPage();
       hideTestConfig();
       showSignOutButton();
     }
@@ -3680,7 +3704,7 @@ function tagsEdit() {
             id: e.data.id,
           });
           updateResultEditTagsPanelButtons();
-          updateSettingsPage();
+          Settings.updateSettingsPage();
           updateFilterTags();
         } else if (status === -1) {
           Util.showNotification("Invalid tag name", 3000);
@@ -3706,7 +3730,7 @@ function tagsEdit() {
           }
         });
         updateResultEditTagsPanelButtons();
-        updateSettingsPage();
+        Settings.updateSettingsPage();
         updateFilterTags();
       } else if (status === -1) {
         Util.showNotification("Invalid tag name", 3000);
@@ -3728,7 +3752,7 @@ function tagsEdit() {
             }
           });
           updateResultEditTagsPanelButtons();
-          updateSettingsPage();
+          Settings.updateSettingsPage();
           updateFilterTags();
           updateActiveTags();
         } else if (status < -1) {

@@ -1,3 +1,4 @@
+import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Util from "./util";
 
@@ -103,7 +104,7 @@ async function saveConfigToDB() {
   if (firebase.auth().currentUser !== null) {
     // showNotification('saving to db',1000);
     Util.accountIconLoading(true);
-    saveConfig({
+    FirebaseFunctions.saveConfig({
       uid: firebase.auth().currentUser.uid,
       obj: UserConfig.config,
     }).then((d) => {
@@ -244,14 +245,6 @@ function loadActiveTagsFromCookie() {
     });
     saveActiveTagsToCookie();
   }
-}
-
-function showTestConfig() {
-  $("#top .config").removeClass("hidden").css("opacity", 1);
-}
-
-function hideTestConfig() {
-  $("#top .config").css("opacity", 0).addClass("hidden");
 }
 
 export function setPlaySoundOnError(val, nosave) {

@@ -1,6 +1,8 @@
+import { UserData } from "./db";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Util from "./util";
+import * as Settings from "./settings";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
 const UserConfig = Config.UserConfig;
@@ -1403,7 +1405,7 @@ function updateCommandsTagsList() {
           tag.active = false;
         });
         updateTestModesNotice();
-        saveActiveTagsToCookie();
+        Config.saveActiveTagsToCookie();
       },
     });
 
@@ -1421,7 +1423,7 @@ function updateCommandsTagsList() {
         display: dis,
         sticky: true,
         exec: () => {
-          toggleTag(tag.id);
+          Settings.toggleTag(tag.id);
           updateTestModesNotice();
           let txt = tag.name;
 
@@ -1693,7 +1695,8 @@ $("#commandInput input").keydown((e) => {
       if (obj.id == command) {
         obj.exec(value);
         if (obj.subgroup !== null && obj.subgroup !== undefined) {
-          subgroup = obj.subgroup;
+          //TODO: is this unneeded?
+          const subgroup = obj.subgroup;
         }
       }
     });

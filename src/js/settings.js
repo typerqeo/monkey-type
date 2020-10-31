@@ -421,7 +421,7 @@ function refreshThemeButtons() {
   });
 }
 
-function updateSettingsPage() {
+export function updateSettingsPage() {
   Object.keys(settingsGroups).forEach((group) => {
     settingsGroups[group].updateButton();
   });
