@@ -947,7 +947,7 @@ export function toggleQuickTabMode() {
 }
 
 //numbers
-function setNumbers(numb, nosave) {
+export function setNumbers(numb, nosave) {
   UserConfig.config.numbers = numb;
   if (!UserConfig.config.numbers) {
     $("#top .config .numbersMode .text-button").removeClass("active");
@@ -1205,7 +1205,7 @@ export function togglePresetCustomTheme() {
   $(".keymap-key").attr("style", "");
 }
 
-function updateFavicon(size, curveSize) {
+export function updateFavicon(size, curveSize) {
   let maincolor, bgcolor;
 
   bgcolor = getComputedStyle(document.body)

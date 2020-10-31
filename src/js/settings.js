@@ -645,7 +645,7 @@ function setActiveThemeTab() {
     : $(".pageSettings .section.themes .tabs .button[tab='preset']").click();
 }
 
-function setCustomThemeInputs() {
+export function setCustomThemeInputs() {
   $(
     ".pageSettings .section.themes .tabContainer .customTheme input[type=color]"
   ).each((n, index) => {

@@ -1837,6 +1837,14 @@ $(document).keydown((e) => {
 
 let currentCommands = [commands];
 
+export function addCurrentCommand(commandsList) {
+  currentCommands.push(commandsList);
+}
+
+export function addThemeCommands() {
+  currentCommands.push(commandsThemes);
+}
+
 function triggerCommand(command) {
   let subgroup = false;
   let input = false;
@@ -1888,7 +1896,7 @@ function hideCommandLine() {
   Util.focusWords();
 }
 
-function showCommandLine() {
+export function showCommandLine() {
   setFocus(false);
   $("#commandLine").removeClass("hidden");
   $("#commandInput").addClass("hidden");

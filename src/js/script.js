@@ -1,5 +1,6 @@
 import * as Account from "./account";
 import * as ClickSound from "./click-sound";
+import * as CommandLine from "./commandline";
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Leaderboards from "./leaderboards";
@@ -486,8 +487,8 @@ function arrangeCharactersLeftToRight() {
 }
 
 function setToggleSettings(state, nosave) {
-  setPunctuation(state, nosave);
-  setNumbers(state, nosave);
+  Settings.setPunctuation(state, nosave);
+  Settings.setNumbers(state, nosave);
 }
 
 function emulateLayout(event) {
@@ -3021,8 +3022,8 @@ function changeMode(mode, nosave) {
     $("#top .config .punctuationMode").addClass("hidden");
     $("#top .config .numbersMode").addClass("hidden");
     $("#top .config .quoteLength").addClass("hidden");
-    setPunctuation(false, true);
-    setNumbers(false, true);
+    Settings.setPunctuation(false, true);
+    Settings.setNumbers(false, true);
   } else if (UserConfig.config.mode == "quote") {
     setToggleSettings(false, nosave);
     $("#top .config .wordCount").addClass("hidden");
@@ -3032,7 +3033,7 @@ function changeMode(mode, nosave) {
     $("#top .config .numbersMode").addClass("hidden");
     $("#result .stats .source").removeClass("hidden");
     $("#top .config .quoteLength").removeClass("hidden");
-    changeLanguage("english", nosave);
+    Config.changeLanguage("english", nosave);
   }
   if (!nosave) Config.saveConfigToCookie();
 }
@@ -3608,9 +3609,9 @@ function tagsEdit() {
           name: inputVal,
           id: e.data.id,
         });
-        updateResultEditTagsPanelButtons();
+        Account.updateResultEditTagsPanelButtons();
         Settings.updateSettingsPage();
-        updateFilterTags();
+        Account.updateFilterTags();
       } else if (status === -1) {
         Util.showNotification("Invalid tag name", 3000);
       } else if (status < -1) {
@@ -3633,9 +3634,9 @@ function tagsEdit() {
             tag.name = inputVal;
           }
         });
-        updateResultEditTagsPanelButtons();
+        Account.updateResultEditTagsPanelButtons();
         Settings.updateSettingsPage();
-        updateFilterTags();
+        Account.updateFilterTags();
       } else if (status === -1) {
         Util.showNotification("Invalid tag name", 3000);
       } else if (status < -1) {
@@ -3657,9 +3658,9 @@ function tagsEdit() {
             UserData.dbSnapshot.tags.splice(index, 1);
           }
         });
-        updateResultEditTagsPanelButtons();
+        Account.updateResultEditTagsPanelButtons();
         Settings.updateSettingsPage();
-        updateFilterTags();
+        Account.updateFilterTags();
         updateActiveTags();
       } else if (status < -1) {
         Util.showNotification("Unknown error", 3000);
@@ -4219,7 +4220,7 @@ $(document).on("click", "#top .config .wordCount .text-button", (e) => {
     //   }
     showCustomMode2Popup("words");
   } else {
-    changeWordCount(wrd);
+    Config.changeWordCount(wrd);
     manualRestart = true;
     restartTest();
   }
@@ -4485,8 +4486,8 @@ $(document).mousemove(function (event) {
 $(document).on("click", "#testModesNotice .text-button", (event) => {
   let commands = eval($(event.currentTarget).attr("commands"));
   if (commands !== undefined) {
-    currentCommands.push(commands);
-    showCommandLine();
+    CommandLine.addCurrentCommand(commands);
+    CommandLine.showCommandLine();
   }
 });
 
@@ -4547,7 +4548,7 @@ $(document).keydown(function (event) {
   }
 
   if (event.key === "Dead") {
-    playClickSound();
+    ClickSound.playClickSound();
     $(
       document.querySelector("#words .word.active").querySelectorAll("letter")[
         currentInput.length
@@ -4827,7 +4828,7 @@ $(document).keydown((event) => {
         }
         compareInput(!UserConfig.config.blindMode);
       }
-      playClickSound();
+      ClickSound.playClickSound();
       if (UserConfig.config.keymapMode === "react") {
         flashPressedKeymapKey(event.code, true);
       } else if (UserConfig.config.keymapMode === "next") {
@@ -5149,8 +5150,8 @@ $(document).on("click", "#bottom .leftright .right .current-theme", (e) => {
   if (UserConfig.config.customTheme) {
     Config.togglePresetCustomTheme();
   }
-  currentCommands.push(commandsThemes);
-  showCommandLine();
+  CommandLine.addThemeCommands();
+  CommandLine.showCommandLine();
 });
 
 $(document).on("mouseleave", "#resultWordsHistory .words .word", (e) => {
@@ -5162,7 +5163,7 @@ $("#wpmChart").on("mouseleave", (e) => {
 });
 
 $(document).ready(() => {
-  updateFavicon(32, 14);
+  Config.updateFavicon(32, 14);
   $("body").css("transition", ".25s");
   // manualRestart = true;
   // restartTest(false,true);
@@ -5188,7 +5189,7 @@ $(document).ready(() => {
           UserConfig.config.customThemeColors = defaultConfig.customThemeColors;
         }
         Config.setCustomTheme(true);
-        setCustomThemeInputs();
+        Settings.setCustomThemeInputs();
         Config.applyCustomThemeColors();
       }
       if (window.location.pathname === "/verify") {

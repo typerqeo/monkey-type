@@ -572,7 +572,7 @@ Misc.getFunboxList().then((funboxModes) => {
   });
 });
 
-function updateFilterTags() {
+export function updateFilterTags() {
   $(
     ".pageAccount .content .filterButtons .buttonsAndTitle.tags .buttons"
   ).empty();
@@ -2112,7 +2112,7 @@ $("#resultEditTagsPanelWrapper").click((e) => {
   }
 });
 
-function updateResultEditTagsPanelButtons() {
+export function updateResultEditTagsPanelButtons() {
   $("#resultEditTagsPanel .buttons").empty();
   UserData.dbSnapshot.tags.forEach((tag) => {
     $("#resultEditTagsPanel .buttons").append(
