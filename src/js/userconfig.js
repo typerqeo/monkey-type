@@ -1,6 +1,7 @@
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Util from "./util";
+import * as TypingTest from "./typing-test";
 
 export const defaultConfig = {
   theme: "serika_dark",
@@ -97,7 +98,7 @@ export async function saveConfigToCookie(noDbCheck = false) {
     expires: d,
     path: "/",
   });
-  restartCount = 0;
+  TypingTest.Globals.restartCount = 0;
   if (!noDbCheck) saveConfigToDB();
 }
 
@@ -158,7 +159,6 @@ export function loadConfigFromCookie() {
     UserConfig.cookieConfig = newConfig;
     saveConfigToCookie(true);
   }
-  restartTest(false, true);
 }
 
 export function applyConfig(configObj) {
@@ -230,9 +230,10 @@ export function applyConfig(configObj) {
     // config = configObj;
     try {
       setEnableAds(configObj.enableAds, true);
-      if (config.enableAds) {
+      if (configObj.enableAds) {
         $("#ad").removeClass("hidden");
-        (adsbygoogle = window.adsbygoogle || []).push({});
+        const adsbygoogle = window.adsbygoogle || [];
+        adsbygoogle.push({});
       } else {
         $("#ad").remove();
       }

@@ -1,8 +1,10 @@
 import * as Account from "./account";
+import * as ClickSound from "./click-sound";
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Settings from "./settings";
+import * as TypingTest from "./typing-test";
 import * as Util from "./util";
 import {
   UserData,
@@ -27,7 +29,6 @@ let testActive = false;
 let testStart, testEnd;
 let wpmHistory = [];
 let rawHistory = [];
-let restartCount = 0;
 let incompleteTestSeconds = 0;
 let currentTestLine = 0;
 let pageTransition = false;
@@ -51,7 +52,6 @@ let quotes = null;
 let focusState = false;
 let activeFunBox = "none";
 let manualRestart = false;
-let bailout = false;
 let notSignedInLastResult = null;
 let caretAnimating = true;
 let lastSecondNotRound = false;
@@ -61,18 +61,6 @@ let verifyUserWhenLoggedIn = null;
 let modeBeforePractise = null;
 let memoryFunboxTimer = null;
 let memoryFunboxInterval = null;
-
-let themeColors = {
-  bg: "#323437",
-  main: "#e2b714",
-  caret: "#e2b714",
-  sub: "#646669",
-  text: "#d1d0c5",
-  error: "#ca4754",
-  errorExtra: "#7e2a33",
-  colorfulError: "#ca4754",
-  colorfulErrorExtra: "#7e2a33",
-};
 
 let accuracyStats = {
   correct: 0,
@@ -90,150 +78,38 @@ let keypressStats = {
   },
 };
 
-let errorSound = new Audio("../sound/error.wav");
-let clickSounds = null;
-
 let isPreviewingTheme = false;
 
-function initClickSounds() {
-  clickSounds = {
-    1: [
-      {
-        sounds: [
-          new Audio("../sound/click1/click1_1.wav"),
-          new Audio("../sound/click1/click1_1.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click1/click1_2.wav"),
-          new Audio("../sound/click1/click1_2.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click1/click1_3.wav"),
-          new Audio("../sound/click1/click1_3.wav"),
-        ],
-        counter: 0,
-      },
-    ],
-    2: [
-      {
-        sounds: [
-          new Audio("../sound/click2/click2_1.wav"),
-          new Audio("../sound/click2/click2_1.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click2/click2_2.wav"),
-          new Audio("../sound/click2/click2_2.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click2/click2_3.wav"),
-          new Audio("../sound/click2/click2_3.wav"),
-        ],
-        counter: 0,
-      },
-    ],
-    3: [
-      {
-        sounds: [
-          new Audio("../sound/click3/click3_1.wav"),
-          new Audio("../sound/click3/click3_1.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click3/click3_2.wav"),
-          new Audio("../sound/click3/click3_2.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click3/click3_3.wav"),
-          new Audio("../sound/click3/click3_3.wav"),
-        ],
-        counter: 0,
-      },
-    ],
-    4: [
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_1.wav"),
-          new Audio("../sound/click4/click4_1.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_2.wav"),
-          new Audio("../sound/click4/click4_2.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_3.wav"),
-          new Audio("../sound/click4/click4_3.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_4.wav"),
-          new Audio("../sound/click4/click4_4.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_5.wav"),
-          new Audio("../sound/click4/click4_5.wav"),
-        ],
-        counter: 0,
-      },
-      {
-        sounds: [
-          new Audio("../sound/click4/click4_6.wav"),
-          new Audio("../sound/click4/click4_6.wav"),
-        ],
-        counter: 0,
-      },
-    ],
-  };
-}
-
-let customText = "The quick brown fox jumps over the lazy dog".split(" ");
-let customTextIsRandom = false;
-let customTextWordCount = 1;
 let randomQuote = null;
 
 function refreshThemeColorObject() {
   let st = getComputedStyle(document.body);
 
-  themeColors.bg = st.getPropertyValue("--bg-color").replace(" ", "");
-  themeColors.main = st.getPropertyValue("--main-color").replace(" ", "");
-  themeColors.caret = st.getPropertyValue("--caret-color").replace(" ", "");
-  themeColors.sub = st.getPropertyValue("--sub-color").replace(" ", "");
-  themeColors.text = st.getPropertyValue("--text-color").replace(" ", "");
-  themeColors.error = st.getPropertyValue("--error-color").replace(" ", "");
-  themeColors.errorExtra = st
+  TypingTest.Globals.themeColors.bg = st
+    .getPropertyValue("--bg-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.main = st
+    .getPropertyValue("--main-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.caret = st
+    .getPropertyValue("--caret-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.sub = st
+    .getPropertyValue("--sub-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.text = st
+    .getPropertyValue("--text-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.error = st
+    .getPropertyValue("--error-color")
+    .replace(" ", "");
+  TypingTest.Globals.themeColors.errorExtra = st
     .getPropertyValue("--error-extra-color")
     .replace(" ", "");
-  themeColors.colorfulError = st
+  TypingTest.Globals.themeColors.colorfulError = st
     .getPropertyValue("--colorful-error-color")
     .replace(" ", "");
-  themeColors.colorfulErrorExtra = st
+  TypingTest.Globals.themeColors.colorfulErrorExtra = st
     .getPropertyValue("--colorful-error-extra-color")
     .replace(" ", "");
 }
@@ -256,7 +132,7 @@ function copyResultToClipboard() {
     $(".pageTest .loginTip").addClass("hidden");
     try {
       html2canvas(document.body, {
-        backgroundColor: themeColors.bg,
+        backgroundColor: TypingTest.Globals.themeColors.bg,
         height: sourceHeight + 50,
         width: sourceWidth + 50,
         x: sourceX - 25,
@@ -462,10 +338,10 @@ async function initWords() {
     let wordsBound = 100;
     if (UserConfig.config.showAllLines) {
       if (UserConfig.config.mode === "custom") {
-        if (customTextIsRandom) {
-          wordsBound = customTextWordCount;
+        if (TypingTest.Globals.customTextIsRandom) {
+          wordsBound = TypingTest.Globals.customTextWordCount;
         } else {
-          wordsBound = customText.length;
+          wordsBound = TypingTest.Globals.customText.length;
         }
       } else if (UserConfig.config.mode != "time") {
         wordsBound = UserConfig.config.words;
@@ -479,17 +355,17 @@ async function initWords() {
       }
       if (
         UserConfig.config.mode == "custom" &&
-        customTextIsRandom &&
-        customTextWordCount < wordsBound
+        TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customTextWordCount < wordsBound
       ) {
-        wordsBound = customTextWordCount;
+        wordsBound = TypingTest.Globals.customTextWordCount;
       }
       if (
         UserConfig.config.mode == "custom" &&
-        !customTextIsRandom &&
-        customText.length < wordsBound
+        !TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customText.length < wordsBound
       ) {
-        wordsBound = customText.length;
+        wordsBound = TypingTest.Globals.customText.length;
       }
     }
     if (UserConfig.config.mode === "words" && UserConfig.config.words === 0) {
@@ -500,16 +376,22 @@ async function initWords() {
     }
     let wordset = language.words;
     if (UserConfig.config.mode == "custom") {
-      wordset = customText;
+      wordset = TypingTest.Globals.customText;
     }
     for (let i = 0; i < wordsBound; i++) {
       let randomWord = wordset[Math.floor(Math.random() * wordset.length)];
       const previousWord = wordsList[i - 1];
       const previousWord2 = wordsList[i - 2];
-      if (UserConfig.config.mode == "custom" && customTextIsRandom) {
+      if (
+        UserConfig.config.mode == "custom" &&
+        TypingTest.Globals.customTextIsRandom
+      ) {
         randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-      } else if (UserConfig.config.mode == "custom" && !customTextIsRandom) {
-        randomWord = customText[i];
+      } else if (
+        UserConfig.config.mode == "custom" &&
+        !TypingTest.Globals.customTextIsRandom
+      ) {
+        randomWord = TypingTest.Globals.customText[i];
       } else {
         while (
           randomWord == previousWord ||
@@ -786,12 +668,15 @@ function addWord() {
 
   if (
     UserConfig.config.mode === "custom" &&
-    customTextIsRandom &&
+    TypingTest.Globals.customTextIsRandom &&
     wordset.length < 3
   ) {
     randomWord = wordset[Math.floor(Math.random() * wordset.length)];
-  } else if (UserConfig.config.mode == "custom" && !customTextIsRandom) {
-    randomWord = customText[wordsList.length];
+  } else if (
+    UserConfig.config.mode == "custom" &&
+    !TypingTest.Globals.customTextIsRandom
+  ) {
+    randomWord = TypingTest.Globals.customText[wordsList.length];
   } else {
     while (
       previousWordStripped == randomWord ||
@@ -992,7 +877,7 @@ function compareInput(showError) {
           let testNow = Date.now();
           let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
           incompleteTestSeconds += testSeconds;
-          restartCount++;
+          TypingTest.Globals.restartCount++;
         }
         if (!showError) {
           if (currentWord[i] == undefined) {
@@ -1238,10 +1123,10 @@ function updateTimer() {
         outof = UserConfig.config.words;
       }
       if (UserConfig.config.mode === "custom") {
-        if (customTextIsRandom) {
-          outof = customTextWordCount;
+        if (TypingTest.Globals.customTextIsRandom) {
+          outof = TypingTest.Globals.customTextWordCount;
         } else {
-          outof = customText.length;
+          outof = TypingTest.Globals.customText.length;
         }
       }
       let percent = Math.floor(((currentWordIndex + 1) / outof) * 100);
@@ -1259,10 +1144,10 @@ function updateTimer() {
         outof = UserConfig.config.words;
       }
       if (UserConfig.config.mode === "custom") {
-        if (customTextIsRandom) {
-          outof = customTextWordCount;
+        if (TypingTest.Globals.customTextIsRandom) {
+          outof = TypingTest.Globals.customTextWordCount;
         } else {
-          outof = customText.length;
+          outof = TypingTest.Globals.customText.length;
         }
       }
       if (UserConfig.config.words === 0) {
@@ -1279,10 +1164,10 @@ function updateTimer() {
         outof = UserConfig.config.words;
       }
       if (UserConfig.config.mode === "custom") {
-        if (customTextIsRandom) {
-          outof = customTextWordCount;
+        if (TypingTest.Globals.customTextIsRandom) {
+          outof = TypingTest.Globals.customTextWordCount;
         } else {
-          outof = customText.length;
+          outof = TypingTest.Globals.customText.length;
         }
       }
       if (UserConfig.config.words === 0) {
@@ -1352,9 +1237,9 @@ function flashPressedKeymapKey(key, correct) {
 
   let errorColor;
   if (UserConfig.config.colorfulMode) {
-    errorColor = themeColors.colorfulError;
+    errorColor = TypingTest.Globals.themeColors.colorfulError;
   } else {
-    errorColor = themeColors.error;
+    errorColor = TypingTest.Globals.themeColors.error;
   }
 
   switch (key) {
@@ -1406,15 +1291,15 @@ function flashPressedKeymapKey(key, correct) {
       $(key)
         .stop(true, true)
         .css({
-          color: themeColors.bg,
-          backgroundColor: themeColors.main,
-          borderColor: themeColors.main,
+          color: TypingTest.Globals.themeColors.bg,
+          backgroundColor: TypingTest.Globals.themeColors.main,
+          borderColor: TypingTest.Globals.themeColors.main,
         })
         .animate(
           {
-            color: themeColors.sub,
+            color: TypingTest.Globals.themeColors.sub,
             backgroundColor: "transparent",
-            borderColor: themeColors.sub,
+            borderColor: TypingTest.Globals.themeColors.sub,
           },
           500,
           "easeOutExpo"
@@ -1423,15 +1308,15 @@ function flashPressedKeymapKey(key, correct) {
       $(key)
         .stop(true, true)
         .css({
-          color: themeColors.bg,
-          backgroundColor: themeColors.error,
-          borderColor: themeColors.error,
+          color: TypingTest.Globals.themeColors.bg,
+          backgroundColor: TypingTest.Globals.themeColors.error,
+          borderColor: TypingTest.Globals.themeColors.error,
         })
         .animate(
           {
-            color: themeColors.sub,
+            color: TypingTest.Globals.themeColors.sub,
             backgroundColor: "transparent",
-            borderColor: themeColors.sub,
+            borderColor: TypingTest.Globals.themeColors.sub,
           },
           500,
           "easeOutExpo"
@@ -1909,22 +1794,22 @@ function showResult(difficultyFailed = false) {
     }
   }
 
-  if (themeColors.main == "") {
+  if (TypingTest.Globals.themeColors.main == "") {
     refreshThemeColorObject();
   }
 
   wpmOverTimeChart.options.scales.xAxes[0].ticks.minor.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.scales.xAxes[0].scaleLabel.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.scales.yAxes[0].ticks.minor.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.scales.yAxes[2].ticks.minor.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.scales.yAxes[0].scaleLabel.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.scales.yAxes[2].scaleLabel.fontColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
 
   wpmOverTimeChart.data.labels = labels;
 
@@ -1967,19 +1852,23 @@ function showResult(difficultyFailed = false) {
     );
   }
 
-  wpmOverTimeChart.data.datasets[0].borderColor = themeColors.main;
-  wpmOverTimeChart.data.datasets[0].pointBackgroundColor = themeColors.main;
+  wpmOverTimeChart.data.datasets[0].borderColor =
+    TypingTest.Globals.themeColors.main;
+  wpmOverTimeChart.data.datasets[0].pointBackgroundColor =
+    TypingTest.Globals.themeColors.main;
   wpmOverTimeChart.data.datasets[0].data = wpmHistory;
-  wpmOverTimeChart.data.datasets[1].borderColor = themeColors.sub;
-  wpmOverTimeChart.data.datasets[1].pointBackgroundColor = themeColors.sub;
+  wpmOverTimeChart.data.datasets[1].borderColor =
+    TypingTest.Globals.themeColors.sub;
+  wpmOverTimeChart.data.datasets[1].pointBackgroundColor =
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.data.datasets[1].data = rawWpmPerSecond;
 
   wpmOverTimeChart.options.annotation.annotations[0].borderColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.annotation.annotations[0].label.backgroundColor =
-    themeColors.sub;
+    TypingTest.Globals.themeColors.sub;
   wpmOverTimeChart.options.annotation.annotations[0].label.fontColor =
-    themeColors.bg;
+    TypingTest.Globals.themeColors.bg;
 
   let maxChartVal = Math.max(
     ...[Math.max(...rawWpmPerSecond), Math.max(...wpmHistory)]
@@ -2019,7 +1908,7 @@ function showResult(difficultyFailed = false) {
 
   let afkDetected = kps === 0 ? true : false;
 
-  if (bailout) afkDetected = false;
+  if (TypingTest.Globals.bailout) afkDetected = false;
 
   if (difficultyFailed) {
     Util.showNotification("Test failed", 2000);
@@ -2062,7 +1951,7 @@ function showResult(difficultyFailed = false) {
       numbers: UserConfig.config.numbers,
       timestamp: Date.now(),
       language: UserConfig.config.language,
-      restartCount: restartCount,
+      restartCount: TypingTest.Globals.restartCount,
       incompleteTestSeconds: incompleteTestSeconds,
       difficulty: UserConfig.config.difficulty,
       testDuration: testtime,
@@ -2075,7 +1964,7 @@ function showResult(difficultyFailed = false) {
       consistency: consistency,
       keyConsistency: keyConsistency,
       funbox: activeFunBox,
-      bailedOut: bailout,
+      bailedOut: TypingTest.Globals.bailout,
       chartData: chartData,
     };
     if (
@@ -2086,7 +1975,7 @@ function showResult(difficultyFailed = false) {
     ) {
       // console.log(incompleteTestSeconds);
       // console.log(restartCount);
-      restartCount = 0;
+      TypingTest.Globals.restartCount = 0;
       incompleteTestSeconds = 0;
     }
     if (
@@ -2210,10 +2099,10 @@ function showResult(difficultyFailed = false) {
                     }
                     if (UserData.dbSnapshot.globalStats.started == undefined) {
                       UserData.dbSnapshot.globalStats.started =
-                        restartCount + 1;
+                        TypingTest.Globals.restartCount + 1;
                     } else {
                       UserData.dbSnapshot.globalStats.started +=
-                        restartCount + 1;
+                        TypingTest.Globals.restartCount + 1;
                     }
                     if (
                       UserData.dbSnapshot.globalStats.completed == undefined
@@ -2529,7 +2418,7 @@ function showResult(difficultyFailed = false) {
   if (sameWordset) {
     otherText += "<br>repeated";
   }
-  if (bailout) {
+  if (TypingTest.Globals.bailout) {
     otherText += "<br>bailed out";
   }
 
@@ -2778,11 +2667,11 @@ function restartTest(withSameWordset = false, nosave = false) {
         UserConfig.config.time > 0) ||
       UserConfig.config.mode === "quote" ||
       (UserConfig.config.mode === "custom" &&
-        customTextIsRandom &&
-        customTextWordCount < 1000) ||
+        TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customTextWordCount < 1000) ||
       (UserConfig.config.mode === "custom" &&
-        !customTextIsRandom &&
-        customText.length < 1000)
+        !TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customText.length < 1000)
     ) {
     } else {
       Util.showNotification(
@@ -2813,7 +2702,7 @@ function restartTest(withSameWordset = false, nosave = false) {
   testActive = false;
   hideLiveWpm();
   hideTimer();
-  bailout = false;
+  TypingTest.Globals.bailout = false;
   paceCaret = null;
   if (paceCaret !== null) clearTimeout(paceCaret.timeout);
   $("#showWordHistoryButton").removeClass("loaded");
@@ -2963,17 +2852,25 @@ function restartTest(withSameWordset = false, nosave = false) {
 }
 
 function changeCustomText() {
-  customText = prompt("Custom text").trim();
-  customText = customText.replace(/[\n\r\t ]/gm, " ");
-  customText = customText.replace(/ +/gm, " ");
-  customText = customText.split(" ");
-  if (customText.length >= 10000) {
+  TypingTest.Globals.customText = prompt("Custom text").trim();
+  TypingTest.Globals.customText = TypingTest.Globals.customText.replace(
+    /[\n\r\t ]/gm,
+    " "
+  );
+  TypingTest.Globals.customText = TypingTest.Globals.customText.replace(
+    / +/gm,
+    " "
+  );
+  TypingTest.Globals.customText = TypingTest.Globals.customText.split(" ");
+  if (TypingTest.Globals.customText.length >= 10000) {
     Util.showNotification(
       "Custom text cannot be longer than 10000 words.",
       4000
     );
     changeMode("time");
-    customText = "The quick brown fox jumped over the lazy dog".split(" ");
+    TypingTest.Globals.customText = "The quick brown fox jumped over the lazy dog".split(
+      " "
+    );
   }
   // initWords();
 }
@@ -3023,7 +2920,7 @@ function changePage(page) {
     });
     showTestConfig();
     hideSignOutButton();
-    restartCount = 0;
+    TypingTest.Globals.restartCount = 0;
     incompleteTestSeconds = 0;
     manualRestart = true;
     restartTest();
@@ -3131,7 +3028,7 @@ function changeMode(mode, nosave) {
     $("#top .config .quoteLength").removeClass("hidden");
     changeLanguage("english", nosave);
   }
-  if (!nosave) saveConfigToCookie();
+  if (!nosave) Config.saveConfigToCookie();
 }
 
 // function liveWPM() {
@@ -3693,29 +3590,30 @@ function tagsEdit() {
   hideEditTags();
   if (action === "add") {
     Util.showBackgroundLoader();
-    addTag({ uid: firebase.auth().currentUser.uid, name: inputVal }).then(
-      (e) => {
-        Util.hideBackgroundLoader();
-        let status = e.data.resultCode;
-        if (status === 1) {
-          Util.showNotification("Tag added", 2000);
-          UserData.dbSnapshot.tags.push({
-            name: inputVal,
-            id: e.data.id,
-          });
-          updateResultEditTagsPanelButtons();
-          Settings.updateSettingsPage();
-          updateFilterTags();
-        } else if (status === -1) {
-          Util.showNotification("Invalid tag name", 3000);
-        } else if (status < -1) {
-          Util.showNotification("Unknown error", 3000);
-        }
+    FirebaseFunctions.addTag({
+      uid: firebase.auth().currentUser.uid,
+      name: inputVal,
+    }).then((e) => {
+      Util.hideBackgroundLoader();
+      let status = e.data.resultCode;
+      if (status === 1) {
+        Util.showNotification("Tag added", 2000);
+        UserData.dbSnapshot.tags.push({
+          name: inputVal,
+          id: e.data.id,
+        });
+        updateResultEditTagsPanelButtons();
+        Settings.updateSettingsPage();
+        updateFilterTags();
+      } else if (status === -1) {
+        Util.showNotification("Invalid tag name", 3000);
+      } else if (status < -1) {
+        Util.showNotification("Unknown error", 3000);
       }
-    );
+    });
   } else if (action === "edit") {
     Util.showBackgroundLoader();
-    editTag({
+    FirebaseFunctions.editTag({
       uid: firebase.auth().currentUser.uid,
       name: inputVal,
       tagid: tagid,
@@ -3740,26 +3638,27 @@ function tagsEdit() {
     });
   } else if (action === "remove") {
     Util.showBackgroundLoader();
-    removeTag({ uid: firebase.auth().currentUser.uid, tagid: tagid }).then(
-      (e) => {
-        Util.hideBackgroundLoader();
-        let status = e.data.resultCode;
-        if (status === 1) {
-          Util.showNotification("Tag removed", 2000);
-          UserData.dbSnapshot.tags.forEach((tag, index) => {
-            if (tag.id === tagid) {
-              UserData.dbSnapshot.tags.splice(index, 1);
-            }
-          });
-          updateResultEditTagsPanelButtons();
-          Settings.updateSettingsPage();
-          updateFilterTags();
-          updateActiveTags();
-        } else if (status < -1) {
-          Util.showNotification("Unknown error", 3000);
-        }
+    FirebaseFunctions.removeTag({
+      uid: firebase.auth().currentUser.uid,
+      tagid: tagid,
+    }).then((e) => {
+      Util.hideBackgroundLoader();
+      let status = e.data.resultCode;
+      if (status === 1) {
+        Util.showNotification("Tag removed", 2000);
+        UserData.dbSnapshot.tags.forEach((tag, index) => {
+          if (tag.id === tagid) {
+            UserData.dbSnapshot.tags.splice(index, 1);
+          }
+        });
+        updateResultEditTagsPanelButtons();
+        Settings.updateSettingsPage();
+        updateFilterTags();
+        updateActiveTags();
+      } else if (status < -1) {
+        Util.showNotification("Unknown error", 3000);
       }
-    );
+    });
   }
 }
 
@@ -3787,8 +3686,12 @@ function showCustomTextPopup() {
       .css("opacity", 0)
       .removeClass("hidden")
       .animate({ opacity: 1 }, 100, (e) => {
-        $("#customTextPopup textarea").val(customText.join(" "));
-        $("#customTextPopup .wordcount input").val(customTextWordCount);
+        $("#customTextPopup textarea").val(
+          TypingTest.Globals.customText.join(" ")
+        );
+        $("#customTextPopup .wordcount input").val(
+          TypingTest.Globals.customTextWordCount
+        );
         $("#customTextPopup textarea").focus();
       });
   }
@@ -3845,13 +3748,17 @@ $("#customTextPopup .button").click((e) => {
   //   changeMode("time");
   //   text = "The quick brown fox jumped over the lazy dog".split(" ");
   // } else {
-  customText = text;
-  customTextIsRandom = $("#customTextPopup .check input").prop("checked");
+  TypingTest.Globals.customText = text;
+  TypingTest.Globals.customTextIsRandom = $(
+    "#customTextPopup .check input"
+  ).prop("checked");
   // if (customTextIsRandom && customText.length < 3) {
   //   showNotification("Random custom text requires at least 3 words", 4000);
   //   customTextIsRandom = false;
   // }
-  customTextWordCount = $("#customTextPopup .wordcount input").val();
+  TypingTest.Globals.customTextWordCount = $(
+    "#customTextPopup .wordcount input"
+  ).val();
   manualRestart = true;
   restartTest();
   // }
@@ -3892,29 +3799,6 @@ function hideCustomMode2Popup() {
         }
       );
   }
-}
-
-function playClickSound() {
-  if (UserConfig.config.playSoundOnClick === "off") return;
-  if (clickSounds === null) initClickSounds();
-
-  let rand = Math.floor(
-    Math.random() * clickSounds[UserConfig.config.playSoundOnClick].length
-  );
-  let randomSound = clickSounds[UserConfig.config.playSoundOnClick][rand];
-  randomSound.counter++;
-  if (randomSound.counter === 2) randomSound.counter = 0;
-  randomSound.sounds[randomSound.counter].currentTime = 0;
-  randomSound.sounds[randomSound.counter].play();
-
-  // clickSound.currentTime = 0;
-  // clickSound.play();
-}
-
-function playErrorSound() {
-  if (!UserConfig.config.playSoundOnError) return;
-  errorSound.currentTime = 0;
-  errorSound.play();
 }
 
 async function initPaceCaret(nosave = false) {
@@ -4433,17 +4317,17 @@ $(document).on("keypress", "#restartTestButton", (event) => {
       (UserConfig.config.mode === "time" && UserConfig.config.time < 3600) ||
       UserConfig.config.mode === "quote" ||
       (UserConfig.config.mode === "custom" &&
-        customTextIsRandom &&
-        customTextWordCount < 1000) ||
+        TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customTextWordCount < 1000) ||
       (UserConfig.config.mode === "custom" &&
-        !customTextIsRandom &&
-        customText.length < 1000)
+        !TypingTest.Globals.customTextIsRandom &&
+        TypingTest.Globals.customText.length < 1000)
     ) {
       if (testActive) {
         let testNow = Date.now();
         let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
         incompleteTestSeconds += testSeconds;
-        restartCount++;
+        TypingTest.Globals.restartCount++;
       }
       restartTest();
     } else {
@@ -4466,9 +4350,9 @@ function initPractiseMissedWords() {
       newCustomText.push(missedWord);
     }
   });
-  customText = newCustomText;
-  customTextIsRandom = true;
-  customTextWordCount = 50;
+  TypingTest.Globals.customText = newCustomText;
+  TypingTest.Globals.customTextIsRandom = true;
+  TypingTest.Globals.customTextWordCount = 50;
   let mode = modeBeforePractise === null ? currentMode : modeBeforePractise;
   modeBeforePractise = null;
   restartTest();
@@ -4709,12 +4593,12 @@ $(document).keydown(function (event) {
     thisCharCorrect = true;
   }
   if (thisCharCorrect) {
-    playClickSound();
+    ClickSound.playClickSound(UserConfig.config);
   } else {
     if (!UserConfig.config.playSoundOnError || UserConfig.config.blindMode) {
-      playClickSound();
+      ClickSound.playClickSound(UserConfig.config);
     } else {
-      playErrorSound();
+      ClickSound.playErrorSound(UserConfig.config);
     }
   }
   if (currentCorrected === "") {
@@ -4743,7 +4627,7 @@ $(document).keydown(function (event) {
       let testNow = Date.now();
       let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
       incompleteTestSeconds += testSeconds;
-      restartCount++;
+      TypingTest.Globals.restartCount++;
       return;
     } else {
       return;
@@ -4820,11 +4704,11 @@ window.addEventListener("beforeunload", (event) => {
     (UserConfig.config.mode === "time" && UserConfig.config.time < 3600) ||
     UserConfig.config.mode === "quote" ||
     (UserConfig.config.mode === "custom" &&
-      customTextIsRandom &&
-      customTextWordCount < 1000) ||
+      TypingTest.Globals.customTextIsRandom &&
+      TypingTest.Globals.customTextWordCount < 1000) ||
     (UserConfig.config.mode === "custom" &&
-      !customTextIsRandom &&
-      customText.length < 1000)
+      !TypingTest.Globals.customTextIsRandom &&
+      TypingTest.Globals.customText.length < 1000)
   ) {
   } else {
     if (testActive) {
@@ -4867,17 +4751,17 @@ $(document).keydown((event) => {
             UserConfig.config.time < 3600) ||
           UserConfig.config.mode === "quote" ||
           (UserConfig.config.mode === "custom" &&
-            customTextIsRandom &&
-            customTextWordCount < 1000) ||
+            TypingTest.Globals.customTextIsRandom &&
+            TypingTest.Globals.customTextWordCount < 1000) ||
           (UserConfig.config.mode === "custom" &&
-            !customTextIsRandom &&
-            customText.length < 1000)
+            !TypingTest.Globals.customTextIsRandom &&
+            TypingTest.Globals.customText.length < 1000)
         ) {
           if (testActive) {
             let testNow = Date.now();
             let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
             incompleteTestSeconds += testSeconds;
-            restartCount++;
+            TypingTest.Globals.restartCount++;
           }
           restartTest();
         } else {
@@ -5104,7 +4988,7 @@ $(document).keydown((event) => {
         updateCaretPosition();
         currentKeypress.count++;
         currentKeypress.words.push(currentWordIndex);
-        playClickSound();
+        ClickSound.playClickSound(UserConfig.config);
       } else {
         //incorrect word
         if (
@@ -5119,9 +5003,9 @@ $(document).keydown((event) => {
           !UserConfig.config.playSoundOnError ||
           UserConfig.config.blindMode
         ) {
-          playClickSound();
+          ClickSound.playClickSound(UserConfig.config);
         } else {
-          playErrorSound();
+          ClickSound.playErrorSound(UserConfig.config);
         }
         accuracyStats.incorrect++;
         let cil = currentInput.length;
@@ -5149,7 +5033,7 @@ $(document).keydown((event) => {
             let testNow = Date.now();
             let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
             incompleteTestSeconds += testSeconds;
-            restartCount++;
+            TypingTest.Globals.restartCount++;
             // }
             return;
           }
@@ -5173,7 +5057,7 @@ $(document).keydown((event) => {
           let testNow = Date.now();
           let testSeconds = Misc.roundTo2((testNow - testStart) / 1000);
           incompleteTestSeconds += testSeconds;
-          restartCount++;
+          TypingTest.Globals.restartCount++;
           // }
           return;
         } else if (currentWordIndex == wordsList.length) {
@@ -5240,6 +5124,7 @@ if (window.location.hostname === "localhost") {
 
 manualRestart = true;
 Config.loadConfigFromCookie();
+restartTest(false, true);
 Misc.getReleasesFromGitHub();
 Misc.getPatreonNames();
 

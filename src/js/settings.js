@@ -1,3 +1,4 @@
+import * as ClickSound from "./click-sound";
 import { UserData } from "./db";
 import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
@@ -211,7 +212,7 @@ settingsGroups.playSoundOnClick = new SettingsGroup(
   () => {
     if (UserConfig.config.playSoundOnClick !== "off")
       // clickSounds[config.playSoundOnClick][0].sounds[0].play();
-      playClickSound();
+      ClickSound.playClickSound(UserConfig.config);
   }
 );
 settingsGroups.showAllLines = new SettingsGroup(

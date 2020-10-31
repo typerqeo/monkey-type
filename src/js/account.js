@@ -3,6 +3,7 @@ import * as FirebaseFunctions from "./firebase-functions";
 import * as Misc from "./misc";
 import * as Settings from "./settings";
 import * as Util from "./util";
+import * as TypingTest from "./typing-test";
 import * as Config from "./userconfig";
 const UserConfig = Config.UserConfig;
 
@@ -904,22 +905,32 @@ function updateHoverChart(filteredId) {
   hoverChart.data.datasets[1].data = data.raw;
   hoverChart.data.datasets[2].data = data.err;
 
-  hoverChart.options.scales.xAxes[0].ticks.minor.fontColor = themeColors.sub;
-  hoverChart.options.scales.xAxes[0].scaleLabel.fontColor = themeColors.sub;
-  hoverChart.options.scales.yAxes[0].ticks.minor.fontColor = themeColors.sub;
-  hoverChart.options.scales.yAxes[2].ticks.minor.fontColor = themeColors.sub;
-  hoverChart.options.scales.yAxes[0].scaleLabel.fontColor = themeColors.sub;
-  hoverChart.options.scales.yAxes[2].scaleLabel.fontColor = themeColors.sub;
+  hoverChart.options.scales.xAxes[0].ticks.minor.fontColor =
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.scales.xAxes[0].scaleLabel.fontColor =
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.scales.yAxes[0].ticks.minor.fontColor =
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.scales.yAxes[2].ticks.minor.fontColor =
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.scales.yAxes[0].scaleLabel.fontColor =
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.scales.yAxes[2].scaleLabel.fontColor =
+    TypingTest.Globals.themeColors.sub;
 
-  hoverChart.data.datasets[0].borderColor = themeColors.main;
-  hoverChart.data.datasets[0].pointBackgroundColor = themeColors.main;
-  hoverChart.data.datasets[1].borderColor = themeColors.sub;
-  hoverChart.data.datasets[1].pointBackgroundColor = themeColors.sub;
+  hoverChart.data.datasets[0].borderColor = TypingTest.Globals.themeColors.main;
+  hoverChart.data.datasets[0].pointBackgroundColor =
+    TypingTest.Globals.themeColors.main;
+  hoverChart.data.datasets[1].borderColor = TypingTest.Globals.themeColors.sub;
+  hoverChart.data.datasets[1].pointBackgroundColor =
+    TypingTest.Globals.themeColors.sub;
 
-  hoverChart.options.annotation.annotations[0].borderColor = themeColors.sub;
+  hoverChart.options.annotation.annotations[0].borderColor =
+    TypingTest.Globals.themeColors.sub;
   hoverChart.options.annotation.annotations[0].label.backgroundColor =
-    themeColors.sub;
-  hoverChart.options.annotation.annotations[0].label.fontColor = themeColors.bg;
+    TypingTest.Globals.themeColors.sub;
+  hoverChart.options.annotation.annotations[0].label.fontColor =
+    TypingTest.Globals.themeColors.bg;
 
   let maxChartVal = Math.max(...[Math.max(...data.wpm), Math.max(...data.raw)]);
   let minChartVal = Math.min(...[Math.min(...data.wpm), Math.min(...data.raw)]);
@@ -2283,44 +2294,54 @@ export function refreshAccountPage() {
     // console.log(activityChartData);
 
     activityChart.options.scales.xAxes[0].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     activityChart.options.scales.yAxes[0].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     activityChart.options.scales.yAxes[0].scaleLabel.fontColor =
-      themeColors.sub;
-    activityChart.data.datasets[0].borderColor = themeColors.main;
-    activityChart.data.datasets[0].backgroundColor = themeColors.main;
+      TypingTest.Globals.themeColors.sub;
+    activityChart.data.datasets[0].borderColor =
+      TypingTest.Globals.themeColors.main;
+    activityChart.data.datasets[0].backgroundColor =
+      TypingTest.Globals.themeColors.main;
 
-    activityChart.options.legend.labels.fontColor = themeColors.sub;
-    activityChart.data.datasets[0].trendlineLinear.style = themeColors.sub;
+    activityChart.options.legend.labels.fontColor =
+      TypingTest.Globals.themeColors.sub;
+    activityChart.data.datasets[0].trendlineLinear.style =
+      TypingTest.Globals.themeColors.sub;
 
     activityChart.data.datasets[0].data = activityChartData_amount;
 
     activityChart.options.scales.yAxes[1].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     activityChart.options.scales.yAxes[1].scaleLabel.fontColor =
-      themeColors.sub;
-    activityChart.data.datasets[1].borderColor = themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
+    activityChart.data.datasets[1].borderColor =
+      TypingTest.Globals.themeColors.sub;
     // activityChart.data.datasets[1].backgroundColor = themeColors.main;
     activityChart.data.datasets[1].data = activityChartData_avgWpm;
 
-    activityChart.options.legend.labels.fontColor = themeColors.sub;
+    activityChart.options.legend.labels.fontColor =
+      TypingTest.Globals.themeColors.sub;
 
     resultHistoryChart.options.scales.xAxes[0].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     resultHistoryChart.options.scales.yAxes[0].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     resultHistoryChart.options.scales.yAxes[0].scaleLabel.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     resultHistoryChart.options.scales.yAxes[1].ticks.minor.fontColor =
-      themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
     resultHistoryChart.options.scales.yAxes[1].scaleLabel.fontColor =
-      themeColors.sub;
-    resultHistoryChart.data.datasets[0].borderColor = themeColors.main;
-    resultHistoryChart.data.datasets[1].borderColor = themeColors.sub;
+      TypingTest.Globals.themeColors.sub;
+    resultHistoryChart.data.datasets[0].borderColor =
+      TypingTest.Globals.themeColors.main;
+    resultHistoryChart.data.datasets[1].borderColor =
+      TypingTest.Globals.themeColors.sub;
 
-    resultHistoryChart.options.legend.labels.fontColor = themeColors.sub;
-    resultHistoryChart.data.datasets[0].trendlineLinear.style = themeColors.sub;
+    resultHistoryChart.options.legend.labels.fontColor =
+      TypingTest.Globals.themeColors.sub;
+    resultHistoryChart.data.datasets[0].trendlineLinear.style =
+      TypingTest.Globals.themeColors.sub;
 
     resultHistoryChart.data.datasets[0].data = chartData;
     resultHistoryChart.data.datasets[1].data = accChartData;

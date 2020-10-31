@@ -1,8 +1,10 @@
+import * as ClickSound from "./click-sound";
 import { UserData } from "./db";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Util from "./util";
 import * as Settings from "./settings";
+import * as TypingTest from "./typing-test";
 import * as Config from "./userconfig";
 const defaultConfig = Config.defaultConfig;
 const UserConfig = Config.UserConfig;
@@ -561,11 +563,11 @@ let commands = {
               exec: () => {
                 if (
                   (UserConfig.config.mode === "custom" &&
-                    customTextIsRandom &&
-                    customTextWordCount >= 5000) ||
+                    TypingTest.Globals.customTextIsRandom &&
+                    TypingTest.Globals.customTextWordCount >= 5000) ||
                   (UserConfig.config.mode === "custom" &&
-                    !customTextIsRandom &&
-                    customText.length >= 5000) ||
+                    !TypingTest.Globals.customTextIsRandom &&
+                    TypingTest.Globals.customText.length >= 5000) ||
                   (UserConfig.config.mode === "words" &&
                     UserConfig.config.words >= 5000) ||
                   UserConfig.config.words === 0 ||
@@ -573,7 +575,7 @@ let commands = {
                     (UserConfig.config.time >= 3600 ||
                       UserConfig.config.time === 0))
                 ) {
-                  bailout = true;
+                  TypingTest.Globals.bailout = true;
                   showResult();
                 } else {
                   Util.showNotification(
@@ -681,7 +683,7 @@ let commandsSoundOnClick = {
       display: "1",
       exec: () => {
         Config.setPlaySoundOnClick("1");
-        playClickSound();
+        ClickSound.playClickSound(UserConfig.config);
       },
     },
     {
@@ -689,7 +691,7 @@ let commandsSoundOnClick = {
       display: "2",
       exec: () => {
         Config.setPlaySoundOnClick("2");
-        playClickSound();
+        ClickSound.playClickSound(UserConfig.config);
       },
     },
     {
@@ -697,7 +699,7 @@ let commandsSoundOnClick = {
       display: "3",
       exec: () => {
         Config.setPlaySoundOnClick("3");
-        playClickSound();
+        ClickSound.playClickSound(UserConfig.config);
       },
     },
     {
@@ -705,7 +707,7 @@ let commandsSoundOnClick = {
       display: "4",
       exec: () => {
         Config.setPlaySoundOnClick("4");
-        playClickSound();
+        ClickSound.playClickSound(UserConfig.config);
       },
     },
   ],
