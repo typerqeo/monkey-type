@@ -1,4 +1,5 @@
 import { UserData } from "./db";
+import * as FirebaseFunctions from "./firebase-functions";
 import { layouts } from "./layouts";
 import * as Misc from "./misc";
 import * as Util from "./util";
@@ -496,7 +497,7 @@ function hideCustomThemeShare() {
       UserConfig.config.customThemeColors = defaultConfig.customThemeColors;
     }
     setCustomThemeInputs();
-    applyCustomThemeColors();
+    Config.applyCustomThemeColors();
     $("#customThemeShareWrapper input").val("");
     $("#customThemeShareWrapper")
       .stop(true, true)
@@ -753,7 +754,9 @@ $(
   ".pageSettings .section.discordIntegration .buttons .generateCodeButton"
 ).click((e) => {
   Util.showBackgroundLoader();
-  generatePairingCode({ uid: firebase.auth().currentUser.uid })
+  FirebaseFunctions.generatePairingCode({
+    uid: firebase.auth().currentUser.uid,
+  })
     .then((ret) => {
       Util.hideBackgroundLoader();
       if (ret.data.status === 1 || ret.data.status === 2) {
@@ -777,7 +780,9 @@ $(".pageSettings .section.discordIntegration #unlinkDiscordButton").click(
   (e) => {
     if (confirm("Are you sure?")) {
       Util.showBackgroundLoader();
-      unlinkDiscord({ uid: firebase.auth().currentUser.uid }).then((ret) => {
+      FirebaseFunctions.unlinkDiscord({
+        uid: firebase.auth().currentUser.uid,
+      }).then((ret) => {
         Util.hideBackgroundLoader();
         console.log(ret);
         if (ret.data.status === 1) {
@@ -859,16 +864,16 @@ $(".pageSettings .section.themes .tabs .button").click((e) => {
   $target.addClass("active");
   setCustomThemeInputs();
   if ($target.attr("tab") == "preset") {
-    setCustomTheme(false, true);
-    applyCustomThemeColors();
+    Config.setCustomTheme(false, true);
+    Config.applyCustomThemeColors();
     swapElements(
       $('.pageSettings .section.themes .tabContainer [tabContent="custom"]'),
       $('.pageSettings .section.themes .tabContainer [tabContent="preset"]'),
       250
     );
   } else {
-    setCustomTheme(true, true);
-    applyCustomThemeColors();
+    Config.setCustomTheme(true, true);
+    Config.applyCustomThemeColors();
     swapElements(
       $('.pageSettings .section.themes .tabContainer [tabContent="preset"]'),
       $('.pageSettings .section.themes .tabContainer [tabContent="custom"]'),
@@ -880,7 +885,7 @@ $(".pageSettings .section.themes .tabs .button").click((e) => {
 $(
   ".pageSettings .section.themes .tabContainer .customTheme input[type=color]"
 ).on("input", (e) => {
-  setCustomTheme(true, true);
+  Config.setCustomTheme(true, true);
   let $colorVar = $(e.currentTarget).attr("id");
   let $pickedColor = $(e.currentTarget).val();
 
@@ -939,7 +944,7 @@ $(".pageSettings #loadCustomColorsFromPreset").click((e) => {
 
 $("#resetSettingsButton").click((e) => {
   if (confirm("Press OK to confirm.")) {
-    resetConfig();
+    Config.resetConfig();
     setTimeout(() => {
       location.reload();
     }, 1000);

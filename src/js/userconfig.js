@@ -121,7 +121,7 @@ async function saveConfigToDB() {
   }
 }
 
-function resetConfig() {
+export function resetConfig() {
   UserConfig.config = {
     ...defaultConfig,
   };
@@ -1084,7 +1084,7 @@ export function setRandomTheme(val, nosave) {
 //   saveConfigToCookie();
 // }
 
-function setCustomTheme(boolean, nosave) {
+export function setCustomTheme(boolean, nosave) {
   if (boolean !== undefined) UserConfig.config.customTheme = boolean;
   // setCustomThemeColors(config.customThemeColors, nosave);
   if (!nosave) saveConfigToCookie();

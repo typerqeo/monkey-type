@@ -2302,7 +2302,7 @@ function showResult(difficultyFailed = false) {
                       dontShowDailyDiff = true;
                       dailyLbDiff = dlbMemory - dlb.insertedAt;
                       updateLbMemory(
-                        config.mode,
+                        UserConfig.config.mode,
                         mode2,
                         "daily",
                         dlb.insertedAt
@@ -2312,7 +2312,7 @@ function showResult(difficultyFailed = false) {
                       if (dlb.newBest) {
                         dailyLbDiff = dlbMemory - dlb.insertedAt;
                         updateLbMemory(
-                          config.mode,
+                          UserConfig.config.mode,
                           mode2,
                           "daily",
                           dlb.insertedAt
@@ -2322,7 +2322,7 @@ function showResult(difficultyFailed = false) {
                       } else {
                         dailyLbDiff = dlbMemory - dlb.foundAt;
                         updateLbMemory(
-                          config.mode,
+                          UserConfig.config.mode,
                           mode2,
                           "daily",
                           dlb.foundAt
@@ -5268,9 +5268,9 @@ $(document).ready(() => {
           );
           UserConfig.config.customThemeColors = defaultConfig.customThemeColors;
         }
-        setCustomTheme(true);
+        Config.setCustomTheme(true);
         setCustomThemeInputs();
-        applyCustomThemeColors();
+        Config.applyCustomThemeColors();
       }
       if (window.location.pathname === "/verify") {
         const fragment = new URLSearchParams(window.location.hash.slice(1));
