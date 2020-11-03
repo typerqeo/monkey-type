@@ -547,14 +547,6 @@ async function initWords() {
   showWords();
 }
 
-function arrangeCharactersRightToLeft() {
-  $("#words").addClass("rightToLeftTest");
-}
-
-function arrangeCharactersLeftToRight() {
-  $("#words").removeClass("rightToLeftTest");
-}
-
 function emulateLayout(event) {
   function emulatedLayoutShouldShiftKey(event, newKeyPreview) {
     if (config.capsLockBackspace) return event.shiftKey;

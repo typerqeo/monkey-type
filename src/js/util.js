@@ -175,3 +175,11 @@ function swapElements(
     callback();
   }
 }
+
+function arrangeCharactersRightToLeft() {
+  $("#words").addClass("rightToLeftTest");
+}
+
+function arrangeCharactersLeftToRight() {
+  $("#words").removeClass("rightToLeftTest");
+}
