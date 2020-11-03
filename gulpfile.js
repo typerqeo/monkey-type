@@ -8,6 +8,7 @@ sass.compiler = require("dart-sass");
 
 //the order of files is important
 const gulpSrc = [
+  "./src/js/util.js",
   "./src/js/firebase-functions.js",
   "./src/js/simple-popup.js",
   "./src/js/misc.js",
