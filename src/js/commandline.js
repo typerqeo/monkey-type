@@ -1,3 +1,42 @@
+function hideCommandLine() {
+  $("#commandLineWrapper")
+    .stop(true, true)
+    .css("opacity", 1)
+    .animate(
+      {
+        opacity: 0,
+      },
+      100,
+      () => {
+        $("#commandLineWrapper").addClass("hidden");
+        $("#commandLine").removeClass("allCommands");
+        focusWords();
+      }
+    );
+  focusWords();
+}
+
+let showCommandLine = () => {
+  setFocus(false);
+  $("#commandLine").removeClass("hidden");
+  $("#commandInput").addClass("hidden");
+  if ($("#commandLineWrapper").hasClass("hidden")) {
+    $("#commandLineWrapper")
+      .stop(true, true)
+      .css("opacity", 0)
+      .removeClass("hidden")
+      .animate(
+        {
+          opacity: 1,
+        },
+        100
+      );
+  }
+  $("#commandLine input").val("");
+  updateSuggestedCommands();
+  $("#commandLine input").focus();
+};
+
 let currentCommands = [];
 
 let commands = {
@@ -1838,45 +1877,6 @@ function triggerCommand(command) {
     hideCommandLine();
   }
 }
-
-function hideCommandLine() {
-  $("#commandLineWrapper")
-    .stop(true, true)
-    .css("opacity", 1)
-    .animate(
-      {
-        opacity: 0,
-      },
-      100,
-      () => {
-        $("#commandLineWrapper").addClass("hidden");
-        $("#commandLine").removeClass("allCommands");
-        focusWords();
-      }
-    );
-  focusWords();
-}
-
-let showCommandLine = () => {
-  setFocus(false);
-  $("#commandLine").removeClass("hidden");
-  $("#commandInput").addClass("hidden");
-  if ($("#commandLineWrapper").hasClass("hidden")) {
-    $("#commandLineWrapper")
-      .stop(true, true)
-      .css("opacity", 0)
-      .removeClass("hidden")
-      .animate(
-        {
-          opacity: 1,
-        },
-        100
-      );
-  }
-  $("#commandLine input").val("");
-  updateSuggestedCommands();
-  $("#commandLine input").focus();
-};
 
 function showCommandInput(command, placeholder) {
   $("#commandLineWrapper").removeClass("hidden");
