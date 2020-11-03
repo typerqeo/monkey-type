@@ -121,140 +121,6 @@ async function saveConfigToCookie(noDbCheck = false) {
   if (!noDbCheck) await saveConfigToDB();
 }
 
-function applyConfig(configObj) {
-  if (configObj && configObj != null && configObj != "null") {
-    setTheme(configObj.theme, true);
-    setCustomTheme(configObj.customTheme, true);
-    setCustomThemeColors(configObj.customThemeColors, true);
-    setQuickTabMode(configObj.quickTab, true);
-    setKeyTips(configObj.showKeyTips, true);
-    changeTimeConfig(configObj.time, true);
-    changeQuoteLength(configObj.quoteLength, true);
-    changeWordCount(configObj.words, true);
-    changeLanguage(configObj.language, true);
-    setCapsLockBackspace(configObj.capsLockBackspace, true);
-    changeSavedLayout(configObj.savedLayout, true);
-    changeFontSize(configObj.fontSize, true);
-    setFreedomMode(configObj.freedomMode, true);
-    setCaretStyle(configObj.caretStyle, true);
-    setPaceCaretStyle(configObj.paceCaretStyle, true);
-    setDifficulty(configObj.difficulty, true);
-    setBlindMode(configObj.blindMode, true);
-    setQuickEnd(configObj.quickEnd, true);
-    // setReadAheadMode(configObj.readAheadMode, true);
-    setFlipTestColors(configObj.flipTestColors, true);
-    setColorfulMode(configObj.colorfulMode, true);
-    setConfidenceMode(configObj.confidenceMode, true);
-    setIndicateTypos(configObj.indicateTypos, true);
-    setTimerStyle(configObj.timerStyle, true);
-    setTimerColor(configObj.timerColor, true);
-    setTimerOpacity(configObj.timerOpacity, true);
-    changeKeymapMode(configObj.keymapMode, true);
-    changeKeymapStyle(configObj.keymapStyle, true);
-    changeKeymapLayout(configObj.keymapLayout, true);
-    setFontFamily(configObj.fontFamily, true);
-    setSmoothCaret(configObj.smoothCaret, true);
-    setSmoothLineScroll(configObj.smoothLineScroll, true);
-    setShowLiveWpm(configObj.showLiveWpm, true);
-    setShowTimerProgress(configObj.showTimerProgress, true);
-    setAlwaysShowDecimalPlaces(configObj.alwaysShowDecimalPlaces, true);
-    setAlwaysShowWordsHistory(configObj.alwaysShowWordsHistory, true);
-    setSingleListCommandLine(configObj.singleListCommandLine, true);
-    setPlaySoundOnError(configObj.playSoundOnError, true);
-    setPlaySoundOnClick(configObj.playSoundOnClick, true);
-    setStopOnError(configObj.stopOnError, true);
-    setFavThemes(configObj.favThemes, true);
-    setRandomTheme(configObj.randomTheme, true);
-    setShowAllLines(configObj.showAllLines, true);
-    setSwapEscAndTab(configObj.swapEscAndTab, true);
-    setShowOutOfFocusWarning(configObj.showOutOfFocusWarning, true);
-    setPaceCaret(configObj.paceCaret, true);
-    setPaceCaretCustomSpeed(configObj.paceCaretCustomSpeed, true);
-    setPageWidth(configObj.pageWidth, true);
-    setChartAccuracy(configObj.chartAccuracy, true);
-    setChartStyle(configObj.chartStyle, true);
-    setMinWpm(configObj.minWpm, true);
-    setMinWpmCustomSpeed(configObj.minWpmCustomSpeed, true);
-    setNumbers(configObj.numbers, true);
-    setPunctuation(configObj.punctuation, true);
-    setHighlightMode(configObj.highlightMode, true);
-    setAlwaysShowCPM(configObj.alwaysShowCPM, true);
-    changeMode(configObj.mode, true);
-    config.startGraphsAtZero = configObj.startGraphsAtZero;
-    // if (
-    //   configObj.resultFilters !== null &&
-    //   configObj.resultFilters !== undefined
-    // ) {
-    //   accountFilters = configObj.resultFilters;
-    // }
-    // config = configObj;
-
-    try {
-      setEnableAds(configObj.enableAds, true);
-      if (config.enableAds === "on") {
-        $("#ad1").removeClass("hidden");
-        $("#ad1")
-          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-        <!-- Horizontal Ad -->
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:850px;height:90px"
-             data-ad-client="ca-pub-7261919841327810"
-             data-ad-slot="2225821478"></ins>`);
-        const adsbygoogle = window.adsbygoogle || [];
-        adsbygoogle.push({});
-      } else if (config.enableAds === "max") {
-        $("#ad1").removeClass("hidden");
-        $("#ad2").removeClass("hidden");
-        $("#ad3").removeClass("hidden");
-        $("#ad1").html(`<script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-      ></script>
-      <!-- Horizontal Ad -->
-      <ins
-        class="adsbygoogle"
-        style="display: inline-block; width: 1000px; height: 90px"
-        data-ad-client="ca-pub-7261919841327810"
-        data-ad-slot="2225821478"
-      ></ins>`);
-        $("#ad2")
-          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-        <!-- Vertical 1 -->
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:160px;height:600px"
-             data-ad-client="ca-pub-7261919841327810"
-             data-ad-slot="6376286644"></ins>`);
-        $("#ad3")
-          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-        <!-- Vertical 2 -->
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:160px;height:600px"
-             data-ad-client="ca-pub-7261919841327810"
-             data-ad-slot="1159796595"></ins>`);
-        const adsbygoogle = window.adsbygoogle || [];
-        adsbygoogle.push({});
-        adsbygoogle.push({});
-        adsbygoogle.push({});
-      } else {
-        $("#ad1").remove();
-        $("#ad2").remove();
-        $("#ad3").remove();
-      }
-    } catch (e) {
-      console.log("error initialising ads " + e.message);
-      $("#ad1").remove();
-      $("#ad2").remove();
-      $("#ad3").remove();
-    }
-  }
-  Object.keys(defaultConfig).forEach((configKey) => {
-    if (config[configKey] == undefined) {
-      config[configKey] = defaultConfig[configKey];
-    }
-  });
-  updateTestModesNotice();
-}
-
 function resetConfig() {
   config = {
     ...defaultConfig,
@@ -1151,6 +1017,140 @@ function setCustomThemeColors(colors, nosave) {
     applyCustomThemeColors();
   }
   if (!nosave) saveConfigToCookie();
+}
+
+function applyConfig(configObj) {
+  if (configObj && configObj != null && configObj != "null") {
+    setTheme(configObj.theme, true);
+    setCustomTheme(configObj.customTheme, true);
+    setCustomThemeColors(configObj.customThemeColors, true);
+    setQuickTabMode(configObj.quickTab, true);
+    setKeyTips(configObj.showKeyTips, true);
+    changeTimeConfig(configObj.time, true);
+    changeQuoteLength(configObj.quoteLength, true);
+    changeWordCount(configObj.words, true);
+    changeLanguage(configObj.language, true);
+    setCapsLockBackspace(configObj.capsLockBackspace, true);
+    changeSavedLayout(configObj.savedLayout, true);
+    changeFontSize(configObj.fontSize, true);
+    setFreedomMode(configObj.freedomMode, true);
+    setCaretStyle(configObj.caretStyle, true);
+    setPaceCaretStyle(configObj.paceCaretStyle, true);
+    setDifficulty(configObj.difficulty, true);
+    setBlindMode(configObj.blindMode, true);
+    setQuickEnd(configObj.quickEnd, true);
+    // setReadAheadMode(configObj.readAheadMode, true);
+    setFlipTestColors(configObj.flipTestColors, true);
+    setColorfulMode(configObj.colorfulMode, true);
+    setConfidenceMode(configObj.confidenceMode, true);
+    setIndicateTypos(configObj.indicateTypos, true);
+    setTimerStyle(configObj.timerStyle, true);
+    setTimerColor(configObj.timerColor, true);
+    setTimerOpacity(configObj.timerOpacity, true);
+    changeKeymapMode(configObj.keymapMode, true);
+    changeKeymapStyle(configObj.keymapStyle, true);
+    changeKeymapLayout(configObj.keymapLayout, true);
+    setFontFamily(configObj.fontFamily, true);
+    setSmoothCaret(configObj.smoothCaret, true);
+    setSmoothLineScroll(configObj.smoothLineScroll, true);
+    setShowLiveWpm(configObj.showLiveWpm, true);
+    setShowTimerProgress(configObj.showTimerProgress, true);
+    setAlwaysShowDecimalPlaces(configObj.alwaysShowDecimalPlaces, true);
+    setAlwaysShowWordsHistory(configObj.alwaysShowWordsHistory, true);
+    setSingleListCommandLine(configObj.singleListCommandLine, true);
+    setPlaySoundOnError(configObj.playSoundOnError, true);
+    setPlaySoundOnClick(configObj.playSoundOnClick, true);
+    setStopOnError(configObj.stopOnError, true);
+    setFavThemes(configObj.favThemes, true);
+    setRandomTheme(configObj.randomTheme, true);
+    setShowAllLines(configObj.showAllLines, true);
+    setSwapEscAndTab(configObj.swapEscAndTab, true);
+    setShowOutOfFocusWarning(configObj.showOutOfFocusWarning, true);
+    setPaceCaret(configObj.paceCaret, true);
+    setPaceCaretCustomSpeed(configObj.paceCaretCustomSpeed, true);
+    setPageWidth(configObj.pageWidth, true);
+    setChartAccuracy(configObj.chartAccuracy, true);
+    setChartStyle(configObj.chartStyle, true);
+    setMinWpm(configObj.minWpm, true);
+    setMinWpmCustomSpeed(configObj.minWpmCustomSpeed, true);
+    setNumbers(configObj.numbers, true);
+    setPunctuation(configObj.punctuation, true);
+    setHighlightMode(configObj.highlightMode, true);
+    setAlwaysShowCPM(configObj.alwaysShowCPM, true);
+    changeMode(configObj.mode, true);
+    config.startGraphsAtZero = configObj.startGraphsAtZero;
+    // if (
+    //   configObj.resultFilters !== null &&
+    //   configObj.resultFilters !== undefined
+    // ) {
+    //   accountFilters = configObj.resultFilters;
+    // }
+    // config = configObj;
+
+    try {
+      setEnableAds(configObj.enableAds, true);
+      if (config.enableAds === "on") {
+        $("#ad1").removeClass("hidden");
+        $("#ad1")
+          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Horizontal Ad -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:850px;height:90px"
+             data-ad-client="ca-pub-7261919841327810"
+             data-ad-slot="2225821478"></ins>`);
+        const adsbygoogle = window.adsbygoogle || [];
+        adsbygoogle.push({});
+      } else if (config.enableAds === "max") {
+        $("#ad1").removeClass("hidden");
+        $("#ad2").removeClass("hidden");
+        $("#ad3").removeClass("hidden");
+        $("#ad1").html(`<script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      ></script>
+      <!-- Horizontal Ad -->
+      <ins
+        class="adsbygoogle"
+        style="display: inline-block; width: 1000px; height: 90px"
+        data-ad-client="ca-pub-7261919841327810"
+        data-ad-slot="2225821478"
+      ></ins>`);
+        $("#ad2")
+          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Vertical 1 -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-7261919841327810"
+             data-ad-slot="6376286644"></ins>`);
+        $("#ad3")
+          .html(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Vertical 2 -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-7261919841327810"
+             data-ad-slot="1159796595"></ins>`);
+        const adsbygoogle = window.adsbygoogle || [];
+        adsbygoogle.push({});
+        adsbygoogle.push({});
+        adsbygoogle.push({});
+      } else {
+        $("#ad1").remove();
+        $("#ad2").remove();
+        $("#ad3").remove();
+      }
+    } catch (e) {
+      console.log("error initialising ads " + e.message);
+      $("#ad1").remove();
+      $("#ad2").remove();
+      $("#ad3").remove();
+    }
+  }
+  Object.keys(defaultConfig).forEach((configKey) => {
+    if (config[configKey] == undefined) {
+      config[configKey] = defaultConfig[configKey];
+    }
+  });
+  updateTestModesNotice();
 }
 
 function applyCustomThemeColors() {
