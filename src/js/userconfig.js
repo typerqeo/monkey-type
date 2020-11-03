@@ -1019,6 +1019,18 @@ function setCustomThemeColors(colors, nosave) {
   if (!nosave) saveConfigToCookie();
 }
 
+function setCapsLockBackspace(capsLockBackspace, nosave) {
+  if (capsLockBackspace === null || capsLockBackspace === undefined) {
+    capsLockBackspace = false;
+  }
+  config.capsLockBackspace = capsLockBackspace;
+  if (!nosave) saveConfigToCookie();
+}
+
+function toggleCapsLockBackspace() {
+  setCapsLockBackspace(!config.capsLockBackspace, false);
+}
+
 function applyConfig(configObj) {
   if (configObj && configObj != null && configObj != "null") {
     setTheme(configObj.theme, true);
@@ -1254,18 +1266,6 @@ function changeLanguage(language, nosave) {
     console.log("Analytics unavailable");
   }
   if (!nosave) saveConfigToCookie();
-}
-
-function setCapsLockBackspace(capsLockBackspace, nosave) {
-  if (capsLockBackspace === null || capsLockBackspace === undefined) {
-    capsLockBackspace = false;
-  }
-  config.capsLockBackspace = capsLockBackspace;
-  if (!nosave) saveConfigToCookie();
-}
-
-function toggleCapsLockBackspace() {
-  setCapsLockBackspace(!config.capsLockBackspace, false);
 }
 
 function changeLayout(layout, nosave) {
