@@ -1857,6 +1857,35 @@ function showLiveWpm() {
   // }
 }
 
+function liveWpmAndRaw() {
+  let chars = 0;
+  let correctWordChars = 0;
+  let spaces = 0;
+  for (let i = 0; i < inputHistory.length; i++) {
+    if (inputHistory[i] == wordsList[i]) {
+      //the word is correct
+      //+1 for space
+      correctWordChars += wordsList[i].length;
+      if (i < inputHistory.length - 1) {
+        spaces++;
+      }
+    }
+    chars += inputHistory[i].length;
+  }
+  if (wordsList[currentWordIndex] === currentInput) {
+    correctWordChars += currentInput.length;
+  }
+  chars += currentInput.length;
+  let testNow = Date.now();
+  let testSeconds = (testNow - testStart) / 1000;
+  let wpm = Math.round(((correctWordChars + spaces) * (60 / testSeconds)) / 5);
+  let raw = Math.round(((chars + spaces) * (60 / testSeconds)) / 5);
+  return {
+    wpm: wpm,
+    raw: raw,
+  };
+}
+
 let resultCalculating = false;
 function showResult(difficultyFailed = false) {
   resultCalculating = true;
@@ -3250,35 +3279,6 @@ function changeMode(mode, nosave) {
 //   raw = (chars * (60 / testSeconds)) / 5;
 //   return Math.round(raw);
 // }
-
-function liveWpmAndRaw() {
-  let chars = 0;
-  let correctWordChars = 0;
-  let spaces = 0;
-  for (let i = 0; i < inputHistory.length; i++) {
-    if (inputHistory[i] == wordsList[i]) {
-      //the word is correct
-      //+1 for space
-      correctWordChars += wordsList[i].length;
-      if (i < inputHistory.length - 1) {
-        spaces++;
-      }
-    }
-    chars += inputHistory[i].length;
-  }
-  if (wordsList[currentWordIndex] === currentInput) {
-    correctWordChars += currentInput.length;
-  }
-  chars += currentInput.length;
-  let testNow = Date.now();
-  let testSeconds = (testNow - testStart) / 1000;
-  let wpm = Math.round(((correctWordChars + spaces) * (60 / testSeconds)) / 5);
-  let raw = Math.round(((chars + spaces) * (60 / testSeconds)) / 5);
-  return {
-    wpm: wpm,
-    raw: raw,
-  };
-}
 
 function updateLiveWpm(wpm, raw) {
   if (!testActive || !config.showLiveWpm) {
