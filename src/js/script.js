@@ -2750,6 +2750,25 @@ function showResult(difficultyFailed = false) {
   });
 }
 
+function updateLiveWpm(wpm, raw) {
+  if (!testActive || !config.showLiveWpm) {
+    hideLiveWpm();
+  } else {
+    showLiveWpm();
+  }
+  // let wpmstring = wpm < 100 ? `&nbsp;${wpm}` : `${wpm}`;
+  let number = wpm;
+  if (config.blindMode) {
+    number = raw;
+  }
+  if (config.alwaysShowCPM) {
+    number = Math.round(number * 5);
+  }
+  document.querySelector("#miniTimerAndLiveWpm .wpm").innerHTML = number;
+  document.querySelector("#liveWpm").innerHTML = number;
+  // $("#liveWpm").html(wpm);
+}
+
 function startTest() {
   if (!dbConfigLoaded) {
     // console.log("config changed before db loaded!");
@@ -3279,25 +3298,6 @@ function changeMode(mode, nosave) {
 //   raw = (chars * (60 / testSeconds)) / 5;
 //   return Math.round(raw);
 // }
-
-function updateLiveWpm(wpm, raw) {
-  if (!testActive || !config.showLiveWpm) {
-    hideLiveWpm();
-  } else {
-    showLiveWpm();
-  }
-  // let wpmstring = wpm < 100 ? `&nbsp;${wpm}` : `${wpm}`;
-  let number = wpm;
-  if (config.blindMode) {
-    number = raw;
-  }
-  if (config.alwaysShowCPM) {
-    number = Math.round(number * 5);
-  }
-  document.querySelector("#miniTimerAndLiveWpm .wpm").innerHTML = number;
-  document.querySelector("#liveWpm").innerHTML = number;
-  // $("#liveWpm").html(wpm);
-}
 
 function updateAccountLoginButton() {
   if (firebase.auth().currentUser != null) {
