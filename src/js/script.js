@@ -3319,37 +3319,6 @@ function updateAccountLoginButton() {
   }
 }
 
-function toggleResultWordsDisplay() {
-  if (resultVisible) {
-    if ($("#resultWordsHistory").stop(true, true).hasClass("hidden")) {
-      //show
-
-      if (!$("#showWordHistoryButton").hasClass("loaded")) {
-        $("#words").html(
-          `<div class="preloader"><i class="fas fa-fw fa-spin fa-circle-notch"></i></div>`
-        );
-        loadWordsHistory().then(() => {
-          $("#resultWordsHistory")
-            .removeClass("hidden")
-            .css("display", "none")
-            .slideDown(250);
-        });
-      } else {
-        $("#resultWordsHistory")
-          .removeClass("hidden")
-          .css("display", "none")
-          .slideDown(250);
-      }
-    } else {
-      //hide
-
-      $("#resultWordsHistory").slideUp(250, () => {
-        $("#resultWordsHistory").addClass("hidden");
-      });
-    }
-  }
-}
-
 async function loadWordsHistory() {
   $("#resultWordsHistory .words").empty();
   // inputHistory.forEach((input, index) => {
@@ -3469,6 +3438,37 @@ async function loadWordsHistory() {
   }
   $("#showWordHistoryButton").addClass("loaded");
   return true;
+}
+
+function toggleResultWordsDisplay() {
+  if (resultVisible) {
+    if ($("#resultWordsHistory").stop(true, true).hasClass("hidden")) {
+      //show
+
+      if (!$("#showWordHistoryButton").hasClass("loaded")) {
+        $("#words").html(
+          `<div class="preloader"><i class="fas fa-fw fa-spin fa-circle-notch"></i></div>`
+        );
+        loadWordsHistory().then(() => {
+          $("#resultWordsHistory")
+            .removeClass("hidden")
+            .css("display", "none")
+            .slideDown(250);
+        });
+      } else {
+        $("#resultWordsHistory")
+          .removeClass("hidden")
+          .css("display", "none")
+          .slideDown(250);
+      }
+    } else {
+      //hide
+
+      $("#resultWordsHistory").slideUp(250, () => {
+        $("#resultWordsHistory").addClass("hidden");
+      });
+    }
+  }
 }
 
 // function applyReadAheadMode(tc) {
