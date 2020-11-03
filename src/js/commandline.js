@@ -1663,6 +1663,50 @@ if (Object.keys(layouts).length > 0) {
   });
 }
 
+function showCommandInput(command, placeholder) {
+  $("#commandLineWrapper").removeClass("hidden");
+  $("#commandLine").addClass("hidden");
+  $("#commandInput").removeClass("hidden");
+  $("#commandInput input").attr("placeholder", placeholder);
+  $("#commandInput input").val("");
+  $("#commandInput input").focus();
+  $("#commandInput input").attr("command", "");
+  $("#commandInput input").attr("command", command);
+}
+
+function triggerCommand(command) {
+  let subgroup = false;
+  let input = false;
+  let list = currentCommands[currentCommands.length - 1];
+  let sticky = false;
+  $.each(list.list, (i, obj) => {
+    if (obj.id == command) {
+      if (obj.input) {
+        input = true;
+        showCommandInput(obj.id, obj.display);
+      } else {
+        obj.exec();
+        if (obj.subgroup !== null && obj.subgroup !== undefined) {
+          subgroup = obj.subgroup;
+        }
+        if (obj.sticky === true) {
+          sticky = true;
+        }
+      }
+    }
+  });
+  if (!subgroup && !input && !sticky) {
+    try {
+      firebase.analytics().logEvent("usedCommandLine", {
+        command: command,
+      });
+    } catch (e) {
+      console.log("Analytics unavailable");
+    }
+    hideCommandLine();
+  }
+}
+
 $("#commandLine input").keyup((e) => {
   if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.code == "Tab")
     return;
@@ -1855,48 +1899,40 @@ $(document).keydown((e) => {
   }
 });
 
-function triggerCommand(command) {
-  let subgroup = false;
-  let input = false;
+function displayFoundCommands() {
+  $("#commandLine .suggestions").empty();
   let list = currentCommands[currentCommands.length - 1];
-  let sticky = false;
-  $.each(list.list, (i, obj) => {
-    if (obj.id == command) {
-      if (obj.input) {
-        input = true;
-        showCommandInput(obj.id, obj.display);
-      } else {
-        obj.exec();
-        if (obj.subgroup !== null && obj.subgroup !== undefined) {
-          subgroup = obj.subgroup;
-        }
-        if (obj.sticky === true) {
-          sticky = true;
-        }
-      }
+  $.each(list.list, (index, obj) => {
+    if (obj.found) {
+      $("#commandLine .suggestions").append(
+        '<div class="entry" command="' + obj.id + '">' + obj.display + "</div>"
+      );
     }
   });
-  if (!subgroup && !input && !sticky) {
-    try {
-      firebase.analytics().logEvent("usedCommandLine", {
-        command: command,
-      });
-    } catch (e) {
-      console.log("Analytics unavailable");
-    }
-    hideCommandLine();
+  if ($("#commandLine .suggestions .entry").length == 0) {
+    $("#commandLine .separator").css({ height: 0, margin: 0 });
+  } else {
+    $("#commandLine .separator").css({
+      height: "1px",
+      "margin-bottom": ".5rem",
+    });
   }
-}
-
-function showCommandInput(command, placeholder) {
-  $("#commandLineWrapper").removeClass("hidden");
-  $("#commandLine").addClass("hidden");
-  $("#commandInput").removeClass("hidden");
-  $("#commandInput input").attr("placeholder", placeholder);
-  $("#commandInput input").val("");
-  $("#commandInput input").focus();
-  $("#commandInput input").attr("command", "");
-  $("#commandInput input").attr("command", command);
+  let entries = $("#commandLine .suggestions .entry");
+  if (entries.length > 0) {
+    $(entries[0]).addClass("activeKeyboard");
+    try {
+      $.each(list.list, (index, obj) => {
+        if (obj.found) {
+          obj.hover();
+          return false;
+        }
+      });
+    } catch (e) {}
+  }
+  $("#commandLine .listTitle").remove();
+  // if(currentCommands.title != ''){
+  //   $("#commandLine .suggestions").before("<div class='listTitle'>"+currentCommands.title+"</div>");
+  // }
 }
 
 function updateSuggestedCommands() {
@@ -1945,40 +1981,4 @@ function updateSuggestedCommands() {
     });
   }
   displayFoundCommands();
-}
-
-function displayFoundCommands() {
-  $("#commandLine .suggestions").empty();
-  let list = currentCommands[currentCommands.length - 1];
-  $.each(list.list, (index, obj) => {
-    if (obj.found) {
-      $("#commandLine .suggestions").append(
-        '<div class="entry" command="' + obj.id + '">' + obj.display + "</div>"
-      );
-    }
-  });
-  if ($("#commandLine .suggestions .entry").length == 0) {
-    $("#commandLine .separator").css({ height: 0, margin: 0 });
-  } else {
-    $("#commandLine .separator").css({
-      height: "1px",
-      "margin-bottom": ".5rem",
-    });
-  }
-  let entries = $("#commandLine .suggestions .entry");
-  if (entries.length > 0) {
-    $(entries[0]).addClass("activeKeyboard");
-    try {
-      $.each(list.list, (index, obj) => {
-        if (obj.found) {
-          obj.hover();
-          return false;
-        }
-      });
-    } catch (e) {}
-  }
-  $("#commandLine .listTitle").remove();
-  // if(currentCommands.title != ''){
-  //   $("#commandLine .suggestions").before("<div class='listTitle'>"+currentCommands.title+"</div>");
-  // }
 }
