@@ -4482,13 +4482,6 @@ $("#wordsInput").keypress((event) => {
 
 let outOfFocusTimeouts = [];
 
-function clearTimeouts(timeouts) {
-  timeouts.forEach((to) => {
-    clearTimeout(to);
-    to = null;
-  });
-}
-
 $("#wordsInput").on("focus", (event) => {
   if (!resultVisible && config.showOutOfFocusWarning) {
     $("#words").css("transition", "none").removeClass("blurred");

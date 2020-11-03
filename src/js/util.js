@@ -17,3 +17,10 @@ function accountIconLoading(truefalse) {
     $("#top #menu .account").css("opacity", 1);
   }
 }
+
+function clearTimeouts(timeouts) {
+  timeouts.forEach((to) => {
+    clearTimeout(to);
+    to = null;
+  });
+}
