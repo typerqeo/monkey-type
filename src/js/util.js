@@ -24,3 +24,19 @@ function clearTimeouts(timeouts) {
     to = null;
   });
 }
+
+function flipTestColors(tf) {
+  if (tf) {
+    $("#words").addClass("flipped");
+  } else {
+    $("#words").removeClass("flipped");
+  }
+}
+
+function applyColorfulMode(tc) {
+  if (tc) {
+    $("#words").addClass("colorfulMode");
+  } else {
+    $("#words").removeClass("colorfulMode");
+  }
+}

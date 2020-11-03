@@ -3396,22 +3396,6 @@ async function loadWordsHistory() {
   return true;
 }
 
-function flipTestColors(tf) {
-  if (tf) {
-    $("#words").addClass("flipped");
-  } else {
-    $("#words").removeClass("flipped");
-  }
-}
-
-function applyColorfulMode(tc) {
-  if (tc) {
-    $("#words").addClass("colorfulMode");
-  } else {
-    $("#words").removeClass("colorfulMode");
-  }
-}
-
 // function applyReadAheadMode(tc) {
 //   if (tc) {
 //     $("#words").addClass("readAheadMode");
