@@ -1844,6 +1844,19 @@ function hideLiveWpm() {
   $("#miniTimerAndLiveWpm .wpm").css("opacity", 0);
 }
 
+function showLiveWpm() {
+  if (!config.showLiveWpm) return;
+  if (!testActive) return;
+  if (config.timerStyle === "mini") {
+    $("#miniTimerAndLiveWpm .wpm").css("opacity", config.timerOpacity);
+  } else {
+    $("#liveWpm").css("opacity", config.timerOpacity);
+  }
+  // if (config.timerStyle === "text") {
+  //   $("#timerNumber").css("opacity", config.timerOpacity);
+  // }
+}
+
 let resultCalculating = false;
 function showResult(difficultyFailed = false) {
   resultCalculating = true;
@@ -3284,19 +3297,6 @@ function updateLiveWpm(wpm, raw) {
   document.querySelector("#miniTimerAndLiveWpm .wpm").innerHTML = number;
   document.querySelector("#liveWpm").innerHTML = number;
   // $("#liveWpm").html(wpm);
-}
-
-function showLiveWpm() {
-  if (!config.showLiveWpm) return;
-  if (!testActive) return;
-  if (config.timerStyle === "mini") {
-    $("#miniTimerAndLiveWpm .wpm").css("opacity", config.timerOpacity);
-  } else {
-    $("#liveWpm").css("opacity", config.timerOpacity);
-  }
-  // if (config.timerStyle === "text") {
-  //   $("#timerNumber").css("opacity", config.timerOpacity);
-  // }
 }
 
 function updateAccountLoginButton() {
