@@ -365,6 +365,11 @@ function setFocus(foc) {
   }
 }
 
+function setToggleSettings(state, nosave) {
+  setPunctuation(state, nosave);
+  setNumbers(state, nosave);
+}
+
 async function initWords() {
   testActive = false;
   wordsList = [];
@@ -548,11 +553,6 @@ function arrangeCharactersRightToLeft() {
 
 function arrangeCharactersLeftToRight() {
   $("#words").removeClass("rightToLeftTest");
-}
-
-function setToggleSettings(state, nosave) {
-  setPunctuation(state, nosave);
-  setNumbers(state, nosave);
 }
 
 function emulateLayout(event) {
