@@ -1631,6 +1631,222 @@ function showCrown() {
       "easeOutCubic"
     );
 }
+
+let ctx = $("#wpmChart");
+let wpmOverTimeChart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        label: "wpm",
+        data: [],
+        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        borderColor: "rgba(125, 125, 125, 1)",
+        borderWidth: 2,
+        yAxisID: "wpm",
+        order: 2,
+        radius: 2,
+      },
+      {
+        label: "raw",
+        data: [],
+        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        borderColor: "rgba(125, 125, 125, 1)",
+        borderWidth: 2,
+        yAxisID: "raw",
+        order: 3,
+        radius: 2,
+      },
+      {
+        label: "errors",
+        data: [],
+        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        borderColor: "rgba(255, 125, 125, 1)",
+        pointBackgroundColor: "rgba(255, 125, 125, 1)",
+        borderWidth: 2,
+        order: 1,
+        yAxisID: "error",
+        // barPercentage: 0.1,
+        maxBarThickness: 10,
+        type: "scatter",
+        pointStyle: "crossRot",
+        radius: function (context) {
+          var index = context.dataIndex;
+          var value = context.dataset.data[index];
+          return value.y <= 0 ? 0 : 3;
+        },
+        pointHoverRadius: function (context) {
+          var index = context.dataIndex;
+          var value = context.dataset.data[index];
+          return value.y <= 0 ? 0 : 5;
+        },
+      },
+    ],
+  },
+  options: {
+    tooltips: {
+      titleFontFamily: "Roboto Mono",
+      bodyFontFamily: "Roboto Mono",
+      mode: "index",
+      intersect: false,
+      callbacks: {
+        afterLabel: function (ti, data) {
+          try {
+            $(".wordInputAfter").remove();
+
+            let wordsToHighlight =
+              keypressPerSecond[parseInt(ti.xLabel) - 1].words;
+
+            let unique = [...new Set(wordsToHighlight)];
+            unique.forEach((wordIndex) => {
+              let wordEl = $($("#resultWordsHistory .words .word")[wordIndex]);
+              let input = wordEl.attr("input");
+              if (input != undefined)
+                wordEl.append(`<div class="wordInputAfter">${input}</div>`);
+            });
+          } catch (e) {}
+        },
+      },
+    },
+    legend: {
+      display: false,
+      labels: {
+        defaultFontFamily: "Roboto Mono",
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+    // hover: {
+    //   mode: 'x',
+    //   intersect: false
+    // },
+    scales: {
+      xAxes: [
+        {
+          ticks: {
+            fontFamily: "Roboto Mono",
+            autoSkip: true,
+            autoSkipPadding: 40,
+          },
+          display: true,
+          scaleLabel: {
+            display: false,
+            labelString: "Seconds",
+            fontFamily: "Roboto Mono",
+          },
+        },
+      ],
+      yAxes: [
+        {
+          id: "wpm",
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: "Words per Minute",
+            fontFamily: "Roboto Mono",
+          },
+          ticks: {
+            fontFamily: "Roboto Mono",
+            beginAtZero: true,
+            min: 0,
+            autoSkip: true,
+            autoSkipPadding: 40,
+          },
+          gridLines: {
+            display: true,
+          },
+        },
+        {
+          id: "raw",
+          display: false,
+          scaleLabel: {
+            display: true,
+            labelString: "Raw Words per Minute",
+            fontFamily: "Roboto Mono",
+          },
+          ticks: {
+            fontFamily: "Roboto Mono",
+            beginAtZero: true,
+            min: 0,
+            autoSkip: true,
+            autoSkipPadding: 40,
+          },
+          gridLines: {
+            display: false,
+          },
+        },
+        {
+          id: "error",
+          display: true,
+          position: "right",
+          scaleLabel: {
+            display: true,
+            labelString: "Errors",
+            fontFamily: "Roboto Mono",
+          },
+          ticks: {
+            precision: 0,
+            fontFamily: "Roboto Mono",
+            beginAtZero: true,
+            autoSkip: true,
+            autoSkipPadding: 40,
+          },
+          gridLines: {
+            display: false,
+          },
+        },
+      ],
+    },
+    annotation: {
+      annotations: [
+        {
+          enabled: false,
+          type: "line",
+          mode: "horizontal",
+          scaleID: "wpm",
+          value: "-30",
+          borderColor: "red",
+          borderWidth: 1,
+          borderDash: [2, 2],
+          label: {
+            // Background color of label, default below
+            backgroundColor: "blue",
+            fontFamily: "Roboto Mono",
+
+            // Font size of text, inherits from global
+            fontSize: 11,
+
+            // Font style of text, default below
+            fontStyle: "normal",
+
+            // Font color of text, default below
+            fontColor: "#fff",
+
+            // Padding of label to add left/right, default below
+            xPadding: 6,
+
+            // Padding of label to add top/bottom, default below
+            yPadding: 6,
+
+            // Radius of label rectangle, default below
+            cornerRadius: 3,
+
+            // Anchor position of label on line, can be one of: top, bottom, left, right, center. Default below.
+            position: "center",
+
+            // Whether the label is enabled and should be displayed
+            enabled: true,
+
+            // Text to display in label - default is null. Provide an array to display values on a new line
+            content: "PB",
+          },
+        },
+      ],
+    },
+  },
+});
+
 let resultCalculating = false;
 function showResult(difficultyFailed = false) {
   resultCalculating = true;
@@ -5165,219 +5381,4 @@ window.addEventListener("keydown", function (e) {
   if (e.keyCode == 32 && e.target == document.body) {
     e.preventDefault();
   }
-});
-
-let ctx = $("#wpmChart");
-let wpmOverTimeChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: "wpm",
-        data: [],
-        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
-        borderColor: "rgba(125, 125, 125, 1)",
-        borderWidth: 2,
-        yAxisID: "wpm",
-        order: 2,
-        radius: 2,
-      },
-      {
-        label: "raw",
-        data: [],
-        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
-        borderColor: "rgba(125, 125, 125, 1)",
-        borderWidth: 2,
-        yAxisID: "raw",
-        order: 3,
-        radius: 2,
-      },
-      {
-        label: "errors",
-        data: [],
-        // backgroundColor: 'rgba(255, 255, 255, 0.25)',
-        borderColor: "rgba(255, 125, 125, 1)",
-        pointBackgroundColor: "rgba(255, 125, 125, 1)",
-        borderWidth: 2,
-        order: 1,
-        yAxisID: "error",
-        // barPercentage: 0.1,
-        maxBarThickness: 10,
-        type: "scatter",
-        pointStyle: "crossRot",
-        radius: function (context) {
-          var index = context.dataIndex;
-          var value = context.dataset.data[index];
-          return value.y <= 0 ? 0 : 3;
-        },
-        pointHoverRadius: function (context) {
-          var index = context.dataIndex;
-          var value = context.dataset.data[index];
-          return value.y <= 0 ? 0 : 5;
-        },
-      },
-    ],
-  },
-  options: {
-    tooltips: {
-      titleFontFamily: "Roboto Mono",
-      bodyFontFamily: "Roboto Mono",
-      mode: "index",
-      intersect: false,
-      callbacks: {
-        afterLabel: function (ti, data) {
-          try {
-            $(".wordInputAfter").remove();
-
-            let wordsToHighlight =
-              keypressPerSecond[parseInt(ti.xLabel) - 1].words;
-
-            let unique = [...new Set(wordsToHighlight)];
-            unique.forEach((wordIndex) => {
-              let wordEl = $($("#resultWordsHistory .words .word")[wordIndex]);
-              let input = wordEl.attr("input");
-              if (input != undefined)
-                wordEl.append(`<div class="wordInputAfter">${input}</div>`);
-            });
-          } catch (e) {}
-        },
-      },
-    },
-    legend: {
-      display: false,
-      labels: {
-        defaultFontFamily: "Roboto Mono",
-      },
-    },
-    responsive: true,
-    maintainAspectRatio: false,
-    // hover: {
-    //   mode: 'x',
-    //   intersect: false
-    // },
-    scales: {
-      xAxes: [
-        {
-          ticks: {
-            fontFamily: "Roboto Mono",
-            autoSkip: true,
-            autoSkipPadding: 40,
-          },
-          display: true,
-          scaleLabel: {
-            display: false,
-            labelString: "Seconds",
-            fontFamily: "Roboto Mono",
-          },
-        },
-      ],
-      yAxes: [
-        {
-          id: "wpm",
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: "Words per Minute",
-            fontFamily: "Roboto Mono",
-          },
-          ticks: {
-            fontFamily: "Roboto Mono",
-            beginAtZero: true,
-            min: 0,
-            autoSkip: true,
-            autoSkipPadding: 40,
-          },
-          gridLines: {
-            display: true,
-          },
-        },
-        {
-          id: "raw",
-          display: false,
-          scaleLabel: {
-            display: true,
-            labelString: "Raw Words per Minute",
-            fontFamily: "Roboto Mono",
-          },
-          ticks: {
-            fontFamily: "Roboto Mono",
-            beginAtZero: true,
-            min: 0,
-            autoSkip: true,
-            autoSkipPadding: 40,
-          },
-          gridLines: {
-            display: false,
-          },
-        },
-        {
-          id: "error",
-          display: true,
-          position: "right",
-          scaleLabel: {
-            display: true,
-            labelString: "Errors",
-            fontFamily: "Roboto Mono",
-          },
-          ticks: {
-            precision: 0,
-            fontFamily: "Roboto Mono",
-            beginAtZero: true,
-            autoSkip: true,
-            autoSkipPadding: 40,
-          },
-          gridLines: {
-            display: false,
-          },
-        },
-      ],
-    },
-    annotation: {
-      annotations: [
-        {
-          enabled: false,
-          type: "line",
-          mode: "horizontal",
-          scaleID: "wpm",
-          value: "-30",
-          borderColor: "red",
-          borderWidth: 1,
-          borderDash: [2, 2],
-          label: {
-            // Background color of label, default below
-            backgroundColor: "blue",
-            fontFamily: "Roboto Mono",
-
-            // Font size of text, inherits from global
-            fontSize: 11,
-
-            // Font style of text, default below
-            fontStyle: "normal",
-
-            // Font color of text, default below
-            fontColor: "#fff",
-
-            // Padding of label to add left/right, default below
-            xPadding: 6,
-
-            // Padding of label to add top/bottom, default below
-            yPadding: 6,
-
-            // Radius of label rectangle, default below
-            cornerRadius: 3,
-
-            // Anchor position of label on line, can be one of: top, bottom, left, right, center. Default below.
-            position: "center",
-
-            // Whether the label is enabled and should be displayed
-            enabled: true,
-
-            // Text to display in label - default is null. Provide an array to display values on a new line
-            content: "PB",
-          },
-        },
-      ],
-    },
-  },
 });
