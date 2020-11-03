@@ -37,599 +37,9 @@ let showCommandLine = () => {
   $("#commandLine input").focus();
 };
 
-let currentCommands = [];
-
-let commands = {
-  title: "",
-  list: [
-    {
-      id: "togglePunctuation",
-      display: "Toggle punctuation",
-      exec: () => {
-        togglePunctuation();
-        restartTest();
-      },
-    },
-    {
-      id: "changeMode",
-      display: "Change mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsMode);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeTimeConfig",
-      display: "Change time config...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsTimeConfig);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeWordCount",
-      display: "Change word count...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsWordCount);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeQuoteLength",
-      display: "Change quote length...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsQuoteLengthConfig);
-        showCommandLine();
-      },
-    },
-    {
-      visible: false,
-      id: "changeTags",
-      display: "Change tags...",
-      subgroup: true,
-      exec: () => {
-        updateCommandsTagsList();
-        currentCommands.push(commandsTags);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeConfidenceMode",
-      display: "Change confidence mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsConfidenceMode);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeStopOnError",
-      display: "Change stop on error...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsStopOnError);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeSoundOnClick",
-      display: "Change sound on click...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsSoundOnClick);
-        showCommandLine();
-      },
-    },
-    {
-      id: "toggleNumbers",
-      display: "Toggle numbers",
-      exec: () => {
-        toggleNumbers();
-        restartTest();
-      },
-    },
-    {
-      id: "toggleSmoothCaret",
-      display: "Toggle smooth caret",
-      exec: () => {
-        toggleSmoothCaret();
-      },
-    },
-    {
-      id: "toggleQuickTab",
-      display: "Toggle quick tab mode",
-      exec: () => {
-        toggleQuickTabMode();
-      },
-    },
-    {
-      id: "toggleShowLiveWpm",
-      display: "Toggle live wpm display",
-      exec: () => {
-        toggleShowLiveWpm();
-        saveConfigToCookie();
-      },
-    },
-    {
-      id: "toggleTimerBar",
-      display: "Toggle timer display",
-      exec: () => {
-        toggleShowTimerProgress();
-        saveConfigToCookie();
-      },
-    },
-    {
-      id: "toggleKeyTips",
-      display: "Toggle keybind tips",
-      exec: () => {
-        toggleKeyTips();
-      },
-    },
-    {
-      id: "toggleFreedom",
-      display: "Toggle freedom mode",
-      exec: () => {
-        toggleFreedomMode();
-      },
-    },
-    {
-      id: "toggleBlindMode",
-      display: "Toggle blind mode",
-      exec: () => {
-        toggleBlindMode();
-      },
-    },
-    {
-      id: "toggleIndicateTypos",
-      display: "Toggle indicate typos",
-      exec: () => {
-        toggleIndicateTypos();
-      },
-    },
-    // {
-    //   id: "toggleReadAheadMode",
-    //   display: "Toggle read ahead mode",
-    //   exec: () => {
-    //     toggleReadAheadMode();
-    //   },
-    // },
-    {
-      id: "toggleQuickEnd",
-      display: "Toggle quick end",
-      exec: () => {
-        toggleQuickEnd();
-      },
-    },
-    {
-      id: "singleListCommandLine",
-      display: "Single list command line...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsSingleListCommandLine);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changePaceCaret",
-      display: "Change min wpm mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsMinWpm);
-        showCommandLine();
-      },
-    },
-    {
-      id: "togglePlaySoundOnError",
-      display: "Toggle play sound on error",
-      exec: () => {
-        togglePlaySoundOnError();
-      },
-    },
-    {
-      id: "toggleFlipTestColors",
-      display: "Toggle flip test colors",
-      exec: () => {
-        toggleFlipTestColors();
-      },
-    },
-    {
-      id: "toggleSmoothLineScroll",
-      display: "Toggle smooth line scroll",
-      exec: () => {
-        toggleSmoothLineScroll();
-      },
-    },
-    {
-      id: "toggleAlwaysShowDecimalPlaces",
-      display: "Toggle always show decimal places",
-      exec: () => {
-        toggleAlwaysShowDecimalPlaces();
-      },
-    },
-    {
-      id: "toggleAlwaysShowCPM",
-      display: "Toggle always show CPM",
-      exec: () => {
-        toggleAlwaysShowCPM();
-      },
-    },
-    {
-      id: "toggleSwapEscAndTab",
-      display: "Toggle swap esc and tab",
-      exec: () => {
-        toggleSwapEscAndTab();
-      },
-    },
-    {
-      id: "toggleShowAllLines",
-      display: "Toggle show all lines",
-      exec: () => {
-        toggleShowAllLines();
-      },
-    },
-    {
-      id: "toggleColorfulMode",
-      display: "Toggle colorful mode",
-      exec: () => {
-        toggleColorfulMode();
-      },
-    },
-    {
-      id: "toggleShowOutOfFocusWarning",
-      display: "Toggle out of focus warning",
-      exec: () => {
-        toggleShowOutOfFocusWarning();
-      },
-    },
-    {
-      id: "togglePresetCustomTheme",
-      display: "Toggle preset/custom theme",
-      exec: () => {
-        togglePresetCustomTheme();
-      },
-    },
-    {
-      id: "changeDifficulty",
-      display: "Change difficulty...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsDifficulty);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeCaretStyle",
-      display: "Change caret style...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsCaretStyle);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changePaceCaret",
-      display: "Change pace caret mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsPaceCaret);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changePaceCaretStyle",
-      display: "Change pace caret style...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsPaceCaretStyle);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeTimerStyle",
-      display: "Change timer/progress style...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsTimerStyle);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeTimerColor",
-      display: "Change timer/progress color...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsTimerColor);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeTimerOpacity",
-      display: "Change timer/progress opacity...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsTimerOpacity);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeHighlightMode",
-      display: "Change highlight mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsHighlightMode);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeTheme",
-      display: "Change theme...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsThemes);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeRandomTheme",
-      display: "Change random theme...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsRandomTheme);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeLanguage",
-      display: "Change language...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsLanguages);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeFunbox",
-      display: "Change funbox...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsFunbox);
-        showCommandLine();
-      },
-    },
-    {
-      id: "toggleCapsLockBackspace",
-      display: "Toggle caps lock backspace",
-      exec: () => {
-        toggleCapsLockBackspace();
-      },
-    },
-    {
-      id: "changeLayout",
-      display: "Change layout...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsLayouts);
-        showCommandLine();
-      },
-    },
-    {
-      id: "toggleKeymap",
-      display: "Change keymap mode...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsKeymapMode);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeKeymapStyle",
-      display: "Change keymap style...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsKeymapStyle);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeKeymapLayout",
-      display: "Change keymap layout...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsKeymapLayouts);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeFontSize",
-      display: "Change font size...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsFontSize);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changeFontFamily",
-      display: "Change font family...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsFonts);
-        showCommandLine();
-      },
-    },
-    {
-      id: "changePageWidth",
-      display: "Change page width...",
-      subgroup: true,
-      exec: () => {
-        currentCommands.push(commandsPageWidth);
-        showCommandLine();
-      },
-    },
-    {
-      id: "randomiseTheme",
-      display: "Next random theme",
-      exec: () => randomiseTheme(),
-    },
-    {
-      id: "viewTypingPage",
-      display: "View Typing Page",
-      exec: () => $("#top #menu .icon-button.view-start").click(),
-    },
-    {
-      id: "viewLeaderboards",
-      display: "View Leaderboards Page",
-      exec: () => $("#top #menu .icon-button.view-leaderboards").click(),
-    },
-    {
-      id: "viewAbout",
-      display: "View About Page",
-      exec: () => $("#top #menu .icon-button.view-about").click(),
-    },
-    {
-      id: "viewSettings",
-      display: "View Settings Page",
-      exec: () => $("#top #menu .icon-button.view-settings").click(),
-    },
-    {
-      id: "viewAccount",
-      display: "View Account Page",
-      exec: () =>
-        $("#top #menu .icon-button.view-account").hasClass("hidden")
-          ? $("#top #menu .icon-button.view-login").click()
-          : $("#top #menu .icon-button.view-account").click(),
-    },
-    {
-      id: "toggleFullscreen",
-      display: "Toggle Fullscreen",
-      exec: () => {
-        toggleFullscreen();
-      },
-    },
-    {
-      id: "bailOut",
-      display: "Bail out...",
-      subgroup: true,
-      visible: false,
-      exec: () => {
-        currentCommands.push({
-          title: "Are you sure...",
-          list: [
-            {
-              id: "bailOutNo",
-              display: "Nevermind",
-              exec: () => {
-                hideCommandLine();
-              },
-            },
-            {
-              id: "bailOutForSure",
-              display: "Yes, I am sure",
-              exec: () => {
-                if (
-                  (config.mode === "custom" &&
-                    customTextIsRandom &&
-                    customTextWordCount >= 5000) ||
-                  (config.mode === "custom" &&
-                    !customTextIsRandom &&
-                    customText.length >= 5000) ||
-                  (config.mode === "words" && config.words >= 5000) ||
-                  config.words === 0 ||
-                  (config.mode === "time" &&
-                    (config.time >= 3600 || config.time === 0))
-                ) {
-                  bailout = true;
-                  showResult();
-                } else {
-                  showNotification(
-                    "You can only bailout out of test longer than 3600 seconds / 5000 words.",
-                    5000
-                  );
-                }
-              },
-            },
-          ],
-        });
-        showCommandLine();
-      },
-    },
-    {
-      id: "joinDiscord",
-      display: "Join the Discord server",
-      exec: () => {
-        window.open("https://discord.gg/monkeytype");
-      },
-    },
-  ],
-};
-
-currentCommands.push(commands);
-
-function addChildCommands(
-  unifiedCommands,
-  commandItem,
-  parentCommandDisplay = ""
-) {
-  let commandItemDisplay = commandItem.display.replace(/\s?\.\.\.$/g, "");
-  if (parentCommandDisplay)
-    commandItemDisplay = parentCommandDisplay + " > " + commandItemDisplay;
-  if (commandItem.subgroup) {
-    try {
-      commandItem.exec();
-      const currentCommandsIndex = currentCommands.length - 1;
-      currentCommands[currentCommandsIndex].list.forEach((cmd) =>
-        addChildCommands(unifiedCommands, cmd, commandItemDisplay)
-      );
-      currentCommands.pop();
-    } catch (e) {}
-  } else {
-    let tempCommandItem = { ...commandItem };
-    if (parentCommandDisplay) tempCommandItem.display = commandItemDisplay;
-    unifiedCommands.push(tempCommandItem);
-  }
-}
-
-function generateSingleListOfCommands() {
-  const allCommands = [];
-  const oldShowCommandLine = showCommandLine;
-  showCommandLine = () => {};
-  commands.list.forEach((c) => addChildCommands(allCommands, c));
-  showCommandLine = oldShowCommandLine;
-  return {
-    title: "All Commands",
-    list: allCommands,
-  };
-}
-
-function isSingleListCommandLineActive() {
-  return $("#commandLine").hasClass("allCommands");
-}
-
-function useSingleListCommandLine(show = true) {
-  let allCommands = generateSingleListOfCommands();
-  if (config.singleListCommandLine == "manual")
-    currentCommands.push(allCommands);
-  else if (config.singleListCommandLine == "on")
-    currentCommands = [allCommands];
-
-  if (config.singleListCommandLine != "off")
-    $("#commandLine").addClass("allCommands");
-  if (show) showCommandLine();
-}
-
-function restoreOldCommandLine(show = true) {
-  if (isSingleListCommandLineActive()) {
-    $("#commandLine").removeClass("allCommands");
-    currentCommands = currentCommands.filter((l) => l.title != "All Commands");
-    if (currentCommands.length < 1) currentCommands = [commands];
-  }
-  if (show) showCommandLine();
-}
-
+// ----------------------------
+// ------ command groups ------
+// ----------------------------
 let commandsPageWidth = {
   title: "Change page width...",
   list: [
@@ -1404,6 +814,606 @@ let commandsTags = {
   title: "Change tags...",
   list: [],
 };
+
+// ------------------------------
+// ------ current commands ------
+// ------------------------------
+// (filled after commands section)
+let currentCommands = [];
+
+// --------------------------
+// ------ all commands ------
+// --------------------------
+let commands = {
+  title: "",
+  list: [
+    {
+      id: "togglePunctuation",
+      display: "Toggle punctuation",
+      exec: () => {
+        togglePunctuation();
+        restartTest();
+      },
+    },
+    {
+      id: "changeMode",
+      display: "Change mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsMode);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeTimeConfig",
+      display: "Change time config...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsTimeConfig);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeWordCount",
+      display: "Change word count...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsWordCount);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeQuoteLength",
+      display: "Change quote length...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsQuoteLengthConfig);
+        showCommandLine();
+      },
+    },
+    {
+      visible: false,
+      id: "changeTags",
+      display: "Change tags...",
+      subgroup: true,
+      exec: () => {
+        updateCommandsTagsList();
+        currentCommands.push(commandsTags);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeConfidenceMode",
+      display: "Change confidence mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsConfidenceMode);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeStopOnError",
+      display: "Change stop on error...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsStopOnError);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeSoundOnClick",
+      display: "Change sound on click...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsSoundOnClick);
+        showCommandLine();
+      },
+    },
+    {
+      id: "toggleNumbers",
+      display: "Toggle numbers",
+      exec: () => {
+        toggleNumbers();
+        restartTest();
+      },
+    },
+    {
+      id: "toggleSmoothCaret",
+      display: "Toggle smooth caret",
+      exec: () => {
+        toggleSmoothCaret();
+      },
+    },
+    {
+      id: "toggleQuickTab",
+      display: "Toggle quick tab mode",
+      exec: () => {
+        toggleQuickTabMode();
+      },
+    },
+    {
+      id: "toggleShowLiveWpm",
+      display: "Toggle live wpm display",
+      exec: () => {
+        toggleShowLiveWpm();
+        saveConfigToCookie();
+      },
+    },
+    {
+      id: "toggleTimerBar",
+      display: "Toggle timer display",
+      exec: () => {
+        toggleShowTimerProgress();
+        saveConfigToCookie();
+      },
+    },
+    {
+      id: "toggleKeyTips",
+      display: "Toggle keybind tips",
+      exec: () => {
+        toggleKeyTips();
+      },
+    },
+    {
+      id: "toggleFreedom",
+      display: "Toggle freedom mode",
+      exec: () => {
+        toggleFreedomMode();
+      },
+    },
+    {
+      id: "toggleBlindMode",
+      display: "Toggle blind mode",
+      exec: () => {
+        toggleBlindMode();
+      },
+    },
+    {
+      id: "toggleIndicateTypos",
+      display: "Toggle indicate typos",
+      exec: () => {
+        toggleIndicateTypos();
+      },
+    },
+    // {
+    //   id: "toggleReadAheadMode",
+    //   display: "Toggle read ahead mode",
+    //   exec: () => {
+    //     toggleReadAheadMode();
+    //   },
+    // },
+    {
+      id: "toggleQuickEnd",
+      display: "Toggle quick end",
+      exec: () => {
+        toggleQuickEnd();
+      },
+    },
+    {
+      id: "singleListCommandLine",
+      display: "Single list command line...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsSingleListCommandLine);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changePaceCaret",
+      display: "Change min wpm mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsMinWpm);
+        showCommandLine();
+      },
+    },
+    {
+      id: "togglePlaySoundOnError",
+      display: "Toggle play sound on error",
+      exec: () => {
+        togglePlaySoundOnError();
+      },
+    },
+    {
+      id: "toggleFlipTestColors",
+      display: "Toggle flip test colors",
+      exec: () => {
+        toggleFlipTestColors();
+      },
+    },
+    {
+      id: "toggleSmoothLineScroll",
+      display: "Toggle smooth line scroll",
+      exec: () => {
+        toggleSmoothLineScroll();
+      },
+    },
+    {
+      id: "toggleAlwaysShowDecimalPlaces",
+      display: "Toggle always show decimal places",
+      exec: () => {
+        toggleAlwaysShowDecimalPlaces();
+      },
+    },
+    {
+      id: "toggleAlwaysShowCPM",
+      display: "Toggle always show CPM",
+      exec: () => {
+        toggleAlwaysShowCPM();
+      },
+    },
+    {
+      id: "toggleSwapEscAndTab",
+      display: "Toggle swap esc and tab",
+      exec: () => {
+        toggleSwapEscAndTab();
+      },
+    },
+    {
+      id: "toggleShowAllLines",
+      display: "Toggle show all lines",
+      exec: () => {
+        toggleShowAllLines();
+      },
+    },
+    {
+      id: "toggleColorfulMode",
+      display: "Toggle colorful mode",
+      exec: () => {
+        toggleColorfulMode();
+      },
+    },
+    {
+      id: "toggleShowOutOfFocusWarning",
+      display: "Toggle out of focus warning",
+      exec: () => {
+        toggleShowOutOfFocusWarning();
+      },
+    },
+    {
+      id: "togglePresetCustomTheme",
+      display: "Toggle preset/custom theme",
+      exec: () => {
+        togglePresetCustomTheme();
+      },
+    },
+    {
+      id: "changeDifficulty",
+      display: "Change difficulty...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsDifficulty);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeCaretStyle",
+      display: "Change caret style...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsCaretStyle);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changePaceCaret",
+      display: "Change pace caret mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsPaceCaret);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changePaceCaretStyle",
+      display: "Change pace caret style...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsPaceCaretStyle);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeTimerStyle",
+      display: "Change timer/progress style...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsTimerStyle);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeTimerColor",
+      display: "Change timer/progress color...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsTimerColor);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeTimerOpacity",
+      display: "Change timer/progress opacity...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsTimerOpacity);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeHighlightMode",
+      display: "Change highlight mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsHighlightMode);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeTheme",
+      display: "Change theme...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsThemes);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeRandomTheme",
+      display: "Change random theme...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsRandomTheme);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeLanguage",
+      display: "Change language...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsLanguages);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeFunbox",
+      display: "Change funbox...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsFunbox);
+        showCommandLine();
+      },
+    },
+    {
+      id: "toggleCapsLockBackspace",
+      display: "Toggle caps lock backspace",
+      exec: () => {
+        toggleCapsLockBackspace();
+      },
+    },
+    {
+      id: "changeLayout",
+      display: "Change layout...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsLayouts);
+        showCommandLine();
+      },
+    },
+    {
+      id: "toggleKeymap",
+      display: "Change keymap mode...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsKeymapMode);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeKeymapStyle",
+      display: "Change keymap style...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsKeymapStyle);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeKeymapLayout",
+      display: "Change keymap layout...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsKeymapLayouts);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeFontSize",
+      display: "Change font size...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsFontSize);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changeFontFamily",
+      display: "Change font family...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsFonts);
+        showCommandLine();
+      },
+    },
+    {
+      id: "changePageWidth",
+      display: "Change page width...",
+      subgroup: true,
+      exec: () => {
+        currentCommands.push(commandsPageWidth);
+        showCommandLine();
+      },
+    },
+    {
+      id: "randomiseTheme",
+      display: "Next random theme",
+      exec: () => randomiseTheme(),
+    },
+    {
+      id: "viewTypingPage",
+      display: "View Typing Page",
+      exec: () => $("#top #menu .icon-button.view-start").click(),
+    },
+    {
+      id: "viewLeaderboards",
+      display: "View Leaderboards Page",
+      exec: () => $("#top #menu .icon-button.view-leaderboards").click(),
+    },
+    {
+      id: "viewAbout",
+      display: "View About Page",
+      exec: () => $("#top #menu .icon-button.view-about").click(),
+    },
+    {
+      id: "viewSettings",
+      display: "View Settings Page",
+      exec: () => $("#top #menu .icon-button.view-settings").click(),
+    },
+    {
+      id: "viewAccount",
+      display: "View Account Page",
+      exec: () =>
+        $("#top #menu .icon-button.view-account").hasClass("hidden")
+          ? $("#top #menu .icon-button.view-login").click()
+          : $("#top #menu .icon-button.view-account").click(),
+    },
+    {
+      id: "toggleFullscreen",
+      display: "Toggle Fullscreen",
+      exec: () => {
+        toggleFullscreen();
+      },
+    },
+    {
+      id: "bailOut",
+      display: "Bail out...",
+      subgroup: true,
+      visible: false,
+      exec: () => {
+        currentCommands.push({
+          title: "Are you sure...",
+          list: [
+            {
+              id: "bailOutNo",
+              display: "Nevermind",
+              exec: () => {
+                hideCommandLine();
+              },
+            },
+            {
+              id: "bailOutForSure",
+              display: "Yes, I am sure",
+              exec: () => {
+                if (
+                  (config.mode === "custom" &&
+                    customTextIsRandom &&
+                    customTextWordCount >= 5000) ||
+                  (config.mode === "custom" &&
+                    !customTextIsRandom &&
+                    customText.length >= 5000) ||
+                  (config.mode === "words" && config.words >= 5000) ||
+                  config.words === 0 ||
+                  (config.mode === "time" &&
+                    (config.time >= 3600 || config.time === 0))
+                ) {
+                  bailout = true;
+                  showResult();
+                } else {
+                  showNotification(
+                    "You can only bailout out of test longer than 3600 seconds / 5000 words.",
+                    5000
+                  );
+                }
+              },
+            },
+          ],
+        });
+        showCommandLine();
+      },
+    },
+    {
+      id: "joinDiscord",
+      display: "Join the Discord server",
+      exec: () => {
+        window.open("https://discord.gg/monkeytype");
+      },
+    },
+  ],
+};
+
+currentCommands.push(commands);
+
+function addChildCommands(
+  unifiedCommands,
+  commandItem,
+  parentCommandDisplay = ""
+) {
+  let commandItemDisplay = commandItem.display.replace(/\s?\.\.\.$/g, "");
+  if (parentCommandDisplay)
+    commandItemDisplay = parentCommandDisplay + " > " + commandItemDisplay;
+  if (commandItem.subgroup) {
+    try {
+      commandItem.exec();
+      const currentCommandsIndex = currentCommands.length - 1;
+      currentCommands[currentCommandsIndex].list.forEach((cmd) =>
+        addChildCommands(unifiedCommands, cmd, commandItemDisplay)
+      );
+      currentCommands.pop();
+    } catch (e) {}
+  } else {
+    let tempCommandItem = { ...commandItem };
+    if (parentCommandDisplay) tempCommandItem.display = commandItemDisplay;
+    unifiedCommands.push(tempCommandItem);
+  }
+}
+
+function generateSingleListOfCommands() {
+  const allCommands = [];
+  const oldShowCommandLine = showCommandLine;
+  showCommandLine = () => {};
+  commands.list.forEach((c) => addChildCommands(allCommands, c));
+  showCommandLine = oldShowCommandLine;
+  return {
+    title: "All Commands",
+    list: allCommands,
+  };
+}
+
+function isSingleListCommandLineActive() {
+  return $("#commandLine").hasClass("allCommands");
+}
+
+function useSingleListCommandLine(show = true) {
+  let allCommands = generateSingleListOfCommands();
+  if (config.singleListCommandLine == "manual")
+    currentCommands.push(allCommands);
+  else if (config.singleListCommandLine == "on")
+    currentCommands = [allCommands];
+
+  if (config.singleListCommandLine != "off")
+    $("#commandLine").addClass("allCommands");
+  if (show) showCommandLine();
+}
+
+function restoreOldCommandLine(show = true) {
+  if (isSingleListCommandLineActive()) {
+    $("#commandLine").removeClass("allCommands");
+    currentCommands = currentCommands.filter((l) => l.title != "All Commands");
+    if (currentCommands.length < 1) currentCommands = [commands];
+  }
+  if (show) showCommandLine();
+}
 
 function updateCommandsTagsList() {
   if (dbSnapshot.tags.length > 0) {
