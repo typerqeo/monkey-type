@@ -27,6 +27,7 @@ const gulpSrc = [
   "./src/js/account.js",
   "./src/js/account-handlers.js",
   "./src/js/script.js",
+  "./src/js/script-handlers.js",
 ];
 
 let eslintConfig = {
