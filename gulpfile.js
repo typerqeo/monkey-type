@@ -23,6 +23,7 @@ const gulpSrc = [
   "./src/js/leaderboards.js",
   "./src/js/settings.js",
   "./src/js/account.js",
+  "./src/js/account-handlers.js",
   "./src/js/script.js",
 ];
 
