@@ -81,24 +81,6 @@ let config = {
 let dbConfigLoaded = false;
 let configChangedBeforeDb = false;
 
-//cookies
-async function saveConfigToCookie(noDbCheck = false) {
-  if (!dbConfigLoaded && !noDbCheck) {
-    // console.log('config changed before db loaded!');
-    configChangedBeforeDb = true;
-  }
-  // showNotification('saving to cookie',1000);
-  let d = new Date();
-  d.setFullYear(d.getFullYear() + 1);
-  $.cookie("config", null);
-  $.cookie("config", JSON.stringify(config), {
-    expires: d,
-    path: "/",
-  });
-  restartCount = 0;
-  if (!noDbCheck) await saveConfigToDB();
-}
-
 async function saveConfigToDB() {
   if (firebase.auth().currentUser !== null) {
     // showNotification('saving to db',1000);
@@ -121,42 +103,22 @@ async function saveConfigToDB() {
   }
 }
 
-function resetConfig() {
-  config = {
-    ...defaultConfig,
-  };
-  applyConfig();
-  saveConfigToCookie();
-}
-
-function saveActiveTagsToCookie() {
-  let tags = [];
-
-  try {
-    dbSnapshot.tags.forEach((tag) => {
-      if (tag.active === true) {
-        tags.push(tag.id);
-      }
-    });
-    let d = new Date();
-    d.setFullYear(d.getFullYear() + 1);
-    $.cookie("activeTags", null);
-    $.cookie("activeTags", JSON.stringify(tags), {
-      expires: d,
-      path: "/",
-    });
-  } catch (e) {}
-}
-
-function loadConfigFromCookie() {
-  let newConfig = $.cookie("config");
-  if (newConfig !== undefined) {
-    newConfig = JSON.parse(newConfig);
-    applyConfig(newConfig);
-    cookieConfig = newConfig;
-    saveConfigToCookie(true);
+//cookies
+async function saveConfigToCookie(noDbCheck = false) {
+  if (!dbConfigLoaded && !noDbCheck) {
+    // console.log('config changed before db loaded!');
+    configChangedBeforeDb = true;
   }
-  restartTest(false, true);
+  // showNotification('saving to cookie',1000);
+  let d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  $.cookie("config", null);
+  $.cookie("config", JSON.stringify(config), {
+    expires: d,
+    path: "/",
+  });
+  restartCount = 0;
+  if (!noDbCheck) await saveConfigToDB();
 }
 
 function applyConfig(configObj) {
@@ -291,6 +253,44 @@ function applyConfig(configObj) {
     }
   });
   updateTestModesNotice();
+}
+
+function resetConfig() {
+  config = {
+    ...defaultConfig,
+  };
+  applyConfig();
+  saveConfigToCookie();
+}
+
+function saveActiveTagsToCookie() {
+  let tags = [];
+
+  try {
+    dbSnapshot.tags.forEach((tag) => {
+      if (tag.active === true) {
+        tags.push(tag.id);
+      }
+    });
+    let d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    $.cookie("activeTags", null);
+    $.cookie("activeTags", JSON.stringify(tags), {
+      expires: d,
+      path: "/",
+    });
+  } catch (e) {}
+}
+
+function loadConfigFromCookie() {
+  let newConfig = $.cookie("config");
+  if (newConfig !== undefined) {
+    newConfig = JSON.parse(newConfig);
+    applyConfig(newConfig);
+    cookieConfig = newConfig;
+    saveConfigToCookie(true);
+  }
+  restartTest(false, true);
 }
 
 function loadActiveTagsFromCookie() {
