@@ -3659,22 +3659,6 @@ function updateTestModesNotice() {
   }
 }
 
-$("#tagsWrapper").click((e) => {
-  if ($(e.target).attr("id") === "tagsWrapper") {
-    hideEditTags();
-  }
-});
-
-$("#tagsWrapper #tagsEdit .button").click((e) => {
-  tagsEdit();
-});
-
-$("#tagsWrapper #tagsEdit input").keypress((e) => {
-  if (e.keyCode == 13) {
-    tagsEdit();
-  }
-});
-
 function tagsEdit() {
   let action = $("#tagsWrapper #tagsEdit").attr("action");
   let inputVal = $("#tagsWrapper #tagsEdit input").val();
@@ -3752,6 +3736,22 @@ function tagsEdit() {
     );
   }
 }
+
+$("#tagsWrapper").click((e) => {
+  if ($(e.target).attr("id") === "tagsWrapper") {
+    hideEditTags();
+  }
+});
+
+$("#tagsWrapper #tagsEdit .button").click((e) => {
+  tagsEdit();
+});
+
+$("#tagsWrapper #tagsEdit input").keypress((e) => {
+  if (e.keyCode == 13) {
+    tagsEdit();
+  }
+});
 
 function showCapsWarning() {
   if ($("#capsWarning").hasClass("hidden")) {
