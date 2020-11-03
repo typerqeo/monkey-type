@@ -21,6 +21,7 @@ const gulpSrc = [
   "./src/js/commandline.js",
   "./src/js/commandline-handlers.js",
   "./src/js/leaderboards.js",
+  "./src/js/leaderboards-handlers.js",
   "./src/js/settings.js",
   "./src/js/account.js",
   "./src/js/account-handlers.js",
