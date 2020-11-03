@@ -1839,6 +1839,11 @@ let wpmOverTimeChart = new Chart(ctx, {
   },
 });
 
+function hideLiveWpm() {
+  $("#liveWpm").css("opacity", 0);
+  $("#miniTimerAndLiveWpm .wpm").css("opacity", 0);
+}
+
 let resultCalculating = false;
 function showResult(difficultyFailed = false) {
   resultCalculating = true;
@@ -3292,11 +3297,6 @@ function showLiveWpm() {
   // if (config.timerStyle === "text") {
   //   $("#timerNumber").css("opacity", config.timerOpacity);
   // }
-}
-
-function hideLiveWpm() {
-  $("#liveWpm").css("opacity", 0);
-  $("#miniTimerAndLiveWpm .wpm").css("opacity", 0);
 }
 
 function updateAccountLoginButton() {
