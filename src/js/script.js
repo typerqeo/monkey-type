@@ -3050,12 +3050,6 @@ function restartTest(withSameWordset = false, nosave = false) {
   // $(".active-key").classList.remove("active-key");
 }
 
-function focusWords() {
-  if (!$("#wordsWrapper").hasClass("hidden")) {
-    $("#wordsInput").focus();
-  }
-}
-
 function changeCustomText() {
   customText = prompt("Custom text").trim();
   customText = customText.replace(/[\n\r\t ]/gm, " ");

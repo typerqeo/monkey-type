@@ -183,3 +183,9 @@ function arrangeCharactersRightToLeft() {
 function arrangeCharactersLeftToRight() {
   $("#words").removeClass("rightToLeftTest");
 }
+
+function focusWords() {
+  if (!$("#wordsWrapper").hasClass("hidden")) {
+    $("#wordsInput").focus();
+  }
+}
